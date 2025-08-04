@@ -62,10 +62,12 @@ export function AddVendorModal({ isOpen, onClose, onSuccess }: AddVendorModalPro
   const analyzeMutation = useMutation({
     mutationFn: (data: { input: string }) => apiRequest("POST", "/api/competitors/analyze", data),
     onSuccess: (analysis: VendorAnalysis) => {
+      console.log("Analysis success:", analysis);
       setVendorAnalysis(analysis);
       setCurrentStep("review");
     },
     onError: (error) => {
+      console.error("Analysis error:", error);
       toast({
         title: "Analysis Failed",
         description: "Unable to analyze vendor input. Please try again.",
@@ -101,6 +103,7 @@ export function AddVendorModal({ isOpen, onClose, onSuccess }: AddVendorModalPro
   });
 
   const handleAnalyze = (data: VendorInputForm) => {
+    console.log("Starting analysis for:", data.input);
     setCurrentStep("analyzing");
     analyzeMutation.mutate({ input: data.input });
   };
@@ -148,6 +151,8 @@ export function AddVendorModal({ isOpen, onClose, onSuccess }: AddVendorModalPro
   };
 
   if (!isOpen) return null;
+
+  console.log("Current step:", currentStep, "Vendor analysis:", vendorAnalysis);
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" data-testid="add-vendor-modal">
