@@ -1,8 +1,8 @@
-# Competitor Pricing Tracker Dashboard
+# ScribeArena - AI Medical Scribe Competitive Intelligence Platform
 
 ## Overview
 
-This is a full-stack web application built for tracking and analyzing competitor pricing strategies. The system provides a comprehensive dashboard to monitor pricing changes, detect market trends, and receive alerts about competitor activities. Built with React frontend, Express backend, and PostgreSQL database, it offers real-time insights for competitive intelligence.
+ScribeArena is a comprehensive competitive intelligence platform for AI medical scribe products, providing in-depth insights into vendor digital performance, pricing strategies, and clinical documentation capabilities. The system enables healthcare professionals and organizations to compare AI scribe solutions through pricing analysis, SEO tracking, vendor comparison tools, and standardized clinical note evaluation.
 
 ## User Preferences
 
@@ -18,6 +18,13 @@ Preferred communication style: Simple, everyday language.
 - **Styling**: Tailwind CSS with custom design system variables
 - **Charts**: Recharts for data visualization and pricing trend displays
 - **Build Tool**: Vite for fast development and optimized production builds
+
+### Key Features
+- **Vendor Comparison**: Side-by-side analysis of up to 3 AI scribe vendors with pricing, SEO metrics, and feature comparison
+- **Example Note Generator**: Clinical documentation testing tool using standardized patient visits with real AI scribe outputs in SOAP format
+- **Feed System**: Vendor updates from official blog sources and market news with chronological ordering
+- **SEO Analytics**: Comprehensive tracking of domain ratings, meta descriptions, and technical SEO attributes
+- **Pricing Intelligence**: Real-time monitoring of competitor pricing plans and feature sets
 
 ### Backend Architecture
 - **Runtime**: Node.js with Express.js framework
@@ -47,3 +54,17 @@ Preferred communication style: Simple, everyday language.
 - **Monitoring**: Custom request logging and error tracking
 
 The architecture follows a clean separation of concerns with shared TypeScript schemas between frontend and backend, ensuring type consistency across the full stack. The modular design allows for easy scaling and feature additions while maintaining code quality and developer experience.
+
+## Recent Updates (August 2025)
+
+### Major Feature Additions
+- **Example Note Tool**: Added comprehensive SOAP note comparison functionality allowing clinicians to test AI scribe outputs using standardized patient visits
+- **Vendor Comparison Enhancement**: Implemented max 3 vendor selection with side-by-side pricing, SEO, and feature analysis
+- **Navigation Restructure**: Moved refresh/export controls and ScribeArena branding to sidebar navigation for cleaner interface
+- **Clinical Documentation Testing**: Integrated real patient transcript with AI-generated SOAP notes from multiple vendors
+
+### UI/UX Improvements
+- Renamed platform from "PriceTracker" to "ScribeArena" for better market positioning
+- Streamlined comparison interface by removing social media elements and optimizing for full-screen width
+- Added timestamp display near refresh controls in sidebar navigation
+- Implemented section-by-section SOAP note editor for custom clinical documentation
