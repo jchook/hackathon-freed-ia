@@ -6,7 +6,8 @@ import {
   insertPricingPlanSchema, 
   insertAlertSchema,
   insertReviewSchema,
-  insertReviewSummarySchema 
+  insertReviewSummarySchema,
+  insertFeedItemSchema
 } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -240,6 +241,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(competitors);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch competitors with reviews" });
+    }
+  });
+
+  // Feed items
+  app.get("/api/feed", async (req, res) => {
+    try {
+      const { source } = req.query;
+      const feedItems = source 
+        ? await storage.getFeedItemsBySource(source as string)
+        : await storage.getFeedItems();
+      res.json(feedItems);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch feed items" });
+    }
+  });
+
+  app.post("/api/feed", async (req, res) => {
+    try {
+      const validatedData = insertFeedItemSchema.parse(req.body);
+      const feedItem = await storage.createFeedItem(validatedData);
+      res.status(201).json(feedItem);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid feed item data" });
     }
   });
 

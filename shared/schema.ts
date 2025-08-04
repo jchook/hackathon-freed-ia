@@ -107,6 +107,23 @@ export const insertReviewSummarySchema = createInsertSchema(reviewSummary).omit(
   lastUpdated: true,
 });
 
+export const feedItems = pgTable("feed_items", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  competitorId: varchar("competitor_id").references(() => competitors.id), // null for generic market updates
+  title: text("title").notNull(),
+  content: text("content").notNull(), // snippet/excerpt
+  source: text("source").notNull(), // 'heidi', 'freed', 'sunoh', 'market'
+  sourceUrl: text("source_url").notNull(),
+  publishedAt: timestamp("published_at").notNull(),
+  tags: jsonb("tags").$type<string[]>().default([]),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertFeedItemSchema = createInsertSchema(feedItems).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type Competitor = typeof competitors.$inferSelect;
 export type InsertCompetitor = z.infer<typeof insertCompetitorSchema>;
@@ -125,6 +142,9 @@ export type InsertReview = z.infer<typeof insertReviewSchema>;
 
 export type ReviewSummary = typeof reviewSummary.$inferSelect;
 export type InsertReviewSummary = z.infer<typeof insertReviewSummarySchema>;
+
+export type FeedItem = typeof feedItems.$inferSelect;
+export type InsertFeedItem = z.infer<typeof insertFeedItemSchema>;
 
 // Combined types for API responses
 export type CompetitorWithPlans = Competitor & {

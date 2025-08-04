@@ -11,6 +11,8 @@ import {
   type InsertReview,
   type ReviewSummary,
   type InsertReviewSummary,
+  type FeedItem,
+  type InsertFeedItem,
   type CompetitorWithPlans,
   type CompetitorWithReviews,
   type DashboardStats
@@ -50,6 +52,11 @@ export interface IStorage {
   createReviewSummary(summary: InsertReviewSummary): Promise<ReviewSummary>;
   updateReviewSummary(id: string, summary: Partial<InsertReviewSummary>): Promise<ReviewSummary | undefined>;
   
+  // Feed Items
+  getFeedItems(): Promise<FeedItem[]>;
+  getFeedItemsBySource(source: string): Promise<FeedItem[]>;
+  createFeedItem(item: InsertFeedItem): Promise<FeedItem>;
+  
   // Dashboard
   getCompetitorsWithPlans(): Promise<CompetitorWithPlans[]>;
   getCompetitorsWithReviews(): Promise<CompetitorWithReviews[]>;
@@ -63,6 +70,7 @@ export class MemStorage implements IStorage {
   private alerts: Map<string, Alert> = new Map();
   private reviews: Map<string, Review> = new Map();
   private reviewSummaries: Map<string, ReviewSummary> = new Map();
+  private feedItems: Map<string, FeedItem> = new Map();
 
   constructor() {
     this.initializeData();
@@ -369,6 +377,102 @@ export class MemStorage implements IStorage {
     sampleReviews.forEach(review => {
       this.reviews.set(review.id, review);
     });
+
+    // Initialize feed items with recent updates
+    const sampleFeedItems: FeedItem[] = [
+      {
+        id: "feed-1",
+        competitorId: "heidi-1",
+        title: "Forms - PDF Form Completion Based on Session Details",
+        content: "Heidi can now complete your PDF forms based on your session details. Upload structured form templates such as pre-surgical screenings or insurance forms and Heidi will automatically complete fields and sections as instructed. No more manual paperwork, no more missed fields.",
+        source: "heidi",
+        sourceUrl: "https://www.heidihealth.com/changelog/july-2025-updates",
+        publishedAt: new Date("2025-07-23"),
+        tags: ["product-update", "forms", "automation"],
+        createdAt: new Date(),
+      },
+      {
+        id: "feed-2",
+        competitorId: "heidi-1",
+        title: "Calls (beta) - Automate Routine Patient Calls",
+        content: "Soon you'll be able to automate routine patient calls and front-desk queries so you and your staff can focus on what matters. Handle medication reviews, post-procedure follow-ups, appointment scheduling, and admin questions - all on autopilot.",
+        source: "heidi",
+        sourceUrl: "https://www.heidihealth.com/changelog/july-2025-updates",
+        publishedAt: new Date("2025-07-23"),
+        tags: ["product-update", "calls", "automation", "beta"],
+        createdAt: new Date(),
+      },
+      {
+        id: "feed-3",
+        competitorId: "heidi-1",
+        title: "Epic Integration Now Available",
+        content: "Heidi is now integrated with Epic. Write consult notes faster without leaving your EHR. Automatically pull patient data, generate notes with AI, and push polished drafts back to the record - all from within the Epic chart.",
+        source: "heidi",
+        sourceUrl: "https://www.heidihealth.com/changelog/july-2025-updates",
+        publishedAt: new Date("2025-07-23"),
+        tags: ["integration", "epic", "ehr"],
+        createdAt: new Date(),
+      },
+      {
+        id: "feed-4",
+        competitorId: "freed-1",
+        title: "Freed Raises $30 Million to Free Clinicians",
+        content: "Freed raised $30 million in Series A funding led by Sequoia Capital. But what does this mean for you — the clinicians? This funding enables us to accelerate development, expand our team, and continue delivering the AI scribe that saves you time.",
+        source: "freed",
+        sourceUrl: "https://www.getfreed.ai/blog/freed-raises-series-a",
+        publishedAt: new Date("2025-01-15"),
+        tags: ["funding", "series-a", "sequoia"],
+        createdAt: new Date(),
+      },
+      {
+        id: "feed-5",
+        competitorId: "freed-1",
+        title: "How Freed Handles Data, Privacy, & Compliance",
+        content: "A clear look at our security-first AI scribe — built for HIPAA compliance, clinician control, and peace of mind. We prioritize data security and never store patient recordings, ensuring your practice remains compliant.",
+        source: "freed",
+        sourceUrl: "https://www.getfreed.ai/blog/how-freed-handles-data-privacy-compliance",
+        publishedAt: new Date("2025-01-10"),
+        tags: ["security", "hipaa", "privacy"],
+        createdAt: new Date(),
+      },
+      {
+        id: "feed-6",
+        competitorId: "freed-1",
+        title: "Introducing Freed's New Template Library",
+        content: "A smarter, faster way to build and share templates — now available in every Freed account. Share, customize, and chart smarter with our comprehensive template system that adapts to your practice needs.",
+        source: "freed",
+        sourceUrl: "https://www.getfreed.ai/blog/freed-template-library",
+        publishedAt: new Date("2025-01-05"),
+        tags: ["templates", "customization", "productivity"],
+        createdAt: new Date(),
+      },
+      {
+        id: "feed-7",
+        competitorId: "heidi-1",
+        title: "Tasks and Past Sessions as Context",
+        content: "Tasks enables Heidi to automatically identify and organize action items from your clinical notes. Everything you need to follow up on is neatly color-coded in an interactive list next to your note. Plus, add previous sessions to Context with the click of a button.",
+        source: "heidi",
+        sourceUrl: "https://www.heidihealth.com/changelog/tasks-and-past-sessions-as-context",
+        publishedAt: new Date("2025-06-05"),
+        tags: ["tasks", "context", "workflow"],
+        createdAt: new Date(),
+      },
+      {
+        id: "feed-8",
+        competitorId: null,
+        title: "AI Medical Scribes Market Growth Accelerates",
+        content: "The AI medical scribe market is experiencing unprecedented growth as healthcare providers seek solutions to reduce documentation burden. Recent studies show 67% of physicians report significant time savings with AI scribes.",
+        source: "market",
+        sourceUrl: "https://example.com/market-research",
+        publishedAt: new Date("2025-01-20"),
+        tags: ["market-research", "growth", "adoption"],
+        createdAt: new Date(),
+      },
+    ];
+
+    sampleFeedItems.forEach(item => {
+      this.feedItems.set(item.id, item);
+    });
   }
 
   async getCompetitors(): Promise<Competitor[]> {
@@ -635,6 +739,29 @@ export class MemStorage implements IStorage {
       averageCustomerRating,
       totalReviews,
     };
+  }
+
+  // Feed Items
+  async getFeedItems(): Promise<FeedItem[]> {
+    return Array.from(this.feedItems.values()).sort((a, b) => 
+      b.publishedAt.getTime() - a.publishedAt.getTime()
+    );
+  }
+
+  async getFeedItemsBySource(source: string): Promise<FeedItem[]> {
+    const allItems = await this.getFeedItems();
+    return allItems.filter(item => item.source === source);
+  }
+
+  async createFeedItem(item: InsertFeedItem): Promise<FeedItem> {
+    const id = randomUUID();
+    const feedItem: FeedItem = {
+      id,
+      ...item,
+      createdAt: new Date(),
+    };
+    this.feedItems.set(id, feedItem);
+    return feedItem;
   }
 }
 
