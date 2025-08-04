@@ -49,62 +49,22 @@ export default function Reviews() {
         
         <div className="p-6 space-y-6">
           {/* Page Header */}
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">Customer Reviews</h1>
-              <p className="text-muted-foreground mt-2">
-                Authentic customer feedback and sentiment analysis from across the medical AI scribe market
-              </p>
-            </div>
-            {selectedVendor && (
-              <Badge 
-                variant="secondary" 
-                className="cursor-pointer"
-                onClick={() => setSelectedVendor(null)}
-                data-testid="clear-filter-badge"
-              >
-                Showing: {competitorsWithReviews?.find(c => c.id === selectedVendor)?.name} ✕
-              </Badge>
-            )}
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">Customer Reviews</h1>
+            <p className="text-muted-foreground mt-2">
+              Authentic customer feedback and sentiment analysis from across the medical AI scribe market
+            </p>
           </div>
 
-          {/* Reviews Section */}
-          <div className="space-y-6">
-            {filteredCompetitors.length === 0 ? (
-              <Card>
-                <CardContent className="text-center py-12">
-                  <Building className="w-16 h-16 mx-auto mb-4 text-muted-foreground opacity-50" />
-                  <h3 className="text-lg font-semibold mb-2">No Reviews Available</h3>
-                  <p className="text-muted-foreground">
-                    {selectedVendor 
-                      ? "This vendor doesn't have any reviews yet." 
-                      : "No customer reviews are currently available."}
-                  </p>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                {filteredCompetitors.map((competitor) => (
-                  <ReviewsPanel
-                    key={`reviews-${competitor.id}`}
-                    reviews={competitor.reviews || []}
-                    summary={competitor.reviewSummary}
-                    competitorName={competitor.name}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Vendor Selection */}
+          {/* Vendor Selection - Moved to top */}
           <Card data-testid="vendor-selection-card">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Building className="w-5 h-5" />
-                Filter by Vendor
+                Select Vendor
               </CardTitle>
               <CardDescription>
-                Click on a vendor name to view their specific reviews and feedback
+                Choose a vendor to view their specific reviews and customer feedback
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -168,6 +128,50 @@ export default function Reviews() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Current Selection Indicator */}
+          {selectedVendor && (
+            <div className="flex items-center gap-2">
+              <Badge variant="secondary" className="text-sm">
+                Currently viewing: {competitorsWithReviews?.find(c => c.id === selectedVendor)?.name}
+              </Badge>
+              <button
+                onClick={() => setSelectedVendor(null)}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                data-testid="clear-filter-button"
+              >
+                Clear filter
+              </button>
+            </div>
+          )}
+
+          {/* Reviews Section - Updates based on selection */}
+          <div className="space-y-6">
+            {filteredCompetitors.length === 0 ? (
+              <Card>
+                <CardContent className="text-center py-12">
+                  <Building className="w-16 h-16 mx-auto mb-4 text-muted-foreground opacity-50" />
+                  <h3 className="text-lg font-semibold mb-2">No Reviews Available</h3>
+                  <p className="text-muted-foreground">
+                    {selectedVendor 
+                      ? "This vendor doesn't have any reviews yet." 
+                      : "No customer reviews are currently available."}
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                {filteredCompetitors.map((competitor) => (
+                  <ReviewsPanel
+                    key={`reviews-${competitor.id}`}
+                    reviews={competitor.reviews || []}
+                    summary={competitor.reviewSummary}
+                    competitorName={competitor.name}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </main>
     </div>
