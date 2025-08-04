@@ -135,12 +135,26 @@ export default function Dashboard() {
                       <CardHeader className="pb-4">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-4">
-                            <div className={`w-16 h-16 bg-gradient-to-br ${
-                              competitor.name.includes("Heidi") ? "from-blue-500 to-purple-600" :
-                              competitor.name.includes("Freed") ? "from-green-500 to-blue-600" :
-                              "from-orange-500 to-red-600"
-                            } rounded-xl flex items-center justify-center`}>
-                              <span className="text-white font-bold text-xl">{competitor.name.charAt(0)}</span>
+                            <div className="w-16 h-16 rounded-xl flex items-center justify-center bg-white border border-gray-200 shadow-sm">
+                              {competitor.name.includes("Heidi") ? (
+                                <svg className="w-10 h-10" viewBox="0 0 40 40" fill="none">
+                                  <circle cx="20" cy="20" r="18" fill="#6366F1" />
+                                  <path d="M14 16h12M14 20h12M14 24h8" stroke="white" strokeWidth="2" strokeLinecap="round" />
+                                  <circle cx="28" cy="12" r="3" fill="#F59E0B" />
+                                </svg>
+                              ) : competitor.name.includes("Freed") ? (
+                                <svg className="w-10 h-10" viewBox="0 0 40 40" fill="none">
+                                  <rect x="4" y="4" width="32" height="32" rx="8" fill="#10B981" />
+                                  <path d="M12 20l4 4 8-8" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                                  <circle cx="30" cy="10" r="2" fill="#F59E0B" />
+                                </svg>
+                              ) : (
+                                <svg className="w-10 h-10" viewBox="0 0 40 40" fill="none">
+                                  <circle cx="20" cy="20" r="18" fill="#F97316" />
+                                  <path d="M15 15h10v2H15zM15 19h10v2H15zM15 23h6v2h-6z" fill="white" />
+                                  <circle cx="29" cy="11" r="4" fill="#EF4444" stroke="white" strokeWidth="1" />
+                                </svg>
+                              )}
                             </div>
                             <div>
                               <CardTitle className="text-2xl" data-testid={`pricing-title-${competitor.id}`}>
