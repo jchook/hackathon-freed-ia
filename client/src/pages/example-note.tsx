@@ -19,9 +19,9 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 
 const TRANSCRIPT = `Hi, it's Doctor McClure. How are you doing today? Doing fine. Great. I know we're supposed to review your labs, but do you have any questions before we start? My ankle has been hurting. Did anything happen to it? I twisted it while running. It's been swollen and not getting much better. When did that happen? A week ago. Have you been able to walk on it since then? Yeah, just hurts. Have you been doing anything for your ankle? I tried some ice. Ibuprofen once kind of helps. Also, I wanted to ask about my current medications - I'm taking delgocitinib for my skin condition and ramipril for blood pressure. Are you able to do other exercises besides running so that you can still move your body even if you have an injury? It sounds like it can help. So I think that's a great first step. Let me just do that exam on your foot. Really glad that you've been doing exercise even when you're in pain. Doing other exercises besides running so that you can still move your body even if you have an injury. Does it hurt here? No. Does it hurt here? No. Does it hurt here? That hurts a little bit. I don't think you need an x-ray. I think you have an ankle sprain. Icing it is great. Ibuprofen can help reduce swelling. Continue your delgocitinib and ramipril as prescribed.`;
 
-// Component to highlight medications in the transcript
-const HighlightedTranscript = ({ text }: { text: string }) => {
-  const medications = ['delgocitinib', 'ramipril'];
+// Component to highlight medications in text
+const HighlightedText = ({ text }: { text: string }) => {
+  const medications = ['delgocitinib', 'ramipril', 'ibuprofen'];
   
   let highlightedText = text;
   medications.forEach(med => {
@@ -36,28 +36,28 @@ const VENDOR_OUTPUTS = {
   'heidi-1': {
     name: 'Heidi Health',
     soap: {
-      subjective: `Patient reports ankle pain lasting one week following a running injury. States ankle is swollen and "not getting much better." Pain persists with walking but patient able to ambulate. Has tried ice and ibuprofen with some relief. Reports ibuprofen "kind of helps." Patient continues other exercises besides running.`,
+      subjective: `Patient reports ankle pain lasting one week following a running injury. States ankle is swollen and "not getting much better." Pain persists with walking but patient able to ambulate. Has tried ice and ibuprofen with some relief. Reports ibuprofen "kind of helps." Patient continues other exercises besides running. Current medications include delgocitinib for skin condition and ramipril for hypertension.`,
       objective: `Physical examination of ankle performed. Point tenderness elicited on palpation at one specific location. No tenderness noted at two other examination points. Patient ambulating without significant distress.`,
       assessment: `Ankle sprain (likely grade 1-2 based on presentation and examination findings). No indication for radiographic imaging at this time.`,
-      plan: `Continue current management with ice and ibuprofen for anti-inflammatory effect and pain control. Patient education provided regarding continued non-impact exercise. Follow-up as needed if symptoms worsen or fail to improve.`
+      plan: `Continue current management with ice and ibuprofen for anti-inflammatory effect and pain control. Patient education provided regarding continued non-impact exercise. Continue current medications: delgocitinib as prescribed for dermatologic condition, ramipril for blood pressure management. Follow-up as needed if symptoms worsen or fail to improve.`
     }
   },
   'freed-1': {
     name: 'Freed AI',
     soap: {
-      subjective: `The patient presents with a chief complaint of ankle pain. The pain began approximately one week ago after the patient twisted their ankle while running. The patient describes the ankle as swollen and reports that it has not been improving significantly. The patient is able to walk on the affected ankle, though it causes discomfort. For pain management, the patient has been using ice and has taken ibuprofen, which provides some relief. The patient continues to engage in other forms of exercise aside from running.`,
+      subjective: `The patient presents with a chief complaint of ankle pain. The pain began approximately one week ago after the patient twisted their ankle while running. The patient describes the ankle as swollen and reports that it has not been improving significantly. The patient is able to walk on the affected ankle, though it causes discomfort. For pain management, the patient has been using ice and has taken ibuprofen, which provides some relief. The patient continues to engage in other forms of exercise aside from running. Patient reports taking delgocitinib for a skin condition and ramipril for blood pressure control.`,
       objective: `Physical examination of the ankle was performed. The provider conducted a focused examination with palpation at multiple points. The patient denied pain at two specific examination sites but reported pain at a third location. The patient appeared to be ambulating without severe distress.`,
       assessment: `Based on the history and physical examination findings, the patient appears to have sustained an ankle sprain. The mechanism of injury (twisting while running), timeline (one week), and examination findings are consistent with this diagnosis. No fracture is suspected based on clinical presentation, and imaging is not indicated at this time.`,
-      plan: `Recommended continued conservative management including ice therapy and ibuprofen for anti-inflammatory effects. Patient counseled on the benefits of maintaining physical activity with modifications (avoiding running temporarily while continuing other exercises). Patient advised to follow up if symptoms worsen or do not improve with conservative measures.`
+      plan: `Recommended continued conservative management including ice therapy and ibuprofen for anti-inflammatory effects. Patient counseled on the benefits of maintaining physical activity with modifications (avoiding running temporarily while continuing other exercises). Continue current medications: ramipril for hypertension management and delgocitinib for dermatologic treatment as previously prescribed. Patient advised to follow up if symptoms worsen or do not improve with conservative measures.`
     }
   },
   'sunoh-1': {
     name: 'Sunoh AI',
     soap: {
-      subjective: `Patient reports onset of ankle pain 1 week ago following injury sustained while running. Describes mechanism as twisting motion. Associated symptoms include swelling without significant improvement over the past week. Patient rates pain as tolerable, allowing continued ambulation. Current self-treatment includes intermittent ice application and ibuprofen with partial symptomatic relief. Patient maintains active lifestyle with modification to avoid aggravating activities.`,
+      subjective: `Patient reports onset of ankle pain 1 week ago following injury sustained while running. Describes mechanism as twisting motion. Associated symptoms include swelling without significant improvement over the past week. Patient rates pain as tolerable, allowing continued ambulation. Current self-treatment includes intermittent ice application and ibuprofen with partial symptomatic relief. Patient maintains active lifestyle with modification to avoid aggravating activities. Medication history includes delgocitinib for skin condition and ramipril for hypertension.`,
       objective: `Focused musculoskeletal examination of affected ankle performed. Palpation reveals point tenderness at one anatomical location with absence of tenderness at adjacent areas tested. Patient demonstrates functional mobility without apparent severe limitation. Swelling noted as reported by patient history.`,
       assessment: `Clinical presentation consistent with ankle sprain injury. History of twisting mechanism during athletic activity with subsequent pain and swelling supports this diagnosis. Physical examination findings of localized tenderness without widespread involvement suggests mild to moderate sprain. No red flags present requiring immediate advanced imaging.`,
-      plan: `Continue current conservative treatment regimen with ice therapy and NSAIDs (ibuprofen) for inflammation control and analgesia. Encourage activity modification with continuation of non-impact exercises as tolerated. Patient education provided regarding expected healing timeline. Return visit warranted if symptoms persist beyond expected timeframe or worsen despite appropriate treatment.`
+      plan: `Continue current conservative treatment regimen with ice therapy and NSAIDs (ibuprofen) for inflammation control and analgesia. Encourage activity modification with continuation of non-impact exercises as tolerated. Maintain current medication regimen including ramipril for blood pressure control and delgocitinib for dermatologic management. Patient education provided regarding expected healing timeline. Return visit warranted if symptoms persist beyond expected timeframe or worsen despite appropriate treatment.`
     }
   }
 };
@@ -291,7 +291,7 @@ Source: ScribeArena Example Note Tool`;
               <div>
                 <h4 className="font-medium mb-2">Visit Transcript:</h4>
                 <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg text-sm">
-                  <HighlightedTranscript text={TRANSCRIPT} />
+                  <HighlightedText text={TRANSCRIPT} />
                 </div>
               </div>
             </CardContent>
@@ -386,7 +386,7 @@ Source: ScribeArena Example Note Tool`;
                               </CollapsibleTrigger>
                               <CollapsibleContent className="mt-2">
                                 <div className="p-3 bg-background border rounded-lg">
-                                  <p className="text-sm leading-relaxed">{sharedExperience.subjective}</p>
+                                  <HighlightedText text={sharedExperience.subjective} />
                                 </div>
                               </CollapsibleContent>
                             </Collapsible>
@@ -399,7 +399,7 @@ Source: ScribeArena Example Note Tool`;
                               </CollapsibleTrigger>
                               <CollapsibleContent className="mt-2">
                                 <div className="p-3 bg-background border rounded-lg">
-                                  <p className="text-sm leading-relaxed">{sharedExperience.objective}</p>
+                                  <HighlightedText text={sharedExperience.objective} />
                                 </div>
                               </CollapsibleContent>
                             </Collapsible>
@@ -412,7 +412,7 @@ Source: ScribeArena Example Note Tool`;
                               </CollapsibleTrigger>
                               <CollapsibleContent className="mt-2">
                                 <div className="p-3 bg-background border rounded-lg">
-                                  <p className="text-sm leading-relaxed">{sharedExperience.assessment}</p>
+                                  <HighlightedText text={sharedExperience.assessment} />
                                 </div>
                               </CollapsibleContent>
                             </Collapsible>
@@ -425,7 +425,7 @@ Source: ScribeArena Example Note Tool`;
                               </CollapsibleTrigger>
                               <CollapsibleContent className="mt-2">
                                 <div className="p-3 bg-background border rounded-lg">
-                                  <p className="text-sm leading-relaxed">{sharedExperience.plan}</p>
+                                  <HighlightedText text={sharedExperience.plan} />
                                 </div>
                               </CollapsibleContent>
                             </Collapsible>
