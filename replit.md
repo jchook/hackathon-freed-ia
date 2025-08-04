@@ -71,6 +71,8 @@ The architecture follows a clean separation of concerns with shared TypeScript s
 - **Vertical Card Layout**: Redesigned pricing layout to stack each AI scribe as separate vertical cards with website links
 - **Simplified Interface**: Removed price alerts, trends, comparison tables, and charts for cleaner focus on core product comparison
 - **Enhanced Pricing Display**: Added annual discount pricing (20% savings) with responsive grid layout for pricing plans
+- **Table-like Comparison**: Redesigned comparison page with grid-based table layout for easier line-by-line vendor comparison
+- **Simplified Formatting**: Streamlined pricing card display with consistent padding and reduced visual complexity
 
 ### UI/UX Improvements
 - Renamed platform from "PriceTracker" to "ScribeArena" for better market positioning

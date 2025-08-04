@@ -168,110 +168,138 @@ export default function Comparison() {
             </CardContent>
           </Card>
 
-          {/* Vendor Comparison Cards */}
+          {/* Table-like Comparison Layout */}
           {selectedCompetitors.length > 0 && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-              {selectedCompetitors.map((competitorId) => {
-                const { competitor, competitorWithReviews, seo, pricing, averageRating, totalReviews } = getCompetitorData(competitorId);
-                const selectedPlan = getSelectedPlan(competitorId);
-                
-                return (
-                  <Card key={competitorId} className="h-fit" data-testid={`comparison-card-${competitorId}`}>
-                    <CardHeader className="pb-4">
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-white border border-gray-200 shadow-sm">
-                          {competitor?.name.includes("Heidi") ? (
-                            <img 
-                              src="https://www.heidihealth.com/favicon.ico" 
-                              alt="Heidi Health Logo" 
-                              className="w-8 h-8"
-                              onError={(e) => {
-                                e.currentTarget.style.display = 'none';
-                                const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-                                if (fallback) fallback.style.display = 'block';
-                              }}
-                            />
-                          ) : competitor?.name.includes("Freed") ? (
-                            <img 
-                              src="https://cdn.prod.website-files.com/6626cd90a59907680f6ccb64/6760822277db164afcfcf749_freed-logo.svg" 
-                              alt="Freed AI Logo" 
-                              className="w-8 h-8"
-                              onError={(e) => {
-                                e.currentTarget.style.display = 'none';
-                                const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-                                if (fallback) fallback.style.display = 'block';
-                              }}
-                            />
-                          ) : (
-                            <img 
-                              src="https://sunoh.ai/favicon.ico" 
-                              alt="Sunoh AI Logo" 
-                              className="w-8 h-8"
-                              onError={(e) => {
-                                e.currentTarget.style.display = 'none';
-                                const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-                                if (fallback) fallback.style.display = 'block';
-                              }}
-                            />
-                          )}
-                          {/* Fallback */}
-                          <div className="hidden w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center text-gray-600 font-bold text-sm">
-                            {competitor?.name.charAt(0)}
+            <Card>
+              <CardHeader>
+                <CardTitle>Side-by-Side Comparison</CardTitle>
+                <CardDescription>
+                  Compare selected vendors with their chosen plans
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="overflow-x-auto">
+                  <div className="grid gap-0 min-w-full" style={{ gridTemplateColumns: `200px repeat(${selectedCompetitors.length}, 1fr)` }}>
+                    
+                    {/* Header Row */}
+                    <div className="p-4 bg-muted font-medium border-b border-r">Vendor</div>
+                    {selectedCompetitors.map((competitorId) => {
+                      const { competitor } = getCompetitorData(competitorId);
+                      return (
+                        <div key={competitorId} className="p-4 bg-muted border-b border-r last:border-r-0">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-white border border-gray-200 shadow-sm">
+                              {competitor?.name.includes("Heidi") ? (
+                                <img 
+                                  src="https://www.heidihealth.com/favicon.ico" 
+                                  alt="Heidi Health Logo" 
+                                  className="w-6 h-6"
+                                  onError={(e) => {
+                                    e.currentTarget.style.display = 'none';
+                                    const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                                    if (fallback) fallback.style.display = 'block';
+                                  }}
+                                />
+                              ) : competitor?.name.includes("Freed") ? (
+                                <img 
+                                  src="https://cdn.prod.website-files.com/6626cd90a59907680f6ccb64/6760822277db164afcfcf749_freed-logo.svg" 
+                                  alt="Freed AI Logo" 
+                                  className="w-6 h-6"
+                                  onError={(e) => {
+                                    e.currentTarget.style.display = 'none';
+                                    const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                                    if (fallback) fallback.style.display = 'block';
+                                  }}
+                                />
+                              ) : (
+                                <img 
+                                  src="https://sunoh.ai/favicon.ico" 
+                                  alt="Sunoh AI Logo" 
+                                  className="w-6 h-6"
+                                  onError={(e) => {
+                                    e.currentTarget.style.display = 'none';
+                                    const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                                    if (fallback) fallback.style.display = 'block';
+                                  }}
+                                />
+                              )}
+                              <div className="hidden w-6 h-6 bg-gray-100 rounded-lg flex items-center justify-center text-gray-600 font-bold text-xs">
+                                {competitor?.name.charAt(0)}
+                              </div>
+                            </div>
+                            <div className="font-semibold text-sm">{competitor?.name}</div>
                           </div>
                         </div>
-                        <div className="flex-1">
-                          <CardTitle className="text-xl">{competitor?.name}</CardTitle>
-                          <CardDescription className="text-sm">{competitor?.description}</CardDescription>
+                      );
+                    })}
+
+                    {/* Website Row */}
+                    <div className="p-4 font-medium border-b border-r bg-gray-50">Website</div>
+                    {selectedCompetitors.map((competitorId) => {
+                      const { competitor } = getCompetitorData(competitorId);
+                      return (
+                        <div key={competitorId} className="p-4 border-b border-r last:border-r-0 bg-gray-50">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            className="w-full text-xs"
+                            onClick={() => competitor?.website && window.open(competitor.website, '_blank')}
+                            data-testid={`visit-website-${competitorId}`}
+                          >
+                            <ExternalLink className="w-3 h-3 mr-1" />
+                            Visit Site
+                          </Button>
                         </div>
-                      </div>
+                      );
+                    })}
 
-                      {/* Website Link */}
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        className="w-full mb-4"
-                        onClick={() => competitor?.website && window.open(competitor.website, '_blank')}
-                        data-testid={`visit-website-${competitorId}`}
-                      >
-                        <ExternalLink className="w-4 h-4 mr-2" />
-                        Visit Website
-                      </Button>
+                    {/* Plan Selection Row */}
+                    <div className="p-4 font-medium border-b border-r">Plan Selection</div>
+                    {selectedCompetitors.map((competitorId) => {
+                      const { pricing } = getCompetitorData(competitorId);
+                      return (
+                        <div key={competitorId} className="p-4 border-b border-r last:border-r-0">
+                          <Select 
+                            value={selectedPlans[competitorId] || ""} 
+                            onValueChange={(value) => handlePlanSelection(competitorId, value)}
+                          >
+                            <SelectTrigger className="text-xs" data-testid={`plan-select-${competitorId}`}>
+                              <SelectValue placeholder="Choose plan" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {pricing?.map((plan) => (
+                                <SelectItem key={plan.id} value={plan.id}>
+                                  {plan.planName} - {plan.price === 0 ? 'Free' : formatPrice(plan.price || 0)}
+                                  {(plan.price || 0) > 0 && `/${plan.billingPeriod}`}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      );
+                    })}
 
-                      {/* Plan Selection */}
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">Select Plan:</label>
-                        <Select 
-                          value={selectedPlans[competitorId] || ""} 
-                          onValueChange={(value) => handlePlanSelection(competitorId, value)}
-                        >
-                          <SelectTrigger data-testid={`plan-select-${competitorId}`}>
-                            <SelectValue placeholder="Choose a plan" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {pricing?.map((plan) => (
-                              <SelectItem key={plan.id} value={plan.id}>
-                                {plan.planName} - {plan.price === 0 ? 'Free' : formatPrice(plan.price || 0)}
-                                {(plan.price || 0) > 0 && `/${plan.billingPeriod}`}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </CardHeader>
-
-                    <CardContent className="space-y-4">
-                      {/* SEO & Reviews Info */}
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium">Domain Rating</span>
-                          <Badge variant="secondary">
+                    {/* Domain Rating Row */}
+                    <div className="p-4 font-medium border-b border-r bg-gray-50">Domain Rating</div>
+                    {selectedCompetitors.map((competitorId) => {
+                      const { seo } = getCompetitorData(competitorId);
+                      return (
+                        <div key={competitorId} className="p-4 border-b border-r last:border-r-0 bg-gray-50">
+                          <Badge variant="secondary" className="text-xs">
                             {seo?.domainRating || 'N/A'}
                           </Badge>
                         </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium">Average Review</span>
+                      );
+                    })}
+
+                    {/* Average Review Row */}
+                    <div className="p-4 font-medium border-b border-r">Average Review</div>
+                    {selectedCompetitors.map((competitorId) => {
+                      const { averageRating, totalReviews } = getCompetitorData(competitorId);
+                      return (
+                        <div key={competitorId} className="p-4 border-b border-r last:border-r-0">
                           <div className="flex items-center gap-1">
-                            <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                            <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
                             <span className="text-sm font-medium">
                               {averageRating ? averageRating.toFixed(1) : 'N/A'}
                             </span>
@@ -282,78 +310,91 @@ export default function Comparison() {
                             )}
                           </div>
                         </div>
-                      </div>
+                      );
+                    })}
 
-                      {/* Selected Plan Details */}
-                      {selectedPlan && (
-                        <div className="border rounded-lg p-4 bg-muted/50">
-                          <div className="flex items-center justify-between mb-3">
-                            <h4 className="font-semibold text-lg">{selectedPlan.planName}</h4>
-                            <div className="text-right">
-                              <div className="text-2xl font-bold text-primary">
+                    {/* Price Row */}
+                    <div className="p-4 font-medium border-b border-r bg-gray-50">Price</div>
+                    {selectedCompetitors.map((competitorId) => {
+                      const selectedPlan = getSelectedPlan(competitorId);
+                      return (
+                        <div key={competitorId} className="p-4 border-b border-r last:border-r-0 bg-gray-50">
+                          {selectedPlan ? (
+                            <div>
+                              <div className="text-lg font-bold text-primary">
                                 {selectedPlan.price === 0 ? 'Free' : formatPrice(selectedPlan.price || 0)}
                               </div>
                               {(selectedPlan.price || 0) > 0 && (
-                                <div className="text-sm text-muted-foreground">
+                                <div className="text-xs text-muted-foreground">
                                   per {selectedPlan.billingPeriod}
                                 </div>
                               )}
                             </div>
-                          </div>
+                          ) : (
+                            <span className="text-sm text-muted-foreground">Select plan</span>
+                          )}
+                        </div>
+                      );
+                    })}
 
-                          {/* Plan Benefits */}
-                          <div className="space-y-2">
-                            <h5 className="font-medium text-sm text-muted-foreground">Plan Benefits:</h5>
-                            <div className="space-y-1">
-                              {selectedPlan.features?.map((feature, index) => (
-                                <div key={index} className="flex items-start gap-2 text-sm">
-                                  <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                                  <span>{feature}</span>
-                                </div>
-                              )) || (
-                                <div className="text-sm text-muted-foreground">No features listed</div>
+                    {/* Plan Name Row */}
+                    <div className="p-4 font-medium border-b border-r">Plan Name</div>
+                    {selectedCompetitors.map((competitorId) => {
+                      const selectedPlan = getSelectedPlan(competitorId);
+                      return (
+                        <div key={competitorId} className="p-4 border-b border-r last:border-r-0">
+                          {selectedPlan ? (
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-sm">{selectedPlan.planName}</span>
+                              {selectedPlan.price === 0 && (
+                                <Badge variant="secondary" className="bg-green-100 text-green-800 text-xs">
+                                  Free
+                                </Badge>
+                              )}
+                              {selectedPlan.isPromo && (
+                                <Badge variant="destructive" className="text-xs">
+                                  Promo
+                                </Badge>
                               )}
                             </div>
-                          </div>
-
-                          {/* Special Badges */}
-                          <div className="flex gap-2 mt-3">
-                            {selectedPlan.price === 0 && (
-                              <Badge variant="secondary" className="bg-green-100 text-green-800">
-                                <CheckCircle className="w-3 h-3 mr-1" />
-                                Free Plan
-                              </Badge>
-                            )}
-                            {selectedPlan.isPromo && (
-                              <Badge variant="destructive">
-                                <Zap className="w-3 h-3 mr-1" />
-                                Limited Time
-                              </Badge>
-                            )}
-                            {selectedPlan.target === "individuals" && (
-                              <Badge variant="outline">Individual</Badge>
-                            )}
-                            {selectedPlan.target === "groups" && (
-                              <Badge variant="outline">Team</Badge>
-                            )}
-                          </div>
+                          ) : (
+                            <span className="text-sm text-muted-foreground">-</span>
+                          )}
                         </div>
-                      )}
+                      );
+                    })}
 
-                      {/* Prompt to select plan */}
-                      {!selectedPlan && (
-                        <div className="border rounded-lg p-4 bg-muted/20 text-center">
-                          <DollarSign className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                          <p className="text-sm text-muted-foreground">
-                            Select a plan above to view detailed benefits and pricing
-                          </p>
+                    {/* Features Row */}
+                    <div className="p-4 font-medium border-r bg-gray-50">Features</div>
+                    {selectedCompetitors.map((competitorId) => {
+                      const selectedPlan = getSelectedPlan(competitorId);
+                      return (
+                        <div key={competitorId} className="p-4 border-r last:border-r-0 bg-gray-50">
+                          {selectedPlan?.features ? (
+                            <div className="space-y-1">
+                              {selectedPlan.features.slice(0, 5).map((feature, index) => (
+                                <div key={index} className="flex items-start gap-1 text-xs">
+                                  <CheckCircle className="w-3 h-3 text-green-500 mt-0.5 flex-shrink-0" />
+                                  <span>{feature}</span>
+                                </div>
+                              ))}
+                              {selectedPlan.features.length > 5 && (
+                                <div className="text-xs text-muted-foreground">
+                                  +{selectedPlan.features.length - 5} more
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="text-sm text-muted-foreground">Select plan to view features</span>
+                          )}
                         </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
+                      );
+                    })}
+
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           )}
 
           {/* Empty State */}
