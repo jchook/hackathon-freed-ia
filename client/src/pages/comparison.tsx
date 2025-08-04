@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Sidebar } from "@/components/Sidebar";
 import { Header } from "@/components/Header";
@@ -7,8 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { GitCompare, ExternalLink, CheckCircle, Zap, DollarSign } from "lucide-react";
-import { type SeoData, type Competitor, type PricingPlan } from "@shared/schema";
+import { GitCompare, ExternalLink, CheckCircle, Zap, DollarSign, Star } from "lucide-react";
+import { type SeoData, type Competitor, type PricingPlan, type CompetitorWithReviews } from "@shared/schema";
 
 export default function Comparison() {
   const [selectedCompetitors, setSelectedCompetitors] = useState<string[]>(['heidi-1', 'freed-1']);
@@ -22,11 +22,15 @@ export default function Comparison() {
     queryKey: ['/api/competitors']
   });
 
+  const { data: competitorsWithReviews, isLoading: reviewsLoading } = useQuery<CompetitorWithReviews[]>({
+    queryKey: ['/api/competitors-with-reviews']
+  });
+
   const { data: pricingPlans, isLoading: pricingLoading } = useQuery<PricingPlan[]>({
     queryKey: ['/api/pricing-plans']
   });
 
-  const isLoading = seoLoading || competitorsLoading || pricingLoading;
+  const isLoading = seoLoading || competitorsLoading || pricingLoading || reviewsLoading;
 
   const handleCompetitorToggle = (competitorId: string) => {
     setSelectedCompetitors(prev => {
@@ -45,10 +49,39 @@ export default function Comparison() {
 
   const getCompetitorData = (competitorId: string) => {
     const competitor = competitors?.find(c => c.id === competitorId);
+    const competitorWithReviews = competitorsWithReviews?.find(c => c.id === competitorId);
     const seo = seoData?.find(s => s.competitorId === competitorId && s.pageType === 'homepage');
     const pricing = pricingPlans?.filter(p => p.competitorId === competitorId);
-    return { competitor, seo, pricing };
+    return { competitor, competitorWithReviews, seo, pricing };
   };
+
+  // Auto-select cheapest paid plan for individuals when data loads
+  useEffect(() => {
+    if (pricingPlans && selectedCompetitors.length > 0) {
+      const newSelectedPlans: Record<string, string> = {};
+      
+      selectedCompetitors.forEach(competitorId => {
+        // Only set if not already selected
+        if (!selectedPlans[competitorId]) {
+          const competitorPlans = pricingPlans.filter(p => p.competitorId === competitorId);
+          const individualPlans = competitorPlans.filter(p => p.target === 'individuals');
+          const paidPlans = individualPlans.filter(p => (p.price || 0) > 0);
+          
+          if (paidPlans.length > 0) {
+            // Find cheapest paid plan
+            const cheapestPlan = paidPlans.reduce((prev, current) => 
+              ((prev.price || 0) < (current.price || 0)) ? prev : current
+            );
+            newSelectedPlans[competitorId] = cheapestPlan.id;
+          }
+        }
+      });
+      
+      if (Object.keys(newSelectedPlans).length > 0) {
+        setSelectedPlans(prev => ({ ...prev, ...newSelectedPlans }));
+      }
+    }
+  }, [pricingPlans, selectedCompetitors, selectedPlans]);
 
   const handlePlanSelection = (competitorId: string, planId: string) => {
     setSelectedPlans(prev => ({
@@ -132,7 +165,7 @@ export default function Comparison() {
           {selectedCompetitors.length > 0 && (
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
               {selectedCompetitors.map((competitorId) => {
-                const { competitor, seo, pricing } = getCompetitorData(competitorId);
+                const { competitor, competitorWithReviews, seo, pricing } = getCompetitorData(competitorId);
                 const selectedPlan = getSelectedPlan(competitorId);
                 
                 return (
@@ -147,7 +180,8 @@ export default function Comparison() {
                               className="w-8 h-8"
                               onError={(e) => {
                                 e.currentTarget.style.display = 'none';
-                                e.currentTarget.nextElementSibling.style.display = 'block';
+                                const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                                if (fallback) fallback.style.display = 'block';
                               }}
                             />
                           ) : competitor?.name.includes("Freed") ? (
@@ -157,7 +191,8 @@ export default function Comparison() {
                               className="w-8 h-8"
                               onError={(e) => {
                                 e.currentTarget.style.display = 'none';
-                                e.currentTarget.nextElementSibling.style.display = 'block';
+                                const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                                if (fallback) fallback.style.display = 'block';
                               }}
                             />
                           ) : (
@@ -167,7 +202,8 @@ export default function Comparison() {
                               className="w-8 h-8"
                               onError={(e) => {
                                 e.currentTarget.style.display = 'none';
-                                e.currentTarget.nextElementSibling.style.display = 'block';
+                                const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                                if (fallback) fallback.style.display = 'block';
                               }}
                             />
                           )}
@@ -187,7 +223,7 @@ export default function Comparison() {
                         variant="outline" 
                         size="sm"
                         className="w-full mb-4"
-                        onClick={() => window.open(competitor?.website, '_blank')}
+                        onClick={() => competitor?.website && window.open(competitor.website, '_blank')}
                         data-testid={`visit-website-${competitorId}`}
                       >
                         <ExternalLink className="w-4 h-4 mr-2" />
@@ -207,8 +243,8 @@ export default function Comparison() {
                           <SelectContent>
                             {pricing?.map((plan) => (
                               <SelectItem key={plan.id} value={plan.id}>
-                                {plan.planName} - {plan.price === 0 ? 'Free' : formatPrice(plan.price)}
-                                {plan.price > 0 && `/${plan.billingPeriod}`}
+                                {plan.planName} - {plan.price === 0 ? 'Free' : formatPrice(plan.price || 0)}
+                                {(plan.price || 0) > 0 && `/${plan.billingPeriod}`}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -217,13 +253,27 @@ export default function Comparison() {
                     </CardHeader>
 
                     <CardContent className="space-y-4">
-                      {/* SEO Info */}
+                      {/* SEO & Reviews Info */}
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-medium">Domain Rating</span>
                           <Badge variant="secondary">
                             {seo?.domainRating || 'N/A'}
                           </Badge>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium">Average Review</span>
+                          <div className="flex items-center gap-1">
+                            <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                            <span className="text-sm font-medium">
+                              {competitorWithReviews?.averageRating?.toFixed(1) || 'N/A'}
+                            </span>
+                            {competitorWithReviews?.totalReviews && (
+                              <span className="text-xs text-muted-foreground">
+                                ({competitorWithReviews.totalReviews})
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
 
@@ -234,9 +284,9 @@ export default function Comparison() {
                             <h4 className="font-semibold text-lg">{selectedPlan.planName}</h4>
                             <div className="text-right">
                               <div className="text-2xl font-bold text-primary">
-                                {selectedPlan.price === 0 ? 'Free' : formatPrice(selectedPlan.price)}
+                                {selectedPlan.price === 0 ? 'Free' : formatPrice(selectedPlan.price || 0)}
                               </div>
-                              {selectedPlan.price > 0 && (
+                              {(selectedPlan.price || 0) > 0 && (
                                 <div className="text-sm text-muted-foreground">
                                   per {selectedPlan.billingPeriod}
                                 </div>
@@ -248,12 +298,14 @@ export default function Comparison() {
                           <div className="space-y-2">
                             <h5 className="font-medium text-sm text-muted-foreground">Plan Benefits:</h5>
                             <div className="space-y-1">
-                              {selectedPlan.features.map((feature, index) => (
+                              {selectedPlan.features?.map((feature, index) => (
                                 <div key={index} className="flex items-start gap-2 text-sm">
                                   <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
                                   <span>{feature}</span>
                                 </div>
-                              ))}
+                              )) || (
+                                <div className="text-sm text-muted-foreground">No features listed</div>
+                              )}
                             </div>
                           </div>
 
