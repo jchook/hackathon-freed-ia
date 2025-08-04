@@ -19,6 +19,7 @@ export const pricingPlans = pgTable("pricing_plans", {
   planName: text("plan_name").notNull(),
   price: integer("price"), // in cents
   billingPeriod: text("billing_period"), // 'monthly', 'annual'
+  target: text("target").default('individuals'), // 'individuals', 'groups'
   isPromo: boolean("is_promo").default(false),
   originalPrice: integer("original_price"), // in cents, for promo pricing
   features: jsonb("features").$type<string[]>(),

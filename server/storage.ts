@@ -139,6 +139,7 @@ export class MemStorage implements IStorage {
         planName: "Free",
         price: 0,
         billingPeriod: "monthly",
+        target: "individuals",
         isPromo: false,
         originalPrice: null,
         features: ["Unlimited consults", "Unlimited dictation", "10 Pro actions", "Basic support"],
@@ -151,6 +152,20 @@ export class MemStorage implements IStorage {
         planName: "Pro",
         price: 9900, // $99 in cents
         billingPeriod: "monthly",
+        target: "individuals",
+        isPromo: false,
+        originalPrice: null,
+        features: ["Everything in Free", "Custom templates", "Unlimited Pro actions", "Priority support"],
+        isActive: true,
+        createdAt: new Date(),
+      },
+      {
+        id: "heidi-pro-annual",
+        competitorId: "heidi-1",
+        planName: "Pro",
+        price: 95040, // $950.40 in cents (annual: $99*12*0.8)
+        billingPeriod: "annual",
+        target: "individuals",
         isPromo: false,
         originalPrice: null,
         features: ["Everything in Free", "Custom templates", "Unlimited Pro actions", "Priority support"],
@@ -163,6 +178,20 @@ export class MemStorage implements IStorage {
         planName: "Together",
         price: 9900, // $99 in cents
         billingPeriod: "monthly",
+        target: "groups",
+        isPromo: false,
+        originalPrice: null,
+        features: ["Everything in Pro", "Template sharing", "Team MFA", "Priority support"],
+        isActive: true,
+        createdAt: new Date(),
+      },
+      {
+        id: "heidi-together-annual",
+        competitorId: "heidi-1",
+        planName: "Together",
+        price: 95040, // $950.40 in cents (annual: $99*12*0.8)
+        billingPeriod: "annual",
+        target: "groups",
         isPromo: false,
         originalPrice: null,
         features: ["Everything in Pro", "Template sharing", "Team MFA", "Priority support"],
@@ -173,14 +202,15 @@ export class MemStorage implements IStorage {
 
     const freedPlans: PricingPlan[] = [
       {
-        id: "freed-individual-annual",
+        id: "freed-free",
         competitorId: "freed-1",
-        planName: "Individual",
-        price: 9000, // $90 in cents
+        planName: "Free Trial",
+        price: 0,
         billingPeriod: "monthly",
+        target: "individuals",
         isPromo: false,
         originalPrice: null,
-        features: ["Unlimited notes", "7-day trial", "Specialty templates", "Magic edit"],
+        features: ["7-day trial", "5 notes", "Basic templates"],
         isActive: true,
         createdAt: new Date(),
       },
@@ -190,6 +220,20 @@ export class MemStorage implements IStorage {
         planName: "Individual",
         price: 9900, // $99 in cents
         billingPeriod: "monthly",
+        target: "individuals",
+        isPromo: false,
+        originalPrice: null,
+        features: ["Unlimited notes", "7-day trial", "Specialty templates", "Magic edit"],
+        isActive: true,
+        createdAt: new Date(),
+      },
+      {
+        id: "freed-individual-annual",
+        competitorId: "freed-1",
+        planName: "Individual",
+        price: 95040, // $950.40 in cents (annual: $99*12*0.8)
+        billingPeriod: "annual",
+        target: "individuals",
         isPromo: false,
         originalPrice: null,
         features: ["Unlimited notes", "7-day trial", "Specialty templates", "Magic edit"],
@@ -202,6 +246,20 @@ export class MemStorage implements IStorage {
         planName: "Group (2-9)",
         price: 8400, // $84 in cents
         billingPeriod: "monthly",
+        target: "groups",
+        isPromo: false,
+        originalPrice: null,
+        features: ["Everything in Individual", "Team templates", "Group management"],
+        isActive: true,
+        createdAt: new Date(),
+      },
+      {
+        id: "freed-group-annual",
+        competitorId: "freed-1",
+        planName: "Group (2-9)",
+        price: 80640, // $806.40 in cents (annual: $84*12*0.8)
+        billingPeriod: "annual",
+        target: "groups",
         isPromo: false,
         originalPrice: null,
         features: ["Everything in Individual", "Team templates", "Group management"],
@@ -212,13 +270,53 @@ export class MemStorage implements IStorage {
 
     const sunohPlans: PricingPlan[] = [
       {
+        id: "sunoh-free",
+        competitorId: "sunoh-1",
+        planName: "Free Trial",
+        price: 0,
+        billingPeriod: "monthly",
+        target: "individuals",
+        isPromo: false,
+        originalPrice: null,
+        features: ["14-day trial", "5 patient visits", "Basic SOAP notes"],
+        isActive: true,
+        createdAt: new Date(),
+      },
+      {
         id: "sunoh-promo",
         competitorId: "sunoh-1",
         planName: "Limited Time",
         price: 14900, // $149 in cents
         billingPeriod: "monthly",
+        target: "individuals",
         isPromo: true,
         originalPrice: 19900, // $199 in cents
+        features: ["Ambient voice capture", "Voice recognition", "SOAP notes", "24/7 support"],
+        isActive: true,
+        createdAt: new Date(),
+      },
+      {
+        id: "sunoh-standard",
+        competitorId: "sunoh-1",
+        planName: "Standard",
+        price: 19900, // $199 in cents
+        billingPeriod: "monthly",
+        target: "individuals",
+        isPromo: false,
+        originalPrice: null,
+        features: ["Ambient voice capture", "Voice recognition", "SOAP notes", "24/7 support"],
+        isActive: true,
+        createdAt: new Date(),
+      },
+      {
+        id: "sunoh-standard-annual",
+        competitorId: "sunoh-1",
+        planName: "Standard",
+        price: 191040, // $1910.40 in cents (annual: $199*12*0.8)
+        billingPeriod: "annual",
+        target: "individuals",
+        isPromo: false,
+        originalPrice: null,
         features: ["Ambient voice capture", "Voice recognition", "SOAP notes", "24/7 support"],
         isActive: true,
         createdAt: new Date(),
