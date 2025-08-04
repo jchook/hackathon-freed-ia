@@ -399,7 +399,7 @@ Source: ScribeArena Example Note Tool`;
                   )}
                 </TabsContent>
 
-                <TabsContent value="custom" className="space-y-4">
+                <TabsContent value="custom" className="space-y-6">
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-medium">Share Your Clinical Experience</h3>
                     <Button onClick={handleDownloadNote} className="flex items-center gap-2" data-testid="download-custom-note">
@@ -408,21 +408,21 @@ Source: ScribeArena Example Note Tool`;
                     </Button>
                   </div>
 
-                  {/* Vendor Selection */}
+                  {/* Section 1: EHR Scribe Vendor Selection */}
                   <Card data-testid="vendor-selection">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         <User className="w-5 h-5" />
-                        Select Your EHR Vendor
+                        EHR Scribe Vendor Selection
                       </CardTitle>
                       <CardDescription>
                         Choose which AI scribe vendor you'd like to test with this patient visit
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="vendor-select">AI Scribe Vendor</Label>
+                          <Label htmlFor="vendor-select">AI Scribe Vendor *</Label>
                           <Select value={selectedVendor} onValueChange={setSelectedVendor} data-testid="vendor-select">
                             <SelectTrigger id="vendor-select">
                               <SelectValue placeholder="Select a vendor to test..." />
@@ -456,92 +456,129 @@ Source: ScribeArena Example Note Tool`;
                             data-testid="input-specialty"
                           />
                         </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="duration">Transcription Time (seconds)</Label>
-                          <Input 
-                            id="duration"
-                            type="number"
-                            placeholder="120"
-                            value={clinicianData.transcriptionDuration}
-                            onChange={(e) => handleClinicianDataChange('transcriptionDuration', parseInt(e.target.value) || 0)}
-                            data-testid="input-duration"
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Section 2: SOAP Note Fields */}
+                  <Card data-testid="soap-note-fields">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <FileText className="w-5 h-5" />
+                        SOAP Note Documentation
+                      </CardTitle>
+                      <CardDescription>
+                        Document your clinical assessment using the SOAP format
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid gap-4">
+                        <div>
+                          <Label htmlFor="subjective" className="text-sm font-medium">
+                            Subjective *
+                          </Label>
+                          <Textarea
+                            id="subjective"
+                            placeholder="Patient's chief complaint, history of present illness, review of systems..."
+                            value={customNote.subjective}
+                            onChange={(e) => handleSectionChange('subjective', e.target.value)}
+                            className="min-h-[100px] mt-2"
+                            data-testid="input-subjective"
+                          />
+                        </div>
+
+                        <div>
+                          <Label htmlFor="objective" className="text-sm font-medium">
+                            Objective *
+                          </Label>
+                          <Textarea
+                            id="objective"
+                            placeholder="Physical examination findings, vital signs, diagnostic test results..."
+                            value={customNote.objective}
+                            onChange={(e) => handleSectionChange('objective', e.target.value)}
+                            className="min-h-[100px] mt-2"
+                            data-testid="input-objective"
+                          />
+                        </div>
+
+                        <div>
+                          <Label htmlFor="assessment" className="text-sm font-medium">
+                            Assessment *
+                          </Label>
+                          <Textarea
+                            id="assessment"
+                            placeholder="Clinical diagnosis, differential diagnosis, clinical reasoning..."
+                            value={customNote.assessment}
+                            onChange={(e) => handleSectionChange('assessment', e.target.value)}
+                            className="min-h-[100px] mt-2"
+                            data-testid="input-assessment"
+                          />
+                        </div>
+
+                        <div>
+                          <Label htmlFor="plan" className="text-sm font-medium">
+                            Plan *
+                          </Label>
+                          <Textarea
+                            id="plan"
+                            placeholder="Treatment plan, medications, follow-up instructions, patient education..."
+                            value={customNote.plan}
+                            onChange={(e) => handleSectionChange('plan', e.target.value)}
+                            className="min-h-[100px] mt-2"
+                            data-testid="input-plan"
                           />
                         </div>
                       </div>
                     </CardContent>
                   </Card>
 
-                  <div className="grid gap-4">
-                    <div>
-                      <label htmlFor="subjective" className="block text-sm font-medium mb-2">
-                        Subjective
-                      </label>
-                      <Textarea
-                        id="subjective"
-                        placeholder="Enter patient's subjective information..."
-                        value={customNote.subjective}
-                        onChange={(e) => handleSectionChange('subjective', e.target.value)}
-                        className="min-h-[100px]"
-                        data-testid="input-subjective"
-                      />
-                    </div>
+                  {/* Section 3: Generation Feedback */}
+                  <Card data-testid="generation-feedback">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Clock className="w-5 h-5" />
+                        Generation Feedback
+                      </CardTitle>
+                      <CardDescription>
+                        Share your experience with the AI scribe generation process
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid gap-4">
+                        <div>
+                          <Label htmlFor="duration" className="text-sm font-medium">
+                            Estimated Generation Time (seconds)
+                          </Label>
+                          <Input 
+                            id="duration"
+                            type="number"
+                            placeholder="e.g., 45"
+                            value={clinicianData.transcriptionDuration}
+                            onChange={(e) => handleClinicianDataChange('transcriptionDuration', parseInt(e.target.value) || 0)}
+                            className="mt-2 max-w-xs"
+                            data-testid="input-duration"
+                          />
+                          <p className="text-xs text-muted-foreground mt-1">
+                            How long did it take for the AI to generate the note?
+                          </p>
+                        </div>
 
-                    <div>
-                      <label htmlFor="objective" className="block text-sm font-medium mb-2">
-                        Objective
-                      </label>
-                      <Textarea
-                        id="objective"
-                        placeholder="Enter objective findings..."
-                        value={customNote.objective}
-                        onChange={(e) => handleSectionChange('objective', e.target.value)}
-                        className="min-h-[100px]"
-                        data-testid="input-objective"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="assessment" className="block text-sm font-medium mb-2">
-                        Assessment
-                      </label>
-                      <Textarea
-                        id="assessment"
-                        placeholder="Enter clinical assessment..."
-                        value={customNote.assessment}
-                        onChange={(e) => handleSectionChange('assessment', e.target.value)}
-                        className="min-h-[100px]"
-                        data-testid="input-assessment"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="plan" className="block text-sm font-medium mb-2">
-                        Plan
-                      </label>
-                      <Textarea
-                        id="plan"
-                        placeholder="Enter treatment plan..."
-                        value={customNote.plan}
-                        onChange={(e) => handleSectionChange('plan', e.target.value)}
-                        className="min-h-[100px]"
-                        data-testid="input-plan"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="notes" className="block text-sm font-medium mb-2">
-                        Additional Notes (Optional)
-                      </label>
-                      <Textarea
-                        id="notes"
-                        placeholder="Any additional comments about your experience with this vendor..."
-                        value={clinicianData.notes}
-                        onChange={(e) => handleClinicianDataChange('notes', e.target.value)}
-                        className="min-h-[80px]"
-                        data-testid="input-notes"
-                      />
-                    </div>
-                  </div>
+                        <div>
+                          <Label htmlFor="notes" className="text-sm font-medium">
+                            Additional Comments (Optional)
+                          </Label>
+                          <Textarea
+                            id="notes"
+                            placeholder="Share your thoughts on accuracy, ease of use, formatting quality, areas for improvement..."
+                            value={clinicianData.notes}
+                            onChange={(e) => handleClinicianDataChange('notes', e.target.value)}
+                            className="min-h-[80px] mt-2"
+                            data-testid="input-notes"
+                          />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </TabsContent>
               </Tabs>
             </CardContent>
