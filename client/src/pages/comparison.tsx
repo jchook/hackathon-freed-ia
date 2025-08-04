@@ -4,13 +4,15 @@ import { Sidebar } from "@/components/Sidebar";
 import { Header } from "@/components/Header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { GitCompare, ExternalLink, Star, DollarSign } from "lucide-react";
+import { GitCompare, ExternalLink, CheckCircle, Zap, DollarSign } from "lucide-react";
 import { type SeoData, type Competitor, type PricingPlan } from "@shared/schema";
 
 export default function Comparison() {
   const [selectedCompetitors, setSelectedCompetitors] = useState<string[]>(['heidi-1', 'freed-1']);
+  const [selectedPlans, setSelectedPlans] = useState<Record<string, string>>({});
 
   const { data: seoData, isLoading: seoLoading } = useQuery<SeoData[]>({
     queryKey: ['/api/seo']
@@ -37,13 +39,6 @@ export default function Comparison() {
     });
   };
 
-  const getDomainRatingColor = (rating?: number | null) => {
-    if (!rating) return 'bg-gray-100 text-gray-800';
-    if (rating >= 80) return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
-    if (rating >= 60) return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
-    return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
-  };
-
   const formatPrice = (price: number) => {
     return `$${(price / 100).toFixed(0)}`;
   };
@@ -53,6 +48,19 @@ export default function Comparison() {
     const seo = seoData?.find(s => s.competitorId === competitorId && s.pageType === 'homepage');
     const pricing = pricingPlans?.filter(p => p.competitorId === competitorId);
     return { competitor, seo, pricing };
+  };
+
+  const handlePlanSelection = (competitorId: string, planId: string) => {
+    setSelectedPlans(prev => ({
+      ...prev,
+      [competitorId]: planId
+    }));
+  };
+
+  const getSelectedPlan = (competitorId: string) => {
+    const planId = selectedPlans[competitorId];
+    if (!planId) return null;
+    return pricingPlans?.find(p => p.id === planId);
   };
 
   if (isLoading) {
@@ -81,7 +89,7 @@ export default function Comparison() {
           <div>
             <h1 className="text-3xl font-bold text-foreground">Vendor Comparison</h1>
             <p className="text-muted-foreground mt-2">
-              Select up to 3 competitors to compare side-by-side
+              Select up to 3 competitors and choose specific plans to compare side-by-side
             </p>
           </div>
 
@@ -120,231 +128,183 @@ export default function Comparison() {
             </CardContent>
           </Card>
 
-          {/* Comparison Table */}
+          {/* Vendor Comparison Cards */}
           {selectedCompetitors.length > 0 && (
-            <Card data-testid="comparison-table">
-              <CardHeader>
-                <CardTitle>Vendor Comparison</CardTitle>
-                <CardDescription>
-                  Side-by-side comparison of selected vendors
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="overflow-x-auto">
-                <Table className="w-full min-w-[800px]">
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-48">Attribute</TableHead>
-                      {selectedCompetitors.map((competitorId) => {
-                        const { competitor } = getCompetitorData(competitorId);
-                        return (
-                          <TableHead key={competitorId} className="text-center min-w-[250px]">
-                            <div className="flex flex-col items-center gap-1">
-                              <span className="font-semibold">{competitor?.name}</span>
-                            </div>
-                          </TableHead>
-                        );
-                      })}
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {/* Website URL */}
-                    <TableRow>
-                      <TableCell className="font-medium">Website</TableCell>
-                      {selectedCompetitors.map((competitorId) => {
-                        const { competitor } = getCompetitorData(competitorId);
-                        return (
-                          <TableCell key={competitorId} className="text-center">
-                            <a
-                              href={competitor?.website}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-primary hover:underline text-sm flex items-center gap-1 justify-center"
-                              data-testid={`link-${competitorId}`}
-                            >
-                              {competitor?.website} <ExternalLink className="w-3 h-3" />
-                            </a>
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+              {selectedCompetitors.map((competitorId) => {
+                const { competitor, seo, pricing } = getCompetitorData(competitorId);
+                const selectedPlan = getSelectedPlan(competitorId);
+                
+                return (
+                  <Card key={competitorId} className="h-fit" data-testid={`comparison-card-${competitorId}`}>
+                    <CardHeader className="pb-4">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-white border border-gray-200 shadow-sm">
+                          {competitor?.name.includes("Heidi") ? (
+                            <img 
+                              src="https://www.heidihealth.com/favicon.ico" 
+                              alt="Heidi Health Logo" 
+                              className="w-8 h-8"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                                e.currentTarget.nextElementSibling.style.display = 'block';
+                              }}
+                            />
+                          ) : competitor?.name.includes("Freed") ? (
+                            <img 
+                              src="https://cdn.prod.website-files.com/6626cd90a59907680f6ccb64/6760822277db164afcfcf749_freed-logo.svg" 
+                              alt="Freed AI Logo" 
+                              className="w-8 h-8"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                                e.currentTarget.nextElementSibling.style.display = 'block';
+                              }}
+                            />
+                          ) : (
+                            <img 
+                              src="https://sunoh.ai/favicon.ico" 
+                              alt="Sunoh AI Logo" 
+                              className="w-8 h-8"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                                e.currentTarget.nextElementSibling.style.display = 'block';
+                              }}
+                            />
+                          )}
+                          {/* Fallback */}
+                          <div className="hidden w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center text-gray-600 font-bold text-sm">
+                            {competitor?.name.charAt(0)}
+                          </div>
+                        </div>
+                        <div className="flex-1">
+                          <CardTitle className="text-xl">{competitor?.name}</CardTitle>
+                          <CardDescription className="text-sm">{competitor?.description}</CardDescription>
+                        </div>
+                      </div>
 
-                    {/* Domain Rating */}
-                    <TableRow>
-                      <TableCell className="font-medium">Domain Rating</TableCell>
-                      {selectedCompetitors.map((competitorId) => {
-                        const { seo } = getCompetitorData(competitorId);
-                        return (
-                          <TableCell key={competitorId} className="text-center">
-                            <Badge className={getDomainRatingColor(seo?.domainRating)}>
-                              {seo?.domainRating || 'N/A'}
-                            </Badge>
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
+                      {/* Website Link */}
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="w-full mb-4"
+                        onClick={() => window.open(competitor?.website, '_blank')}
+                        data-testid={`visit-website-${competitorId}`}
+                      >
+                        <ExternalLink className="w-4 h-4 mr-2" />
+                        Visit Website
+                      </Button>
 
-                    {/* Title */}
-                    <TableRow>
-                      <TableCell className="font-medium">Page Title</TableCell>
-                      {selectedCompetitors.map((competitorId) => {
-                        const { seo } = getCompetitorData(competitorId);
-                        return (
-                          <TableCell key={competitorId} className="text-center">
-                            <div className="text-sm">
-                              {seo?.title || 'Not specified'}
-                              {seo?.title && (
-                                <div className="text-xs text-muted-foreground mt-1">
-                                  {seo.title.length} chars
+                      {/* Plan Selection */}
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Select Plan:</label>
+                        <Select 
+                          value={selectedPlans[competitorId] || ""} 
+                          onValueChange={(value) => handlePlanSelection(competitorId, value)}
+                        >
+                          <SelectTrigger data-testid={`plan-select-${competitorId}`}>
+                            <SelectValue placeholder="Choose a plan" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {pricing?.map((plan) => (
+                              <SelectItem key={plan.id} value={plan.id}>
+                                {plan.planName} - {plan.price === 0 ? 'Free' : formatPrice(plan.price)}
+                                {plan.price > 0 && `/${plan.billingPeriod}`}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </CardHeader>
+
+                    <CardContent className="space-y-4">
+                      {/* SEO Info */}
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium">Domain Rating</span>
+                          <Badge variant="secondary">
+                            {seo?.domainRating || 'N/A'}
+                          </Badge>
+                        </div>
+                      </div>
+
+                      {/* Selected Plan Details */}
+                      {selectedPlan && (
+                        <div className="border rounded-lg p-4 bg-muted/50">
+                          <div className="flex items-center justify-between mb-3">
+                            <h4 className="font-semibold text-lg">{selectedPlan.planName}</h4>
+                            <div className="text-right">
+                              <div className="text-2xl font-bold text-primary">
+                                {selectedPlan.price === 0 ? 'Free' : formatPrice(selectedPlan.price)}
+                              </div>
+                              {selectedPlan.price > 0 && (
+                                <div className="text-sm text-muted-foreground">
+                                  per {selectedPlan.billingPeriod}
                                 </div>
                               )}
                             </div>
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
+                          </div>
 
-                    {/* Meta Description */}
-                    <TableRow>
-                      <TableCell className="font-medium">Meta Description</TableCell>
-                      {selectedCompetitors.map((competitorId) => {
-                        const { seo } = getCompetitorData(competitorId);
-                        return (
-                          <TableCell key={competitorId} className="text-center">
-                            <div className="text-sm">
-                              {seo?.metaDescription ? (
-                                <div>
-                                  <div className="line-clamp-3">
-                                    {seo.metaDescription}
-                                  </div>
-                                  <div className="text-xs text-muted-foreground mt-1">
-                                    {seo.metaDescription.length} chars
-                                  </div>
-                                </div>
-                              ) : (
-                                'Not specified'
-                              )}
-                            </div>
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
-
-                    {/* Pricing */}
-                    <TableRow>
-                      <TableCell className="font-medium">Pricing Plans</TableCell>
-                      {selectedCompetitors.map((competitorId) => {
-                        const { pricing } = getCompetitorData(competitorId);
-                        return (
-                          <TableCell key={competitorId} className="text-center">
-                            <div className="space-y-2">
-                              {pricing?.map((plan) => (
-                                <div key={plan.id} className="p-2 border rounded">
-                                  <div className="font-medium text-sm">{plan.planName}</div>
-                                  <div className="text-lg font-bold text-primary">
-                                    {plan.price === 0 ? 'Free' : formatPrice(plan.price)}
-                                    {plan.price > 0 && (
-                                      <span className="text-xs text-muted-foreground">
-                                        /{plan.billingPeriod}
-                                      </span>
-                                    )}
-                                  </div>
+                          {/* Plan Benefits */}
+                          <div className="space-y-2">
+                            <h5 className="font-medium text-sm text-muted-foreground">Plan Benefits:</h5>
+                            <div className="space-y-1">
+                              {selectedPlan.features.map((feature, index) => (
+                                <div key={index} className="flex items-start gap-2 text-sm">
+                                  <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                                  <span>{feature}</span>
                                 </div>
                               ))}
                             </div>
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
+                          </div>
 
-                    {/* Features */}
-                    <TableRow>
-                      <TableCell className="font-medium">Features</TableCell>
-                      {selectedCompetitors.map((competitorId) => {
-                        const { pricing } = getCompetitorData(competitorId);
-                        return (
-                          <TableCell key={competitorId} className="text-center">
-                            <div className="space-y-3">
-                              {pricing?.map((plan) => (
-                                <div key={plan.id} className="text-left">
-                                  <div className="font-medium text-sm mb-2 text-center">{plan.planName}</div>
-                                  <ul className="text-xs space-y-1">
-                                    {plan.features.map((feature, index) => (
-                                      <li key={index} className="flex items-start gap-1">
-                                        <span className="text-green-500 mt-0.5">✓</span>
-                                        <span>{feature}</span>
-                                      </li>
-                                    ))}
-                                  </ul>
-                                </div>
-                              ))}
-                            </div>
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
-
-                    {/* Keywords */}
-                    <TableRow>
-                      <TableCell className="font-medium">Target Keywords</TableCell>
-                      {selectedCompetitors.map((competitorId) => {
-                        const { seo } = getCompetitorData(competitorId);
-                        return (
-                          <TableCell key={competitorId} className="text-center">
-                            <div className="flex flex-wrap gap-1 justify-center">
-                              {seo?.keywords?.slice(0, 3).map((keyword, index) => (
-                                <Badge key={index} variant="outline" className="text-xs">
-                                  {keyword}
-                                </Badge>
-                              ))}
-                              {seo?.keywords && seo.keywords.length > 3 && (
-                                <Badge variant="outline" className="text-xs">
-                                  +{seo.keywords.length - 3} more
-                                </Badge>
-                              )}
-                            </div>
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
-
-                    {/* Canonical URL */}
-                    <TableRow>
-                      <TableCell className="font-medium">Canonical URL</TableCell>
-                      {selectedCompetitors.map((competitorId) => {
-                        const { seo } = getCompetitorData(competitorId);
-                        return (
-                          <TableCell key={competitorId} className="text-center">
-                            {seo?.canonicalUrl ? (
-                              <a
-                                href={seo.canonicalUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-primary hover:underline text-sm break-all"
-                              >
-                                {seo.canonicalUrl}
-                              </a>
-                            ) : (
-                              'Not specified'
+                          {/* Special Badges */}
+                          <div className="flex gap-2 mt-3">
+                            {selectedPlan.price === 0 && (
+                              <Badge variant="secondary" className="bg-green-100 text-green-800">
+                                <CheckCircle className="w-3 h-3 mr-1" />
+                                Free Plan
+                              </Badge>
                             )}
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
+                            {selectedPlan.isPromo && (
+                              <Badge variant="destructive">
+                                <Zap className="w-3 h-3 mr-1" />
+                                Limited Time
+                              </Badge>
+                            )}
+                            {selectedPlan.target === "individuals" && (
+                              <Badge variant="outline">Individual</Badge>
+                            )}
+                            {selectedPlan.target === "groups" && (
+                              <Badge variant="outline">Team</Badge>
+                            )}
+                          </div>
+                        </div>
+                      )}
 
-
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
+                      {/* Prompt to select plan */}
+                      {!selectedPlan && (
+                        <div className="border rounded-lg p-4 bg-muted/20 text-center">
+                          <DollarSign className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                          <p className="text-sm text-muted-foreground">
+                            Select a plan above to view detailed benefits and pricing
+                          </p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
           )}
 
+          {/* Empty State */}
           {selectedCompetitors.length === 0 && (
             <Card>
-              <CardContent className="text-center py-12">
+              <CardContent className="text-center py-8">
                 <GitCompare className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">No Vendors Selected</h3>
+                <h3 className="text-lg font-semibold mb-2">No Vendors Selected</h3>
                 <p className="text-muted-foreground">
-                  Select at least one vendor above to start comparing their features and pricing.
+                  Select at least one vendor from the list above to start comparing
                 </p>
               </CardContent>
             </Card>
