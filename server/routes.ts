@@ -344,6 +344,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/shared-experiences", async (req, res) => {
+    try {
+      const validatedData = insertSharedExperienceSchema.parse(req.body);
+      const experience = await storage.createSharedExperience(validatedData);
+      res.status(201).json(experience);
+    } catch (error) {
+      console.error("Shared experience creation error:", error);
+      res.status(400).json({ error: "Invalid shared experience data" });
+    }
+  });
+
   app.get("/api/competitors/:id/latest-shared-experience", async (req, res) => {
     try {
       const experience = await storage.getLatestSharedExperience(req.params.id);

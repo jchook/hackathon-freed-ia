@@ -19,9 +19,20 @@ import {
   type InsertSharedExperience,
   type CompetitorWithPlans,
   type CompetitorWithReviews,
-  type DashboardStats
+  type DashboardStats,
+  competitors,
+  pricingPlans,
+  priceHistory,
+  alerts,
+  reviews,
+  reviewSummary,
+  feedItems,
+  seoData,
+  sharedExperiences
 } from "@shared/schema";
 import { randomUUID } from "crypto";
+import { db } from "./db";
+import { eq, desc } from "drizzle-orm";
 
 export interface IStorage {
   // Competitors

@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Sidebar } from "@/components/Sidebar";
 import { Header } from "@/components/Header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,11 +7,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileText, Play, Pause, Upload, Download, Stethoscope, Clock, User } from "lucide-react";
+import { FileText, Play, Pause, Upload, Download, Stethoscope, Clock, User, Share2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import audioFile from "@assets/Visit to the family doctor_1754271038617.m4a";
-import type { SharedExperience } from "@shared/schema";
+import type { SharedExperience, Competitor } from "@shared/schema";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 
 const TRANSCRIPT = `Hi, it's Doctor McClure. How are you doing today? Doing fine. Great. I know we're supposed to review your labs, but do you have any questions before we start? My ankle has been hurting. Did anything happen to it? I twisted it while running. It's been swollen and not getting much better. When did that happen? A week ago. Have you been able to walk on it since then? Yeah, just hurts. Have you been doing anything for your ankle? I tried some ice. Ibuprofen once kind of helps. Are you able to do other exercises besides running so that you can still move your body even if you have an injury? It sounds like it can help. So I think that's a great first step. Let me just do that exam on your foot. Really glad that you've been doing exercise even when you're in pain. Doing other exercises besides running so that you can still move your body even if you have an injury. Does it hurt here? No. Does it hurt here? No. Does it hurt here? That hurts a little bit. I don't think you need an x-ray. I think you have an ankle sprain. Icing it is great. Ibuprofen can help reduce swelling.`;
 
@@ -46,20 +49,62 @@ const VENDOR_OUTPUTS = {
 };
 
 export default function ExampleNote() {
-  const [selectedVendor, setSelectedVendor] = useState<string>('heidi-1');
+  const [selectedVendor, setSelectedVendor] = useState<string>('');
   const [customNote, setCustomNote] = useState({
     subjective: '',
     objective: '',
     assessment: '',
     plan: ''
   });
+  const [clinicianData, setClinicianData] = useState({
+    name: '',
+    specialty: '',
+    transcriptionDuration: 0,
+    notes: ''
+  });
   const [activeTab, setActiveTab] = useState('compare');
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
   const { toast } = useToast();
 
+  // Fetch competitors for the vendor selector
+  const { data: competitors = [] } = useQuery<Competitor[]>({
+    queryKey: ['/api/competitors'],
+  });
+
+  // Mutation for submitting shared experience
+  const shareExperience = useMutation({
+    mutationFn: async (experienceData: any) => {
+      return apiRequest('/api/shared-experiences', {
+        method: 'POST',
+        body: JSON.stringify(experienceData),
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Your experience has been shared with the community",
+      });
+      // Reset form
+      setCustomNote({ subjective: '', objective: '', assessment: '', plan: '' });
+      setClinicianData({ name: '', specialty: '', transcriptionDuration: 0, notes: '' });
+      setSelectedVendor('');
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: "Failed to share experience. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleSectionChange = (section: keyof typeof customNote, value: string) => {
     setCustomNote(prev => ({ ...prev, [section]: value }));
+  };
+
+  const handleClinicianDataChange = (field: keyof typeof clinicianData, value: string | number) => {
+    setClinicianData(prev => ({ ...prev, [field]: value }));
   };
 
   const handlePlayPause = () => {
@@ -72,6 +117,42 @@ export default function ExampleNote() {
         setIsPlaying(true);
       }
     }
+  };
+
+  const handleSubmitExperience = () => {
+    if (!selectedVendor) {
+      toast({
+        title: "Error",
+        description: "Please select a vendor first",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!customNote.subjective || !customNote.objective || !customNote.assessment || !customNote.plan) {
+      toast({
+        title: "Error", 
+        description: "Please fill in all SOAP note sections",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const experienceData = {
+      competitorId: selectedVendor,
+      transcriptId: "family-doctor-visit-1",
+      clinicianName: clinicianData.name || "Anonymous",
+      clinicianSpecialty: clinicianData.specialty || "General Practice",
+      subjective: customNote.subjective,
+      objective: customNote.objective,
+      assessment: customNote.assessment,
+      plan: customNote.plan,
+      transcriptionDuration: clinicianData.transcriptionDuration || null,
+      notes: clinicianData.notes || null,
+      isPublic: true
+    };
+
+    shareExperience.mutate(experienceData);
   };
 
   const handleAudioEnded = () => {
@@ -145,6 +226,69 @@ Source: ScribeArena Example Note Tool`;
             </p>
           </div>
 
+          {/* Vendor Selection */}
+          <Card data-testid="vendor-selection">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <User className="w-5 h-5" />
+                Select Your EHR Vendor
+              </CardTitle>
+              <CardDescription>
+                Choose which AI scribe vendor you'd like to test with this patient visit
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="vendor-select">AI Scribe Vendor</Label>
+                  <Select value={selectedVendor} onValueChange={setSelectedVendor} data-testid="vendor-select">
+                    <SelectTrigger id="vendor-select">
+                      <SelectValue placeholder="Select a vendor to test..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {competitors.map((competitor) => (
+                        <SelectItem key={competitor.id} value={competitor.id}>
+                          {competitor.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="clinician-name">Your Name (Optional)</Label>
+                  <Input 
+                    id="clinician-name"
+                    placeholder="Dr. Smith"
+                    value={clinicianData.name}
+                    onChange={(e) => handleClinicianDataChange('name', e.target.value)}
+                    data-testid="input-clinician-name"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="specialty">Specialty (Optional)</Label>
+                  <Input 
+                    id="specialty"
+                    placeholder="Internal Medicine"
+                    value={clinicianData.specialty}
+                    onChange={(e) => handleClinicianDataChange('specialty', e.target.value)}
+                    data-testid="input-specialty"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="duration">Transcription Time (seconds)</Label>
+                  <Input 
+                    id="duration"
+                    type="number"
+                    placeholder="120"
+                    value={clinicianData.transcriptionDuration}
+                    onChange={(e) => handleClinicianDataChange('transcriptionDuration', parseInt(e.target.value) || 0)}
+                    data-testid="input-duration"
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Audio and Transcript Section */}
           <Card data-testid="transcript-section">
             <CardHeader>
@@ -202,112 +346,117 @@ Source: ScribeArena Example Note Tool`;
                 </TabsList>
                 
                 <TabsContent value="compare" className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <label htmlFor="vendor-select" className="text-sm font-medium">
-                        Select AI Scribe Vendor:
-                      </label>
-                      <Select value={selectedVendor} onValueChange={setSelectedVendor}>
-                        <SelectTrigger className="w-48" data-testid="vendor-select">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="heidi-1">Heidi Health</SelectItem>
-                          <SelectItem value="freed-1">Freed AI</SelectItem>
-                          <SelectItem value="sunoh-1">Sunoh AI</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <Button onClick={handleDownloadNote} className="flex items-center gap-2" data-testid="download-note">
-                      <Download className="w-4 h-4" />
-                      Download Note
-                    </Button>
-                  </div>
-
-                  {/* Latest Shared Experience Display */}
-                  {selectedVendor && sharedExperience && (
-                    <Card className="mt-4 border-blue-200 bg-blue-50/50">
-                      <CardHeader className="pb-3">
-                        <div className="flex items-center justify-between">
-                          <CardTitle className="text-sm font-medium text-blue-900">Latest Shared Experience</CardTitle>
-                          <div className="flex items-center gap-2 text-xs text-blue-700">
-                            <Clock className="w-3 h-3" />
-                            <span>Transcription: {formatDuration(sharedExperience.transcriptionDuration || 0)}</span>
-                          </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="pt-0">
-                        <div className="flex items-center gap-2 mb-2">
-                          <User className="w-4 h-4 text-blue-600" />
-                          <span className="text-sm font-medium text-blue-900">{sharedExperience.clinicianName}</span>
-                          <Badge variant="outline" className="text-xs">{sharedExperience.clinicianSpecialty}</Badge>
-                        </div>
-                        {sharedExperience.notes && (
-                          <p className="text-sm text-blue-800 italic">"{sharedExperience.notes}"</p>
-                        )}
-                        <div className="text-xs text-blue-600 mt-2">
-                          Shared {new Date(sharedExperience.createdAt!).toLocaleDateString()}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
-
-                  {selectedVendor && isLoadingExperience && (
-                    <Card className="mt-4 border-gray-200">
-                      <CardContent className="p-4">
-                        <div className="text-sm text-gray-500">Loading shared experience...</div>
-                      </CardContent>
-                    </Card>
-                  )}
-
-                  {selectedVendor && (
-                    <div className="grid gap-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <Card>
-                          <CardHeader className="pb-3">
-                            <CardTitle className="text-lg">Subjective</CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            <p className="text-sm leading-relaxed">
-                              {VENDOR_OUTPUTS[selectedVendor as keyof typeof VENDOR_OUTPUTS].soap.subjective}
-                            </p>
-                          </CardContent>
-                        </Card>
-
-                        <Card>
-                          <CardHeader className="pb-3">
-                            <CardTitle className="text-lg">Objective</CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            <p className="text-sm leading-relaxed">
-                              {VENDOR_OUTPUTS[selectedVendor as keyof typeof VENDOR_OUTPUTS].soap.objective}
-                            </p>
-                          </CardContent>
-                        </Card>
-
-                        <Card>
-                          <CardHeader className="pb-3">
-                            <CardTitle className="text-lg">Assessment</CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            <p className="text-sm leading-relaxed">
-                              {VENDOR_OUTPUTS[selectedVendor as keyof typeof VENDOR_OUTPUTS].soap.assessment}
-                            </p>
-                          </CardContent>
-                        </Card>
-
-                        <Card>
-                          <CardHeader className="pb-3">
-                            <CardTitle className="text-lg">Plan</CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            <p className="text-sm leading-relaxed">
-                              {VENDOR_OUTPUTS[selectedVendor as keyof typeof VENDOR_OUTPUTS].soap.plan}
-                            </p>
-                          </CardContent>
-                        </Card>
+                  {!selectedVendor ? (
+                    <div className="text-center py-12">
+                      <div className="max-w-md mx-auto">
+                        <FileText className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                        <h3 className="text-lg font-medium mb-2">Select a Vendor Above</h3>
+                        <p className="text-muted-foreground text-sm">
+                          Choose an AI scribe vendor from the selection section above to see their generated SOAP note for this visit.
+                        </p>
                       </div>
                     </div>
+                  ) : (
+                    <>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-lg font-medium">AI-Generated SOAP Note</h3>
+                          <Badge variant="secondary">
+                            {competitors.find(c => c.id === selectedVendor)?.name || 'Unknown Vendor'}
+                          </Badge>
+                        </div>
+                        <Button onClick={handleDownloadNote} className="flex items-center gap-2" data-testid="download-note">
+                          <Download className="w-4 h-4" />
+                          Download Note
+                        </Button>
+                      </div>
+
+                      {/* Latest Shared Experience Display */}
+                      {selectedVendor && sharedExperience && (
+                        <Card className="mt-4 border-blue-200 bg-blue-50/50">
+                          <CardHeader className="pb-3">
+                            <div className="flex items-center justify-between">
+                              <CardTitle className="text-sm font-medium text-blue-900">Latest Shared Experience</CardTitle>
+                              <div className="flex items-center gap-2 text-xs text-blue-700">
+                                <Clock className="w-3 h-3" />
+                                <span>Transcription: {formatDuration(sharedExperience.transcriptionDuration || 0)}</span>
+                              </div>
+                            </div>
+                          </CardHeader>
+                          <CardContent className="pt-0">
+                            <div className="flex items-center gap-2 mb-2">
+                              <User className="w-4 h-4 text-blue-600" />
+                              <span className="text-sm font-medium text-blue-900">{sharedExperience.clinicianName}</span>
+                              <Badge variant="outline" className="text-xs">{sharedExperience.clinicianSpecialty}</Badge>
+                            </div>
+                            {sharedExperience.notes && (
+                              <p className="text-sm text-blue-800 italic">"{sharedExperience.notes}"</p>
+                            )}
+                            <div className="text-xs text-blue-600 mt-2">
+                              Shared {new Date(sharedExperience.createdAt!).toLocaleDateString()}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      )}
+
+                      {selectedVendor && isLoadingExperience && (
+                        <Card className="mt-4 border-gray-200">
+                          <CardContent className="p-4">
+                            <div className="text-sm text-gray-500">Loading shared experience...</div>
+                          </CardContent>
+                        </Card>
+                      )}
+
+                      {selectedVendor && (
+                        <div className="grid gap-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <Card>
+                              <CardHeader className="pb-3">
+                                <CardTitle className="text-lg">Subjective</CardTitle>
+                              </CardHeader>
+                              <CardContent>
+                                <p className="text-sm leading-relaxed">
+                                  {VENDOR_OUTPUTS[selectedVendor as keyof typeof VENDOR_OUTPUTS].soap.subjective}
+                                </p>
+                              </CardContent>
+                            </Card>
+
+                            <Card>
+                              <CardHeader className="pb-3">
+                                <CardTitle className="text-lg">Objective</CardTitle>
+                              </CardHeader>
+                              <CardContent>
+                                <p className="text-sm leading-relaxed">
+                                  {VENDOR_OUTPUTS[selectedVendor as keyof typeof VENDOR_OUTPUTS].soap.objective}
+                                </p>
+                              </CardContent>
+                            </Card>
+
+                            <Card>
+                              <CardHeader className="pb-3">
+                                <CardTitle className="text-lg">Assessment</CardTitle>
+                              </CardHeader>
+                              <CardContent>
+                                <p className="text-sm leading-relaxed">
+                                  {VENDOR_OUTPUTS[selectedVendor as keyof typeof VENDOR_OUTPUTS].soap.assessment}
+                                </p>
+                              </CardContent>
+                            </Card>
+
+                            <Card>
+                              <CardHeader className="pb-3">
+                                <CardTitle className="text-lg">Plan</CardTitle>
+                              </CardHeader>
+                              <CardContent>
+                                <p className="text-sm leading-relaxed">
+                                  {VENDOR_OUTPUTS[selectedVendor as keyof typeof VENDOR_OUTPUTS].soap.plan}
+                                </p>
+                              </CardContent>
+                            </Card>
+                          </div>
+                        </div>
+                      )}
+                    </>
                   )}
                 </TabsContent>
 
@@ -376,11 +525,59 @@ Source: ScribeArena Example Note Tool`;
                         data-testid="input-plan"
                       />
                     </div>
+
+                    <div>
+                      <label htmlFor="notes" className="block text-sm font-medium mb-2">
+                        Additional Notes (Optional)
+                      </label>
+                      <Textarea
+                        id="notes"
+                        placeholder="Any additional comments about your experience with this vendor..."
+                        value={clinicianData.notes}
+                        onChange={(e) => handleClinicianDataChange('notes', e.target.value)}
+                        className="min-h-[80px]"
+                        data-testid="input-notes"
+                      />
+                    </div>
                   </div>
                 </TabsContent>
               </Tabs>
             </CardContent>
           </Card>
+
+          {/* Submit Experience Section */}
+          {activeTab === 'custom' && (
+            <Card data-testid="submit-experience">
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <h3 className="text-lg font-semibold">Share Your Clinical Experience</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Help the medical community by sharing your SOAP note for this standardized visit
+                    </p>
+                  </div>
+                  <Button 
+                    onClick={handleSubmitExperience}
+                    disabled={!selectedVendor || shareExperience.isPending}
+                    className="flex items-center gap-2"
+                    data-testid="button-submit-experience"
+                  >
+                    {shareExperience.isPending ? (
+                      <>
+                        <Clock className="w-4 h-4 animate-spin" />
+                        Submitting...
+                      </>
+                    ) : (
+                      <>
+                        <Share2 className="w-4 h-4" />
+                        Share Experience
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Usage Instructions */}
           <Card data-testid="usage-instructions">
