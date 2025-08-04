@@ -86,23 +86,29 @@ Guidelines:
   } catch (error) {
     console.error("AI vendor analysis failed:", error);
     
-    // Fallback parsing for basic inputs
+    // Enhanced fallback parsing for basic inputs
     const fallbackName = input.includes("http") 
       ? extractDomainName(input)
-      : input.trim();
+      : capitalizeVendorName(input.trim());
     
-    const fallbackWebsite = input.includes("http") 
-      ? input 
-      : `https://${input.toLowerCase().replace(/\s+/g, "")}.com`;
-
+    let fallbackWebsite = "";
+    if (input.includes("http")) {
+      fallbackWebsite = input;
+    } else {
+      // Enhanced website discovery for known medical AI companies
+      const cleanName = input.toLowerCase().replace(/\s+/g, "");
+      const knownWebsite = getKnownMedicalAIWebsite(cleanName);
+      fallbackWebsite = knownWebsite || `https://www.${cleanName}.com`;
+    }
+    
     return {
       vendorName: fallbackName,
-      description: `${fallbackName} is an AI medical scribe solution that helps healthcare providers with clinical documentation.`,
+      description: `${fallbackName} is an AI medical scribe solution that helps healthcare providers with clinical documentation and workflow automation.`,
       website: fallbackWebsite,
       reviewSources: [],
       newsSources: [],
       confidence: 0.3,
-      reasoning: "Fallback analysis due to AI processing error"
+      reasoning: "Fallback analysis - AI quota exceeded, using basic pattern matching"
     };
   }
 }
@@ -114,4 +120,36 @@ function extractDomainName(url: string): string {
   } catch {
     return url.trim();
   }
+}
+
+function capitalizeVendorName(name: string): string {
+  return name
+    .split(/\s+/)
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+}
+
+function getKnownMedicalAIWebsite(cleanName: string): string | null {
+  const knownCompanies: Record<string, string> = {
+    "nabla": "https://www.nabla.com",
+    "heidi": "https://www.heidihealthai.com", 
+    "heidihealthai": "https://www.heidihealthai.com",
+    "hedihealth": "https://www.heidihealthai.com",
+    "freed": "https://www.getfreed.ai",
+    "getfreed": "https://www.getfreed.ai",
+    "freedai": "https://www.getfreed.ai",
+    "sunoh": "https://www.sunoh.ai",
+    "sunohai": "https://www.sunoh.ai",
+    "ambient": "https://www.ambient.ai",
+    "ambientai": "https://www.ambient.ai",
+    "nuance": "https://www.nuance.com",
+    "microsoft": "https://www.microsoft.com",
+    "dragon": "https://www.nuance.com",
+    "whisper": "https://openai.com",
+    "openai": "https://openai.com",
+    "anthropic": "https://www.anthropic.com",
+    "claude": "https://www.anthropic.com"
+  };
+  
+  return knownCompanies[cleanName] || null;
 }
