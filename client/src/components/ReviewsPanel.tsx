@@ -1,8 +1,10 @@
-import { Star, TrendingUp, TrendingDown, MessageSquare, Shield } from "lucide-react";
+import { useState } from "react";
+import { Star, TrendingUp, TrendingDown, MessageSquare, Shield, Plus } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
 import type { Review, ReviewSummary } from "@shared/schema";
 
 interface ReviewsPanelProps {
@@ -12,6 +14,8 @@ interface ReviewsPanelProps {
 }
 
 export function ReviewsPanel({ reviews, summary, competitorName }: ReviewsPanelProps) {
+  const [displayedCount, setDisplayedCount] = useState(10);
+  const [isLoading, setIsLoading] = useState(false);
   const getRatingColor = (rating: number) => {
     if (rating >= 4) return "text-green-600 dark:text-green-400";
     if (rating >= 3) return "text-yellow-600 dark:text-yellow-400";
@@ -43,6 +47,17 @@ export function ReviewsPanel({ reviews, summary, competitorName }: ReviewsPanelP
 
   const averageRating = summary?.averageRating ? summary.averageRating / 10 : 0;
   const sentimentScore = summary?.sentimentScore ?? 0;
+
+  const displayedReviews = reviews.slice(0, displayedCount);
+  const hasMoreReviews = displayedCount < reviews.length;
+
+  const handleShowMore = async () => {
+    setIsLoading(true);
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+    setDisplayedCount(prev => prev + 10);
+    setIsLoading(false);
+  };
 
   return (
     <div className="w-full space-y-6" data-testid="reviews-panel">
@@ -155,7 +170,7 @@ export function ReviewsPanel({ reviews, summary, competitorName }: ReviewsPanelP
             </div>
           ) : (
             <div className="space-y-6">
-              {reviews.map((review, index) => (
+              {displayedReviews.map((review, index) => (
                 <div key={review.id} data-testid={`review-item-${index}`}>
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-3">
@@ -200,9 +215,34 @@ export function ReviewsPanel({ reviews, summary, competitorName }: ReviewsPanelP
                     <span>{review.platform}</span>
                   </div>
 
-                  {index < reviews.length - 1 && <Separator className="mt-6" />}
+                  {index < displayedReviews.length - 1 && <Separator className="mt-6" />}
                 </div>
               ))}
+            </div>
+          )}
+          
+          {/* Show More Button */}
+          {hasMoreReviews && (
+            <div className="flex justify-center pt-6 border-t">
+              <Button
+                variant="outline"
+                onClick={handleShowMore}
+                disabled={isLoading}
+                className="min-w-[160px]"
+                data-testid="show-more-reviews-button"
+              >
+                {isLoading ? (
+                  <>
+                    <div className="w-4 h-4 mr-2 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+                    Loading...
+                  </>
+                ) : (
+                  <>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Show 10 more ({reviews.length - displayedCount} remaining)
+                  </>
+                )}
+              </Button>
             </div>
           )}
         </CardContent>
