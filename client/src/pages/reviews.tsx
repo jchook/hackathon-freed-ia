@@ -159,7 +159,8 @@ export default function Reviews() {
                   </p>
                 </CardContent>
               </Card>
-            ) : (
+            ) : selectedVendor ? (
+              // Show single vendor's reviews
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                 {filteredCompetitors.map((competitor) => (
                   <ReviewsPanel
@@ -168,6 +169,36 @@ export default function Reviews() {
                     summary={competitor.reviewSummary}
                     competitorName={competitor.name}
                   />
+                ))}
+              </div>
+            ) : (
+              // Show all vendors' reviews in a single consolidated view
+              <div className="space-y-6">
+                {competitorsWithReviews?.map((competitor) => (
+                  <div key={`vendor-section-${competitor.id}`} className="space-y-4">
+                    <div className="flex items-center gap-3 border-b pb-2">
+                      <Building className="w-5 h-5 text-primary" />
+                      <h2 className="text-xl font-semibold">{competitor.name}</h2>
+                      {competitor.reviewSummary && (
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1">
+                            {renderStars(Math.round((competitor.reviewSummary.averageRating || 0) / 10))}
+                          </div>
+                          <span className="text-sm text-muted-foreground">
+                            {((competitor.reviewSummary.averageRating || 0) / 10).toFixed(1)} 
+                            ({competitor.reviewSummary.totalReviews || 0} reviews)
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                      <ReviewsPanel
+                        reviews={competitor.reviews || []}
+                        summary={competitor.reviewSummary}
+                        competitorName={competitor.name}
+                      />
+                    </div>
+                  </div>
                 ))}
               </div>
             )}
