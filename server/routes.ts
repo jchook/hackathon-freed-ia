@@ -1,7 +1,13 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertCompetitorSchema, insertPricingPlanSchema, insertAlertSchema } from "@shared/schema";
+import { 
+  insertCompetitorSchema, 
+  insertPricingPlanSchema, 
+  insertAlertSchema,
+  insertReviewSchema,
+  insertReviewSummarySchema 
+} from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Dashboard stats
@@ -163,6 +169,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(reportData);
     } catch (error) {
       res.status(500).json({ error: "Failed to generate report" });
+    }
+  });
+
+  // Reviews
+  app.get("/api/reviews", async (req, res) => {
+    try {
+      const reviews = await storage.getReviews();
+      res.json(reviews);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch reviews" });
+    }
+  });
+
+  app.get("/api/competitors/:id/reviews", async (req, res) => {
+    try {
+      const reviews = await storage.getReviewsByCompetitor(req.params.id);
+      res.json(reviews);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch competitor reviews" });
+    }
+  });
+
+  app.post("/api/reviews", async (req, res) => {
+    try {
+      const validatedData = insertReviewSchema.parse(req.body);
+      const review = await storage.createReview(validatedData);
+      res.status(201).json(review);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid review data" });
+    }
+  });
+
+  // Review Summaries
+  app.get("/api/review-summaries", async (req, res) => {
+    try {
+      const summaries = await storage.getReviewSummaries();
+      res.json(summaries);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch review summaries" });
+    }
+  });
+
+  app.get("/api/competitors/:id/review-summary", async (req, res) => {
+    try {
+      const summary = await storage.getReviewSummaryByCompetitor(req.params.id);
+      if (!summary) {
+        return res.status(404).json({ error: "Review summary not found" });
+      }
+      res.json(summary);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch review summary" });
+    }
+  });
+
+  app.post("/api/review-summaries", async (req, res) => {
+    try {
+      const validatedData = insertReviewSummarySchema.parse(req.body);
+      const summary = await storage.createReviewSummary(validatedData);
+      res.status(201).json(summary);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid review summary data" });
+    }
+  });
+
+  // Enhanced competitors endpoint with reviews
+  app.get("/api/competitors-with-reviews", async (req, res) => {
+    try {
+      const competitors = await storage.getCompetitorsWithReviews();
+      res.json(competitors);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch competitors with reviews" });
     }
   });
 

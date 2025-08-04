@@ -47,6 +47,34 @@ export const alerts = pgTable("alerts", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const reviews = pgTable("reviews", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  competitorId: varchar("competitor_id").notNull().references(() => competitors.id),
+  platform: text("platform").notNull(), // 'trustpilot', 'google', 'capterra', etc.
+  rating: integer("rating").notNull(), // 1-5 stars
+  title: text("title"),
+  content: text("content").notNull(),
+  author: text("author"),
+  sentiment: text("sentiment"), // 'positive', 'negative', 'neutral'
+  highlights: jsonb("highlights").$type<string[]>(),
+  isVerified: boolean("is_verified").default(false),
+  reviewDate: timestamp("review_date"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const reviewSummary = pgTable("review_summary", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  competitorId: varchar("competitor_id").notNull().references(() => competitors.id),
+  platform: text("platform").notNull(),
+  totalReviews: integer("total_reviews").default(0),
+  averageRating: integer("average_rating"), // stored as integer (4.4 = 44)
+  sentimentScore: integer("sentiment_score"), // -100 to 100
+  commonPraises: jsonb("common_praises").$type<string[]>(),
+  commonComplaints: jsonb("common_complaints").$type<string[]>(),
+  lastUpdated: timestamp("last_updated").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertCompetitorSchema = createInsertSchema(competitors).omit({
   id: true,
@@ -68,6 +96,17 @@ export const insertAlertSchema = createInsertSchema(alerts).omit({
   createdAt: true,
 });
 
+export const insertReviewSchema = createInsertSchema(reviews).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertReviewSummarySchema = createInsertSchema(reviewSummary).omit({
+  id: true,
+  createdAt: true,
+  lastUpdated: true,
+});
+
 // Types
 export type Competitor = typeof competitors.$inferSelect;
 export type InsertCompetitor = z.infer<typeof insertCompetitorSchema>;
@@ -81,9 +120,22 @@ export type InsertPriceHistory = z.infer<typeof insertPriceHistorySchema>;
 export type Alert = typeof alerts.$inferSelect;
 export type InsertAlert = z.infer<typeof insertAlertSchema>;
 
+export type Review = typeof reviews.$inferSelect;
+export type InsertReview = z.infer<typeof insertReviewSchema>;
+
+export type ReviewSummary = typeof reviewSummary.$inferSelect;
+export type InsertReviewSummary = z.infer<typeof insertReviewSummarySchema>;
+
 // Combined types for API responses
 export type CompetitorWithPlans = Competitor & {
   plans: PricingPlan[];
+  reviewSummary?: ReviewSummary;
+};
+
+export type CompetitorWithReviews = Competitor & {
+  plans: PricingPlan[];
+  reviews: Review[];
+  reviewSummary?: ReviewSummary;
 };
 
 export type DashboardStats = {
@@ -92,4 +144,6 @@ export type DashboardStats = {
   priceChanges: number;
   marketPosition: number;
   priceChangePercentage: number;
+  averageCustomerRating: number;
+  totalReviews: number;
 };
