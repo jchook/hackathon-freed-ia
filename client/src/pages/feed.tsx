@@ -5,18 +5,23 @@ import { Header } from "@/components/Header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Rss, ExternalLink, Calendar, Filter } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Rss, ExternalLink, Calendar, Filter, Tag } from "lucide-react";
 import { type FeedItem } from "@shared/schema";
 import { format } from "date-fns";
 
 export default function Feed() {
   const [selectedSource, setSelectedSource] = useState<string | null>(null);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   const { data: feedItems, isLoading } = useQuery<FeedItem[]>({
-    queryKey: selectedSource ? ['/api/feed', selectedSource] : ['/api/feed'],
-    queryFn: selectedSource 
-      ? () => fetch(`/api/feed?source=${selectedSource}`).then(res => res.json())
-      : () => fetch('/api/feed').then(res => res.json())
+    queryKey: ['/api/feed', selectedSource, selectedTags],
+    queryFn: () => {
+      const params = new URLSearchParams();
+      if (selectedSource) params.append('source', selectedSource);
+      if (selectedTags.length > 0) params.append('tags', selectedTags.join(','));
+      return fetch(`/api/feed?${params.toString()}`).then(res => res.json());
+    }
   });
 
   if (isLoading) {
@@ -36,6 +41,35 @@ export default function Feed() {
     { id: 'sunoh', name: 'Sunoh AI', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300' },
     { id: 'market', name: 'Market News', color: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300' },
   ];
+
+  const availableTags = [
+    'product-update',
+    'integration',
+    'funding',
+    'security',
+    'market-research',
+    'beta',
+    'forms',
+    'automation',
+    'calls',
+    'epic',
+    'ehr',
+    'series-a',
+    'sequoia',
+    'hipaa',
+    'privacy',
+    'templates',
+    'customization',
+    'productivity'
+  ];
+
+  const handleTagToggle = (tag: string) => {
+    setSelectedTags(prev => 
+      prev.includes(tag) 
+        ? prev.filter(t => t !== tag)
+        : [...prev, tag]
+    );
+  };
 
   const getSourceInfo = (source: string) => {
     return sources.find(s => s.id === source) || { id: source, name: source, color: 'bg-gray-100 text-gray-800' };
@@ -102,6 +136,53 @@ export default function Feed() {
                   </Button>
                 ))}
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Tag Filters */}
+          <Card data-testid="tag-filters">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Tag className="w-5 h-5" />
+                Filter by Tags
+              </CardTitle>
+              <CardDescription>
+                Select multiple tags to filter updates. Leave empty to show all tags.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                {availableTags.map((tag) => (
+                  <div key={tag} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`tag-${tag}`}
+                      checked={selectedTags.includes(tag)}
+                      onCheckedChange={() => handleTagToggle(tag)}
+                      data-testid={`tag-checkbox-${tag}`}
+                    />
+                    <label 
+                      htmlFor={`tag-${tag}`} 
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                    >
+                      {tag}
+                    </label>
+                  </div>
+                ))}
+              </div>
+              
+              {/* Clear Tags Button */}
+              {selectedTags.length > 0 && (
+                <div className="mt-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setSelectedTags([])}
+                    data-testid="clear-tags"
+                  >
+                    Clear All Tags ({selectedTags.length})
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
 

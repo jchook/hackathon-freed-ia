@@ -249,10 +249,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Feed items
   app.get("/api/feed", async (req, res) => {
     try {
-      const { source } = req.query;
-      const feedItems = source 
+      const { source, tags } = req.query;
+      const tagArray = tags ? (tags as string).split(',').map(t => t.trim()) : [];
+      
+      let feedItems = source 
         ? await storage.getFeedItemsBySource(source as string)
         : await storage.getFeedItems();
+      
+      // Filter by tags if provided
+      if (tagArray.length > 0) {
+        feedItems = feedItems.filter(item => 
+          item.tags && item.tags.some(tag => tagArray.includes(tag))
+        );
+      }
+      
       res.json(feedItems);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch feed items" });
