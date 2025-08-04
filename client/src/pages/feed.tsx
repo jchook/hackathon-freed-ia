@@ -13,7 +13,10 @@ export default function Feed() {
   const [selectedSource, setSelectedSource] = useState<string | null>(null);
 
   const { data: feedItems, isLoading } = useQuery<FeedItem[]>({
-    queryKey: selectedSource ? ['/api/feed', { source: selectedSource }] : ['/api/feed']
+    queryKey: selectedSource ? ['/api/feed', selectedSource] : ['/api/feed'],
+    queryFn: selectedSource 
+      ? () => fetch(`/api/feed?source=${selectedSource}`).then(res => res.json())
+      : () => fetch('/api/feed').then(res => res.json())
   });
 
   if (isLoading) {
