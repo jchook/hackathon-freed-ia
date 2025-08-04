@@ -226,68 +226,7 @@ Source: ScribeArena Example Note Tool`;
             </p>
           </div>
 
-          {/* Vendor Selection */}
-          <Card data-testid="vendor-selection">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="w-5 h-5" />
-                Select Your EHR Vendor
-              </CardTitle>
-              <CardDescription>
-                Choose which AI scribe vendor you'd like to test with this patient visit
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="vendor-select">AI Scribe Vendor</Label>
-                  <Select value={selectedVendor} onValueChange={setSelectedVendor} data-testid="vendor-select">
-                    <SelectTrigger id="vendor-select">
-                      <SelectValue placeholder="Select a vendor to test..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {competitors.map((competitor) => (
-                        <SelectItem key={competitor.id} value={competitor.id}>
-                          {competitor.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="clinician-name">Your Name (Optional)</Label>
-                  <Input 
-                    id="clinician-name"
-                    placeholder="Dr. Smith"
-                    value={clinicianData.name}
-                    onChange={(e) => handleClinicianDataChange('name', e.target.value)}
-                    data-testid="input-clinician-name"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="specialty">Specialty (Optional)</Label>
-                  <Input 
-                    id="specialty"
-                    placeholder="Internal Medicine"
-                    value={clinicianData.specialty}
-                    onChange={(e) => handleClinicianDataChange('specialty', e.target.value)}
-                    data-testid="input-specialty"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="duration">Transcription Time (seconds)</Label>
-                  <Input 
-                    id="duration"
-                    type="number"
-                    placeholder="120"
-                    value={clinicianData.transcriptionDuration}
-                    onChange={(e) => handleClinicianDataChange('transcriptionDuration', parseInt(e.target.value) || 0)}
-                    data-testid="input-duration"
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+
 
           {/* Audio and Transcript Section */}
           <Card data-testid="transcript-section">
@@ -350,9 +289,9 @@ Source: ScribeArena Example Note Tool`;
                     <div className="text-center py-12">
                       <div className="max-w-md mx-auto">
                         <FileText className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                        <h3 className="text-lg font-medium mb-2">Select a Vendor Above</h3>
+                        <h3 className="text-lg font-medium mb-2">Select a Vendor in Share Experience Tab</h3>
                         <p className="text-muted-foreground text-sm">
-                          Choose an AI scribe vendor from the selection section above to see their generated SOAP note for this visit.
+                          Go to the "Share Experience" tab and choose an AI scribe vendor to see their generated SOAP note for this visit.
                         </p>
                       </div>
                     </div>
@@ -468,6 +407,69 @@ Source: ScribeArena Example Note Tool`;
                       Download Your Note
                     </Button>
                   </div>
+
+                  {/* Vendor Selection */}
+                  <Card data-testid="vendor-selection">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <User className="w-5 h-5" />
+                        Select Your EHR Vendor
+                      </CardTitle>
+                      <CardDescription>
+                        Choose which AI scribe vendor you'd like to test with this patient visit
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="vendor-select">AI Scribe Vendor</Label>
+                          <Select value={selectedVendor} onValueChange={setSelectedVendor} data-testid="vendor-select">
+                            <SelectTrigger id="vendor-select">
+                              <SelectValue placeholder="Select a vendor to test..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {competitors.map((competitor) => (
+                                <SelectItem key={competitor.id} value={competitor.id}>
+                                  {competitor.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="clinician-name">Your Name (Optional)</Label>
+                          <Input 
+                            id="clinician-name"
+                            placeholder="Dr. Smith"
+                            value={clinicianData.name}
+                            onChange={(e) => handleClinicianDataChange('name', e.target.value)}
+                            data-testid="input-clinician-name"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="specialty">Specialty (Optional)</Label>
+                          <Input 
+                            id="specialty"
+                            placeholder="Internal Medicine"
+                            value={clinicianData.specialty}
+                            onChange={(e) => handleClinicianDataChange('specialty', e.target.value)}
+                            data-testid="input-specialty"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="duration">Transcription Time (seconds)</Label>
+                          <Input 
+                            id="duration"
+                            type="number"
+                            placeholder="120"
+                            value={clinicianData.transcriptionDuration}
+                            onChange={(e) => handleClinicianDataChange('transcriptionDuration', parseInt(e.target.value) || 0)}
+                            data-testid="input-duration"
+                          />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
 
                   <div className="grid gap-4">
                     <div>
