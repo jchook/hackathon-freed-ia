@@ -6,9 +6,9 @@ import { CompetitorCard } from "@/components/CompetitorCard";
 import { PricingChart } from "@/components/PricingChart";
 import { ComparisonTable } from "@/components/ComparisonTable";
 import { AlertsPanel } from "@/components/AlertsPanel";
-import { ReviewsPanel } from "@/components/ReviewsPanel";
+
 import { HistoryPanel } from "@/components/HistoryPanel";
-import { type CompetitorWithPlans, type CompetitorWithReviews, type DashboardStats } from "@shared/schema";
+import { type CompetitorWithPlans, type DashboardStats } from "@shared/schema";
 
 export default function Dashboard() {
   const { data: competitors, isLoading: competitorsLoading } = useQuery<CompetitorWithPlans[]>({
@@ -19,15 +19,7 @@ export default function Dashboard() {
     queryKey: ['/api/dashboard/stats']
   });
 
-  const { data: competitorsWithReviews, isLoading: reviewsLoading } = useQuery<CompetitorWithReviews[]>({
-    queryKey: ['/api/competitors-with-reviews']
-  });
-
-  const { data: reviews, isLoading: allReviewsLoading } = useQuery({
-    queryKey: ['/api/reviews']
-  });
-
-  if (competitorsLoading || statsLoading || reviewsLoading) {
+  if (competitorsLoading || statsLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="text-center">
@@ -66,21 +58,7 @@ export default function Dashboard() {
           
           <ComparisonTable competitors={competitors || []} />
           
-          {/* Customer Reviews Section */}
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-foreground">Customer Reviews & Sentiment</h2>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {competitorsWithReviews?.map((competitor) => (
-                <ReviewsPanel
-                  key={`reviews-${competitor.id}`}
-                  reviews={competitor.reviews || []}
-                  summary={competitor.reviewSummary}
-                  competitorName={competitor.name}
-                />
-              ))}
-            </div>
-          </div>
-          
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <AlertsPanel />
             <HistoryPanel competitors={competitors || []} />

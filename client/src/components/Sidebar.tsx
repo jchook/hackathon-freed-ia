@@ -1,9 +1,13 @@
-import { Building, TrendingUp, BarChart3, Bell, Download, Settings, User } from "lucide-react";
+import { Building, TrendingUp, BarChart3, Bell, Download, Settings, User, MessageSquare } from "lucide-react";
+import { Link, useLocation } from "wouter";
 
 export function Sidebar() {
+  const [location] = useLocation();
+  
   const navItems = [
-    { icon: BarChart3, label: "Dashboard", href: "#", active: true },
+    { icon: BarChart3, label: "Dashboard", href: "/", active: location === "/" },
     { icon: Building, label: "Pricing Analysis", href: "#" },
+    { icon: MessageSquare, label: "Reviews", href: "/reviews", active: location === "/reviews" },
     { icon: TrendingUp, label: "Trends", href: "#" },
     { icon: Bell, label: "Alerts", href: "#" },
     { icon: Download, label: "Reports", href: "#" },
@@ -22,19 +26,35 @@ export function Sidebar() {
         
         <nav className="space-y-2">
           {navItems.map((item) => (
-            <a
-              key={item.label}
-              href={item.href}
-              className={`flex items-center space-x-3 p-3 rounded-lg transition-colors ${
-                item.active 
-                  ? 'bg-primary/20 text-blue-300' 
-                  : 'hover:bg-gray-700'
-              }`}
-              data-testid={`nav-${item.label.toLowerCase().replace(' ', '-')}`}
-            >
-              <item.icon className="w-5 h-5" />
-              <span>{item.label}</span>
-            </a>
+            item.href.startsWith("/") ? (
+              <Link
+                key={item.label}
+                href={item.href}
+                className={`flex items-center space-x-3 p-3 rounded-lg transition-colors ${
+                  item.active 
+                    ? 'bg-primary/20 text-blue-300' 
+                    : 'hover:bg-gray-700'
+                }`}
+                data-testid={`nav-${item.label.toLowerCase().replace(' ', '-')}`}
+              >
+                <item.icon className="w-5 h-5" />
+                <span>{item.label}</span>
+              </Link>
+            ) : (
+              <a
+                key={item.label}
+                href={item.href}
+                className={`flex items-center space-x-3 p-3 rounded-lg transition-colors ${
+                  item.active 
+                    ? 'bg-primary/20 text-blue-300' 
+                    : 'hover:bg-gray-700'
+                }`}
+                data-testid={`nav-${item.label.toLowerCase().replace(' ', '-')}`}
+              >
+                <item.icon className="w-5 h-5" />
+                <span>{item.label}</span>
+              </a>
+            )
           ))}
         </nav>
       </div>
