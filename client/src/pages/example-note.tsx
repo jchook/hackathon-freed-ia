@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Sidebar } from "@/components/Sidebar";
 import { Header } from "@/components/Header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,14 +8,15 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileText, Play, Pause, Upload, Download, Stethoscope } from "lucide-react";
+import { FileText, Play, Pause, Upload, Download, Stethoscope, Clock, User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import audioFile from "@assets/Visit to the family doctor_1754271038617.m4a";
+import type { SharedExperience } from "@shared/schema";
 
 const TRANSCRIPT = `Hi, it's Doctor McClure. How are you doing today? Doing fine. Great. I know we're supposed to review your labs, but do you have any questions before we start? My ankle has been hurting. Did anything happen to it? I twisted it while running. It's been swollen and not getting much better. When did that happen? A week ago. Have you been able to walk on it since then? Yeah, just hurts. Have you been doing anything for your ankle? I tried some ice. Ibuprofen once kind of helps. Are you able to do other exercises besides running so that you can still move your body even if you have an injury? It sounds like it can help. So I think that's a great first step. Let me just do that exam on your foot. Really glad that you've been doing exercise even when you're in pain. Doing other exercises besides running so that you can still move your body even if you have an injury. Does it hurt here? No. Does it hurt here? No. Does it hurt here? That hurts a little bit. I don't think you need an x-ray. I think you have an ankle sprain. Icing it is great. Ibuprofen can help reduce swelling.`;
 
 const VENDOR_OUTPUTS = {
-  'heidi': {
+  'heidi-1': {
     name: 'Heidi Health',
     soap: {
       subjective: `Patient reports ankle pain lasting one week following a running injury. States ankle is swollen and "not getting much better." Pain persists with walking but patient able to ambulate. Has tried ice and ibuprofen with some relief. Reports ibuprofen "kind of helps." Patient continues other exercises besides running.`,
@@ -23,7 +25,7 @@ const VENDOR_OUTPUTS = {
       plan: `Continue current management with ice and ibuprofen for anti-inflammatory effect and pain control. Patient education provided regarding continued non-impact exercise. Follow-up as needed if symptoms worsen or fail to improve.`
     }
   },
-  'freed': {
+  'freed-1': {
     name: 'Freed AI',
     soap: {
       subjective: `The patient presents with a chief complaint of ankle pain. The pain began approximately one week ago after the patient twisted their ankle while running. The patient describes the ankle as swollen and reports that it has not been improving significantly. The patient is able to walk on the affected ankle, though it causes discomfort. For pain management, the patient has been using ice and has taken ibuprofen, which provides some relief. The patient continues to engage in other forms of exercise aside from running.`,
@@ -32,7 +34,7 @@ const VENDOR_OUTPUTS = {
       plan: `Recommended continued conservative management including ice therapy and ibuprofen for anti-inflammatory effects. Patient counseled on the benefits of maintaining physical activity with modifications (avoiding running temporarily while continuing other exercises). Patient advised to follow up if symptoms worsen or do not improve with conservative measures.`
     }
   },
-  'sunoh': {
+  'sunoh-1': {
     name: 'Sunoh AI',
     soap: {
       subjective: `Patient reports onset of ankle pain 1 week ago following injury sustained while running. Describes mechanism as twisting motion. Associated symptoms include swelling without significant improvement over the past week. Patient rates pain as tolerable, allowing continued ambulation. Current self-treatment includes intermittent ice application and ibuprofen with partial symptomatic relief. Patient maintains active lifestyle with modification to avoid aggravating activities.`,
@@ -44,7 +46,7 @@ const VENDOR_OUTPUTS = {
 };
 
 export default function ExampleNote() {
-  const [selectedVendor, setSelectedVendor] = useState<string>('heidi');
+  const [selectedVendor, setSelectedVendor] = useState<string>('heidi-1');
   const [customNote, setCustomNote] = useState({
     subjective: '',
     objective: '',
@@ -74,6 +76,18 @@ export default function ExampleNote() {
 
   const handleAudioEnded = () => {
     setIsPlaying(false);
+  };
+
+  // Fetch latest shared experience for selected vendor
+  const { data: sharedExperience, isLoading: isLoadingExperience } = useQuery({
+    queryKey: ['/api/competitors', selectedVendor, 'latest-shared-experience'],
+    enabled: !!selectedVendor,
+  });
+
+  const formatDuration = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
   const handleDownloadNote = () => {
@@ -198,9 +212,9 @@ Source: ScribeArena Example Note Tool`;
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="heidi">Heidi Health</SelectItem>
-                          <SelectItem value="freed">Freed AI</SelectItem>
-                          <SelectItem value="sunoh">Sunoh AI</SelectItem>
+                          <SelectItem value="heidi-1">Heidi Health</SelectItem>
+                          <SelectItem value="freed-1">Freed AI</SelectItem>
+                          <SelectItem value="sunoh-1">Sunoh AI</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -209,6 +223,42 @@ Source: ScribeArena Example Note Tool`;
                       Download Note
                     </Button>
                   </div>
+
+                  {/* Latest Shared Experience Display */}
+                  {selectedVendor && sharedExperience && (
+                    <Card className="mt-4 border-blue-200 bg-blue-50/50">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-sm font-medium text-blue-900">Latest Shared Experience</CardTitle>
+                          <div className="flex items-center gap-2 text-xs text-blue-700">
+                            <Clock className="w-3 h-3" />
+                            <span>Transcription: {formatDuration(sharedExperience.transcriptionDuration || 0)}</span>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="pt-0">
+                        <div className="flex items-center gap-2 mb-2">
+                          <User className="w-4 h-4 text-blue-600" />
+                          <span className="text-sm font-medium text-blue-900">{sharedExperience.clinicianName}</span>
+                          <Badge variant="outline" className="text-xs">{sharedExperience.clinicianSpecialty}</Badge>
+                        </div>
+                        {sharedExperience.notes && (
+                          <p className="text-sm text-blue-800 italic">"{sharedExperience.notes}"</p>
+                        )}
+                        <div className="text-xs text-blue-600 mt-2">
+                          Shared {new Date(sharedExperience.createdAt!).toLocaleDateString()}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {selectedVendor && isLoadingExperience && (
+                    <Card className="mt-4 border-gray-200">
+                      <CardContent className="p-4">
+                        <div className="text-sm text-gray-500">Loading shared experience...</div>
+                      </CardContent>
+                    </Card>
+                  )}
 
                   {selectedVendor && (
                     <div className="grid gap-4">

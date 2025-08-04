@@ -178,6 +178,31 @@ export const insertSeoDataSchema = createInsertSchema(seoData).omit({
 export type SeoData = typeof seoData.$inferSelect;
 export type InsertSeoData = z.infer<typeof insertSeoDataSchema>;
 
+// Schema for shared clinical experiences
+export const sharedExperiences = pgTable("shared_experiences", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  competitorId: varchar("competitor_id").references(() => competitors.id).notNull(),
+  transcriptId: text("transcript_id").notNull(), // Links to specific patient visit
+  clinicianName: text("clinician_name"),
+  clinicianSpecialty: text("clinician_specialty"),
+  subjective: text("subjective").notNull(),
+  objective: text("objective").notNull(),
+  assessment: text("assessment").notNull(),
+  plan: text("plan").notNull(),
+  transcriptionDuration: integer("transcription_duration"), // in seconds
+  notes: text("notes"), // Additional comments from clinician
+  isPublic: boolean("is_public").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertSharedExperienceSchema = createInsertSchema(sharedExperiences).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type SharedExperience = typeof sharedExperiences.$inferSelect;
+export type InsertSharedExperience = z.infer<typeof insertSharedExperienceSchema>;
+
 // Combined types for API responses
 export type CompetitorWithPlans = Competitor & {
   plans: PricingPlan[];

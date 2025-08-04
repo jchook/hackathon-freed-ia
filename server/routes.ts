@@ -8,7 +8,8 @@ import {
   insertReviewSchema,
   insertReviewSummarySchema,
   insertFeedItemSchema,
-  insertSeoDataSchema
+  insertSeoDataSchema,
+  insertSharedExperienceSchema
 } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -295,6 +296,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(seoData);
     } catch (error) {
       res.status(400).json({ error: "Invalid SEO data" });
+    }
+  });
+
+  // Shared Experiences
+  app.get("/api/shared-experiences", async (req, res) => {
+    try {
+      const experiences = await storage.getSharedExperiences();
+      res.json(experiences);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch shared experiences" });
+    }
+  });
+
+  app.get("/api/competitors/:id/shared-experiences", async (req, res) => {
+    try {
+      const experiences = await storage.getSharedExperiencesByCompetitor(req.params.id);
+      res.json(experiences);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch shared experiences for competitor" });
+    }
+  });
+
+  app.get("/api/competitors/:id/latest-shared-experience", async (req, res) => {
+    try {
+      const experience = await storage.getLatestSharedExperience(req.params.id);
+      if (!experience) {
+        return res.status(404).json({ error: "No shared experience found" });
+      }
+      res.json(experience);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch latest shared experience" });
+    }
+  });
+
+  app.post("/api/shared-experiences", async (req, res) => {
+    try {
+      const validatedData = insertSharedExperienceSchema.parse(req.body);
+      const experience = await storage.createSharedExperience(validatedData);
+      res.status(201).json(experience);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid shared experience data" });
     }
   });
 

@@ -15,6 +15,8 @@ import {
   type InsertFeedItem,
   type SeoData,
   type InsertSeoData,
+  type SharedExperience,
+  type InsertSharedExperience,
   type CompetitorWithPlans,
   type CompetitorWithReviews,
   type DashboardStats
@@ -66,6 +68,12 @@ export interface IStorage {
   createSeoData(seoData: InsertSeoData): Promise<SeoData>;
   updateSeoData(id: string, seoData: Partial<InsertSeoData>): Promise<SeoData | undefined>;
   
+  // Shared Experiences
+  getSharedExperiences(): Promise<SharedExperience[]>;
+  getSharedExperiencesByCompetitor(competitorId: string): Promise<SharedExperience[]>;
+  getLatestSharedExperience(competitorId: string): Promise<SharedExperience | undefined>;
+  createSharedExperience(experience: InsertSharedExperience): Promise<SharedExperience>;
+  
   // Dashboard
   getCompetitorsWithPlans(): Promise<CompetitorWithPlans[]>;
   getCompetitorsWithReviews(): Promise<CompetitorWithReviews[]>;
@@ -81,6 +89,7 @@ export class MemStorage implements IStorage {
   private reviewSummaries: Map<string, ReviewSummary> = new Map();
   private feedItems: Map<string, FeedItem> = new Map();
   private seoData: Map<string, SeoData> = new Map();
+  private sharedExperiences: Map<string, SharedExperience> = new Map();
 
   constructor() {
     this.initializeData();
@@ -593,6 +602,59 @@ export class MemStorage implements IStorage {
     sampleSeoData.forEach(data => {
       this.seoData.set(data.id, data);
     });
+
+    // Initialize shared experiences with sample data
+    const sampleSharedExperiences: SharedExperience[] = [
+      {
+        id: "exp-heidi-1",
+        competitorId: "heidi-1",
+        transcriptId: "family-medicine-visit-1",
+        clinicianName: "Dr. Sarah Chen",
+        clinicianSpecialty: "Family Medicine",
+        subjective: "Mr. McClure, a 52-year-old male, presents for routine follow-up of hypertension and recent concerns about fatigue. He reports good compliance with medications but has been experiencing increased tiredness over the past 2-3 weeks. Denies chest pain, shortness of breath, or palpitations.",
+        objective: "Vital signs: BP 142/88, HR 78, T 98.6°F. Physical exam notable for mild peripheral edema. Heart rate regular, no murmurs. Lungs clear bilaterally. No focal neurological deficits.",
+        assessment: "1. Hypertension - suboptimal control, considering medication adjustment\n2. Fatigue - likely related to blood pressure medications, will monitor\n3. Peripheral edema - mild, consistent with current antihypertensive regimen",
+        plan: "1. Increase lisinopril to 10mg daily\n2. Basic metabolic panel to check kidney function\n3. Consider adding hydrochlorothiazide if BP remains elevated\n4. Return visit in 4 weeks\n5. Patient education on sodium restriction and regular exercise",
+        transcriptionDuration: 142, // 2 minutes 22 seconds
+        notes: "Heidi Health captured the clinical reasoning very well. The assessment and plan were comprehensive and clinically appropriate.",
+        isPublic: true,
+        createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
+      },
+      {
+        id: "exp-freed-1",
+        competitorId: "freed-1",
+        transcriptId: "family-medicine-visit-1",
+        clinicianName: "Dr. Michael Rodriguez",
+        clinicianSpecialty: "Internal Medicine",
+        subjective: "Patient presents for hypertension follow-up. Reports fatigue x 2-3 weeks. Medications: lisinopril 5mg daily, metformin 500mg BID. Denies cardiac symptoms.",
+        objective: "VS: 142/88, 78, 98.6. Exam: +1 pedal edema bilaterally, RRR, CTAB.",
+        assessment: "Hypertension with suboptimal control. Medication-related fatigue possible.",
+        plan: "Increase lisinopril to 10mg daily. Order BMP. F/U 4 weeks. Lifestyle counseling provided.",
+        transcriptionDuration: 89, // 1 minute 29 seconds
+        notes: "Freed AI provided a more concise note. Good for efficiency but might miss some clinical nuances.",
+        isPublic: true,
+        createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
+      },
+      {
+        id: "exp-sunoh-1",
+        competitorId: "sunoh-1",
+        transcriptId: "family-medicine-visit-1",
+        clinicianName: "Dr. Emily Johnson",
+        clinicianSpecialty: "Family Medicine",
+        subjective: "52-year-old male with established hypertension presents for routine follow-up. Patient reports good medication adherence but notes increasing fatigue over the past 2-3 weeks. Reviews symptoms systematically - denies chest pain, dyspnea, or palpitations.",
+        objective: "Blood pressure 142/88 mmHg, heart rate 78 bpm, temperature 98.6°F. Physical examination reveals mild bilateral lower extremity edema. Cardiovascular exam shows regular rate and rhythm without murmurs. Pulmonary examination clear to auscultation bilaterally.",
+        assessment: "Primary hypertension with suboptimal blood pressure control on current ACE inhibitor therapy. New onset fatigue likely multifactorial - consider medication side effects versus underlying cardiovascular status. Mild peripheral edema consistent with current medication regimen.",
+        plan: "Optimize antihypertensive therapy by increasing lisinopril dose to 10mg daily. Order comprehensive metabolic panel to assess renal function prior to medication adjustment. Consider addition of thiazide diuretic if blood pressure remains elevated. Schedule follow-up appointment in 4 weeks. Provide patient education regarding dietary sodium restriction and regular aerobic exercise.",
+        transcriptionDuration: 195, // 3 minutes 15 seconds
+        notes: "Sunoh AI generated a very detailed note with excellent clinical flow. Perhaps too verbose for some practice styles.",
+        isPublic: true,
+        createdAt: new Date(Date.now() - 3 * 60 * 60 * 1000), // 3 hours ago
+      },
+    ];
+
+    sampleSharedExperiences.forEach(exp => {
+      this.sharedExperiences.set(exp.id, exp);
+    });
   }
 
   async getCompetitors(): Promise<Competitor[]> {
@@ -915,6 +977,35 @@ export class MemStorage implements IStorage {
     const updated = { ...existing, ...seoData, lastUpdated: new Date() };
     this.seoData.set(id, updated);
     return updated;
+  }
+
+  // Shared Experience methods
+  async getSharedExperiences(): Promise<SharedExperience[]> {
+    return Array.from(this.sharedExperiences.values()).sort((a, b) => 
+      b.createdAt!.getTime() - a.createdAt!.getTime()
+    );
+  }
+
+  async getSharedExperiencesByCompetitor(competitorId: string): Promise<SharedExperience[]> {
+    return Array.from(this.sharedExperiences.values())
+      .filter(exp => exp.competitorId === competitorId)
+      .sort((a, b) => b.createdAt!.getTime() - a.createdAt!.getTime());
+  }
+
+  async getLatestSharedExperience(competitorId: string): Promise<SharedExperience | undefined> {
+    const experiences = await this.getSharedExperiencesByCompetitor(competitorId);
+    return experiences[0]; // First item is most recent due to sorting
+  }
+
+  async createSharedExperience(experience: InsertSharedExperience): Promise<SharedExperience> {
+    const id = randomUUID();
+    const newExperience: SharedExperience = {
+      id,
+      ...experience,
+      createdAt: new Date(),
+    };
+    this.sharedExperiences.set(id, newExperience);
+    return newExperience;
   }
 }
 
