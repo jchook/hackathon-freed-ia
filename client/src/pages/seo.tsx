@@ -6,8 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, ExternalLink, Globe, Hash, Image, Star } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Search, ExternalLink, Star, Hash, Image, Globe } from "lucide-react";
 import { type SeoData } from "@shared/schema";
 
 export default function SEO() {
@@ -44,15 +44,6 @@ export default function SEO() {
     return names[competitorId] || competitorId;
   };
 
-  const getCompetitorColor = (competitorId: string) => {
-    const colors: Record<string, string> = {
-      'heidi-1': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
-      'freed-1': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
-      'sunoh-1': 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300'
-    };
-    return colors[competitorId] || 'bg-gray-100 text-gray-800';
-  };
-
   const getDomainRatingColor = (rating?: number | null) => {
     if (!rating) return 'bg-gray-100 text-gray-800';
     if (rating >= 80) return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
@@ -64,6 +55,15 @@ export default function SEO() {
     if (!text) return 'Not specified';
     return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
   };
+
+  // Create a lookup map for competitor data
+  const competitorMap: Record<string, SeoData> = {};
+  seoData?.forEach(data => {
+    competitorMap[data.competitorId] = data;
+  });
+
+  // Define the competitors we want to show
+  const competitors = ['heidi-1', 'freed-1', 'sunoh-1'];
 
   return (
     <div className="flex h-screen bg-dashboard-bg" data-testid="seo-container">
@@ -108,230 +108,241 @@ export default function SEO() {
             </CardContent>
           </Card>
 
-          {/* SEO Comparison Grid */}
+          {/* SEO Comparison Table */}
           {seoData && seoData.length > 0 ? (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {seoData.map((data) => (
-                <Card key={data.id} className="h-fit" data-testid={`seo-card-${data.competitorId}`}>
-                  <CardHeader className="pb-4">
-                    <div className="flex items-center justify-between">
-                      <Badge className={getCompetitorColor(data.competitorId)}>
-                        {getCompetitorName(data.competitorId)}
-                      </Badge>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        asChild
-                        className="h-8 w-8 p-0"
-                      >
-                        <a
-                          href={data.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          data-testid={`external-link-${data.competitorId}`}
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                        </a>
-                      </Button>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Globe className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-sm text-muted-foreground font-mono">
-                        {data.url.replace('https://', '')}
-                      </span>
-                    </div>
-                  </CardHeader>
-                  
-                  <CardContent className="space-y-6">
-                    <Tabs defaultValue="basic" className="w-full">
-                      <TabsList className="grid w-full grid-cols-3">
-                        <TabsTrigger value="basic">Basic</TabsTrigger>
-                        <TabsTrigger value="social">Social</TabsTrigger>
-                        <TabsTrigger value="technical">Technical</TabsTrigger>
-                      </TabsList>
-                      
-                      <TabsContent value="basic" className="space-y-4 mt-4">
-                        {/* Domain Rating */}
-                        <div>
-                          <div className="flex items-center gap-2 mb-2">
+            <Card data-testid="seo-comparison-table">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Search className="w-5 h-5" />
+                  SEO Attribute Comparison
+                </CardTitle>
+                <CardDescription>
+                  Side-by-side comparison of SEO attributes for {pageTypes.find(t => t.value === selectedPageType)?.label.toLowerCase()} pages
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-48 font-semibold">SEO Attribute</TableHead>
+                        {competitors.map((competitorId) => (
+                          <TableHead key={competitorId} className="text-center min-w-64">
+                            <div className="flex flex-col items-center gap-2">
+                              <span className="font-semibold">{getCompetitorName(competitorId)}</span>
+                              {competitorMap[competitorId] && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  asChild
+                                  className="h-6 w-6 p-0"
+                                >
+                                  <a
+                                    href={competitorMap[competitorId].url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    data-testid={`header-link-${competitorId}`}
+                                  >
+                                    <ExternalLink className="w-3 h-3" />
+                                  </a>
+                                </Button>
+                              )}
+                            </div>
+                          </TableHead>
+                        ))}
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {/* Domain Rating */}
+                      <TableRow>
+                        <TableCell className="font-medium">
+                          <div className="flex items-center gap-2">
                             <Star className="w-4 h-4 text-muted-foreground" />
-                            <span className="text-sm font-medium">Domain Rating</span>
+                            Domain Rating
                           </div>
-                          <Badge className={getDomainRatingColor(data.domainRating)}>
-                            {data.domainRating || 'N/A'}
-                          </Badge>
-                        </div>
+                        </TableCell>
+                        {competitors.map((competitorId) => (
+                          <TableCell key={competitorId} className="text-center">
+                            {competitorMap[competitorId] ? (
+                              <Badge className={getDomainRatingColor(competitorMap[competitorId].domainRating)}>
+                                {competitorMap[competitorId].domainRating || 'N/A'}
+                              </Badge>
+                            ) : (
+                              <span className="text-muted-foreground">No data</span>
+                            )}
+                          </TableCell>
+                        ))}
+                      </TableRow>
 
-                        {/* Title */}
-                        <div>
-                          <span className="text-sm font-medium block mb-1">Title Tag</span>
-                          <p className="text-sm text-muted-foreground leading-relaxed">
-                            {truncateText(data.title, 120)}
-                          </p>
-                          {data.title && (
-                            <span className="text-xs text-muted-foreground">
-                              {data.title.length} characters
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Meta Description */}
-                        <div>
-                          <span className="text-sm font-medium block mb-1">Meta Description</span>
-                          <p className="text-sm text-muted-foreground leading-relaxed">
-                            {truncateText(data.metaDescription, 160)}
-                          </p>
-                          {data.metaDescription && (
-                            <span className="text-xs text-muted-foreground">
-                              {data.metaDescription.length} characters
-                            </span>
-                          )}
-                        </div>
-
-                        {/* H1 Tag */}
-                        <div>
-                          <span className="text-sm font-medium block mb-1">H1 Tag</span>
-                          <p className="text-sm text-muted-foreground">
-                            {data.h1Tag || 'Not specified'}
-                          </p>
-                        </div>
-
-                        {/* H2 Tags */}
-                        {data.h2Tags && data.h2Tags.length > 0 && (
-                          <div>
-                            <span className="text-sm font-medium block mb-2">H2 Tags</span>
-                            <div className="space-y-1">
-                              {data.h2Tags.slice(0, 3).map((h2, index) => (
-                                <p key={index} className="text-xs text-muted-foreground">
-                                  {truncateText(h2, 80)}
+                      {/* Title Tag */}
+                      <TableRow>
+                        <TableCell className="font-medium">Title Tag</TableCell>
+                        {competitors.map((competitorId) => (
+                          <TableCell key={competitorId} className="max-w-xs">
+                            {competitorMap[competitorId] ? (
+                              <div>
+                                <p className="text-sm leading-relaxed mb-1">
+                                  {truncateText(competitorMap[competitorId].title, 80)}
                                 </p>
-                              ))}
-                              {data.h2Tags.length > 3 && (
-                                <span className="text-xs text-muted-foreground italic">
-                                  +{data.h2Tags.length - 3} more
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        )}
+                                {competitorMap[competitorId].title && (
+                                  <span className="text-xs text-muted-foreground">
+                                    {competitorMap[competitorId].title.length} chars
+                                  </span>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="text-muted-foreground">No data</span>
+                            )}
+                          </TableCell>
+                        ))}
+                      </TableRow>
 
-                        {/* Keywords */}
-                        {data.keywords && data.keywords.length > 0 && (
-                          <div>
-                            <span className="text-sm font-medium block mb-2">Target Keywords</span>
-                            <div className="flex flex-wrap gap-1">
-                              {data.keywords.slice(0, 4).map((keyword, index) => (
-                                <Badge key={index} variant="outline" className="text-xs">
-                                  {keyword}
-                                </Badge>
-                              ))}
-                              {data.keywords.length > 4 && (
-                                <Badge variant="outline" className="text-xs">
-                                  +{data.keywords.length - 4} more
-                                </Badge>
-                              )}
-                            </div>
-                          </div>
-                        )}
-                      </TabsContent>
+                      {/* Meta Description */}
+                      <TableRow>
+                        <TableCell className="font-medium">Meta Description</TableCell>
+                        {competitors.map((competitorId) => (
+                          <TableCell key={competitorId} className="max-w-xs">
+                            {competitorMap[competitorId] ? (
+                              <div>
+                                <p className="text-sm leading-relaxed mb-1">
+                                  {truncateText(competitorMap[competitorId].metaDescription, 100)}
+                                </p>
+                                {competitorMap[competitorId].metaDescription && (
+                                  <span className="text-xs text-muted-foreground">
+                                    {competitorMap[competitorId].metaDescription.length} chars
+                                  </span>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="text-muted-foreground">No data</span>
+                            )}
+                          </TableCell>
+                        ))}
+                      </TableRow>
 
-                      <TabsContent value="social" className="space-y-4 mt-4">
-                        {/* Open Graph */}
-                        <div>
-                          <span className="text-sm font-medium block mb-1">OG Title</span>
-                          <p className="text-sm text-muted-foreground">
-                            {truncateText(data.ogTitle, 100)}
-                          </p>
-                        </div>
+                      {/* H1 Tag */}
+                      <TableRow>
+                        <TableCell className="font-medium">H1 Tag</TableCell>
+                        {competitors.map((competitorId) => (
+                          <TableCell key={competitorId} className="max-w-xs">
+                            <p className="text-sm">
+                              {competitorMap[competitorId]?.h1Tag || 'Not specified'}
+                            </p>
+                          </TableCell>
+                        ))}
+                      </TableRow>
 
-                        <div>
-                          <span className="text-sm font-medium block mb-1">OG Description</span>
-                          <p className="text-sm text-muted-foreground">
-                            {truncateText(data.ogDescription, 120)}
-                          </p>
-                        </div>
+                      {/* Keywords */}
+                      <TableRow>
+                        <TableCell className="font-medium">Target Keywords</TableCell>
+                        {competitors.map((competitorId) => (
+                          <TableCell key={competitorId} className="max-w-xs">
+                            {competitorMap[competitorId]?.keywords && competitorMap[competitorId].keywords.length > 0 ? (
+                              <div className="flex flex-wrap gap-1">
+                                {competitorMap[competitorId].keywords.slice(0, 3).map((keyword, index) => (
+                                  <Badge key={index} variant="outline" className="text-xs">
+                                    {keyword}
+                                  </Badge>
+                                ))}
+                                {competitorMap[competitorId].keywords.length > 3 && (
+                                  <Badge variant="outline" className="text-xs">
+                                    +{competitorMap[competitorId].keywords.length - 3}
+                                  </Badge>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="text-muted-foreground">No keywords</span>
+                            )}
+                          </TableCell>
+                        ))}
+                      </TableRow>
 
-                        {data.ogImage && (
-                          <div>
-                            <div className="flex items-center gap-2 mb-1">
-                              <Image className="w-4 h-4 text-muted-foreground" />
-                              <span className="text-sm font-medium">OG Image</span>
-                            </div>
-                            <Badge variant="outline" className="text-xs">
-                              Image set
-                            </Badge>
-                          </div>
-                        )}
+                      {/* Open Graph Title */}
+                      <TableRow>
+                        <TableCell className="font-medium">OG Title</TableCell>
+                        {competitors.map((competitorId) => (
+                          <TableCell key={competitorId} className="max-w-xs">
+                            <p className="text-sm">
+                              {truncateText(competitorMap[competitorId]?.ogTitle, 60)}
+                            </p>
+                          </TableCell>
+                        ))}
+                      </TableRow>
 
-                        {/* Twitter */}
-                        <div>
-                          <span className="text-sm font-medium block mb-1">Twitter Title</span>
-                          <p className="text-sm text-muted-foreground">
-                            {truncateText(data.twitterTitle, 100)}
-                          </p>
-                        </div>
+                      {/* Open Graph Description */}
+                      <TableRow>
+                        <TableCell className="font-medium">OG Description</TableCell>
+                        {competitors.map((competitorId) => (
+                          <TableCell key={competitorId} className="max-w-xs">
+                            <p className="text-sm">
+                              {truncateText(competitorMap[competitorId]?.ogDescription, 80)}
+                            </p>
+                          </TableCell>
+                        ))}
+                      </TableRow>
 
-                        <div>
-                          <span className="text-sm font-medium block mb-1">Twitter Description</span>
-                          <p className="text-sm text-muted-foreground">
-                            {truncateText(data.twitterDescription, 120)}
-                          </p>
-                        </div>
-
-                        {data.twitterImage && (
-                          <div>
-                            <div className="flex items-center gap-2 mb-1">
-                              <Image className="w-4 h-4 text-muted-foreground" />
-                              <span className="text-sm font-medium">Twitter Image</span>
-                            </div>
-                            <Badge variant="outline" className="text-xs">
-                              Image set
-                            </Badge>
-                          </div>
-                        )}
-                      </TabsContent>
-
-                      <TabsContent value="technical" className="space-y-4 mt-4">
-                        {/* Canonical URL */}
-                        <div>
-                          <span className="text-sm font-medium block mb-1">Canonical URL</span>
-                          <p className="text-sm text-muted-foreground font-mono">
-                            {data.canonicalUrl || 'Not set'}
-                          </p>
-                        </div>
-
-                        {/* Schema Markup */}
-                        <div>
-                          <div className="flex items-center gap-2 mb-1">
+                      {/* Schema Markup */}
+                      <TableRow>
+                        <TableCell className="font-medium">
+                          <div className="flex items-center gap-2">
                             <Hash className="w-4 h-4 text-muted-foreground" />
-                            <span className="text-sm font-medium">Schema Markup</span>
+                            Schema Markup
                           </div>
-                          {data.schemaMarkup ? (
-                            <div className="flex flex-wrap gap-1">
-                              {data.schemaMarkup.split(', ').map((schema, index) => (
-                                <Badge key={index} variant="outline" className="text-xs">
-                                  {schema}
-                                </Badge>
-                              ))}
-                            </div>
-                          ) : (
-                            <p className="text-sm text-muted-foreground">Not implemented</p>
-                          )}
-                        </div>
+                        </TableCell>
+                        {competitors.map((competitorId) => (
+                          <TableCell key={competitorId} className="max-w-xs">
+                            {competitorMap[competitorId]?.schemaMarkup ? (
+                              <div className="flex flex-wrap gap-1">
+                                {competitorMap[competitorId].schemaMarkup.split(', ').slice(0, 2).map((schema, index) => (
+                                  <Badge key={index} variant="outline" className="text-xs">
+                                    {schema}
+                                  </Badge>
+                                ))}
+                              </div>
+                            ) : (
+                              <span className="text-muted-foreground">No schema</span>
+                            )}
+                          </TableCell>
+                        ))}
+                      </TableRow>
 
-                        {/* Last Updated */}
-                        <div>
-                          <span className="text-sm font-medium block mb-1">Last Updated</span>
-                          <p className="text-sm text-muted-foreground">
-                            {new Date(data.lastUpdated).toLocaleDateString()}
-                          </p>
-                        </div>
-                      </TabsContent>
-                    </Tabs>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                      {/* Images */}
+                      <TableRow>
+                        <TableCell className="font-medium">
+                          <div className="flex items-center gap-2">
+                            <Image className="w-4 h-4 text-muted-foreground" />
+                            Social Images
+                          </div>
+                        </TableCell>
+                        {competitors.map((competitorId) => (
+                          <TableCell key={competitorId} className="text-center">
+                            {competitorMap[competitorId] ? (
+                              <div className="flex gap-2 justify-center">
+                                {competitorMap[competitorId].ogImage && (
+                                  <Badge variant="outline" className="text-xs">
+                                    OG
+                                  </Badge>
+                                )}
+                                {competitorMap[competitorId].twitterImage && (
+                                  <Badge variant="outline" className="text-xs">
+                                    Twitter
+                                  </Badge>
+                                )}
+                                {!competitorMap[competitorId].ogImage && !competitorMap[competitorId].twitterImage && (
+                                  <span className="text-muted-foreground">No images</span>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="text-muted-foreground">No data</span>
+                            )}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
           ) : (
             <Card>
               <CardContent className="text-center py-12">
