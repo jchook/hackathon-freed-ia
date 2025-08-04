@@ -123,8 +123,8 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              {/* Horizontal Pricing Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6" data-testid="pricing-plans-grid">
+              {/* Vertical Pricing Cards */}
+              <div className="space-y-6" data-testid="pricing-plans-grid">
                 {competitors?.map((competitor) => {
                   const filteredPlans = getFilteredPlans(competitor.plans);
                   const freePlan = competitor.plans.find(plan => plan.price === 0 && plan.target === "individuals");
@@ -132,73 +132,92 @@ export default function Dashboard() {
                   
                   return (
                     <Card key={competitor.id} className="relative" data-testid={`pricing-card-${competitor.id}`}>
-                      <CardHeader className="text-center pb-4">
-                        <div className="flex items-center justify-center mb-2">
-                          <div className={`w-12 h-12 bg-gradient-to-br ${
-                            competitor.name.includes("Heidi") ? "from-blue-500 to-purple-600" :
-                            competitor.name.includes("Freed") ? "from-green-500 to-blue-600" :
-                            "from-orange-500 to-red-600"
-                          } rounded-lg flex items-center justify-center`}>
-                            <span className="text-white font-bold text-lg">{competitor.name.charAt(0)}</span>
+                      <CardHeader className="pb-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4">
+                            <div className={`w-16 h-16 bg-gradient-to-br ${
+                              competitor.name.includes("Heidi") ? "from-blue-500 to-purple-600" :
+                              competitor.name.includes("Freed") ? "from-green-500 to-blue-600" :
+                              "from-orange-500 to-red-600"
+                            } rounded-xl flex items-center justify-center`}>
+                              <span className="text-white font-bold text-xl">{competitor.name.charAt(0)}</span>
+                            </div>
+                            <div>
+                              <CardTitle className="text-2xl" data-testid={`pricing-title-${competitor.id}`}>
+                                {competitor.name}
+                              </CardTitle>
+                              <CardDescription className="text-base mt-1" data-testid={`pricing-description-${competitor.id}`}>
+                                {competitor.description}
+                              </CardDescription>
+                            </div>
                           </div>
+                          <Button 
+                            variant="outline" 
+                            className="flex items-center gap-2"
+                            onClick={() => window.open(competitor.website, '_blank')}
+                            data-testid={`visit-website-${competitor.id}`}
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                            Visit Website
+                          </Button>
                         </div>
-                        <CardTitle className="text-xl" data-testid={`pricing-title-${competitor.id}`}>
-                          {competitor.name}
-                        </CardTitle>
-                        <CardDescription data-testid={`pricing-description-${competitor.id}`}>
-                          {competitor.description}
-                        </CardDescription>
                       </CardHeader>
-                      <CardContent className="space-y-4">
-                        {plansToShow.length > 0 ? plansToShow.map((plan) => (
-                          <div key={plan.id} className={`p-4 rounded-lg border-2 ${
-                            plan.price === 0 ? "border-green-200 bg-green-50" :
-                            plan.isPromo ? "border-red-200 bg-red-50" :
-                            "border-gray-200 bg-gray-50"
-                          }`} data-testid={`plan-${plan.id}`}>
-                            <div className="flex items-center justify-between mb-2">
-                              <h4 className="font-semibold text-lg" data-testid={`plan-name-${plan.id}`}>
-                                {plan.planName}
-                              </h4>
-                              {plan.price === 0 && (
-                                <Badge variant="secondary" className="bg-green-100 text-green-800">
-                                  <CheckCircle className="w-3 h-3 mr-1" />
-                                  Free
-                                </Badge>
-                              )}
-                              {plan.isPromo && (
-                                <Badge variant="destructive" data-testid={`promo-badge-${plan.id}`}>
-                                  Limited Time
-                                </Badge>
-                              )}
-                            </div>
-                            <div className="text-3xl font-bold mb-2" data-testid={`plan-price-${plan.id}`}>
-                              {plan.isPromo && plan.originalPrice ? (
-                                <div className="flex items-center gap-2">
-                                  <span className="text-lg text-red-400 line-through">
-                                    {formatPrice(plan.originalPrice)}
-                                  </span>
-                                  <span className="text-red-600">
-                                    {formatPrice(plan.price)}
-                                  </span>
+                      <CardContent>
+                        {plansToShow.length > 0 ? (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                            {plansToShow.map((plan) => (
+                              <div key={plan.id} className={`p-4 rounded-lg border-2 ${
+                                plan.price === 0 ? "border-green-200 bg-green-50" :
+                                plan.isPromo ? "border-red-200 bg-red-50" :
+                                "border-gray-200 bg-gray-50"
+                              }`} data-testid={`plan-${plan.id}`}>
+                                <div className="flex items-center justify-between mb-2">
+                                  <h4 className="font-semibold text-lg" data-testid={`plan-name-${plan.id}`}>
+                                    {plan.planName}
+                                  </h4>
+                                  {plan.price === 0 && (
+                                    <Badge variant="secondary" className="bg-green-100 text-green-800">
+                                      <CheckCircle className="w-3 h-3 mr-1" />
+                                      Free
+                                    </Badge>
+                                  )}
+                                  {plan.isPromo && (
+                                    <Badge variant="destructive" data-testid={`promo-badge-${plan.id}`}>
+                                      Limited Time
+                                    </Badge>
+                                  )}
                                 </div>
-                              ) : (
-                                formatPrice(plan.price)
-                              )}
-                            </div>
-                            <p className="text-sm text-gray-600 mb-3" data-testid={`plan-billing-${plan.id}`}>
-                              {getDisplayPrice(plan.price)}
-                            </p>
-                            <ul className="space-y-1 text-sm">
-                              {plan.features?.map((feature, idx) => (
-                                <li key={idx} className="flex items-start gap-2" data-testid={`feature-${plan.id}-${idx}`}>
-                                  <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                                  {feature}
-                                </li>
-                              ))}
-                            </ul>
+                                <div className="text-3xl font-bold mb-2" data-testid={`plan-price-${plan.id}`}>
+                                  {plan.isPromo && plan.originalPrice ? (
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-lg text-red-400 line-through">
+                                        {formatPrice(plan.originalPrice)}
+                                      </span>
+                                      <span className="text-red-600">
+                                        {formatPrice(plan.price)}
+                                      </span>
+                                    </div>
+                                  ) : (
+                                    formatPrice(plan.price)
+                                  )}
+                                </div>
+                                <p className="text-sm text-gray-600 mb-3" data-testid={`plan-billing-${plan.id}`}>
+                                  {getDisplayPrice(plan.price)}
+                                </p>
+                                <ul className="space-y-1 text-sm">
+                                  {plan.features?.map((feature, idx) => (
+                                    <li key={idx} className="flex items-start gap-2" data-testid={`feature-${plan.id}-${idx}`}>
+                                      <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                                      {feature}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            ))}
                           </div>
-                        )) : (
+                        ) : (
                           <div className="text-center py-8 text-gray-500" data-testid={`no-plans-${competitor.id}`}>
                             <p>No {planFilter} plans available for {billingPeriod} billing</p>
                           </div>
