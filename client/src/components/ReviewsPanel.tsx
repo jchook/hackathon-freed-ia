@@ -45,7 +45,7 @@ export function ReviewsPanel({ reviews, summary, competitorName }: ReviewsPanelP
   const sentimentScore = summary?.sentimentScore ?? 0;
 
   return (
-    <div className="space-y-6" data-testid="reviews-panel">
+    <div className="w-full space-y-6" data-testid="reviews-panel">
       {/* Summary Statistics */}
       {summary && (
         <Card data-testid="review-summary-card">

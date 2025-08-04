@@ -132,8 +132,8 @@ export default function Reviews() {
                 </CardContent>
               </Card>
             ) : (
-              // Show selected vendor's reviews
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+              // Show selected vendor's reviews - Full width
+              <div className="w-full">
                 {filteredCompetitors.map((competitor) => (
                   <ReviewsPanel
                     key={`reviews-${competitor.id}`}
