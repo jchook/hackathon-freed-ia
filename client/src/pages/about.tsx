@@ -4,7 +4,7 @@ import { Separator } from "@/components/ui/separator";
 import { Users, BookOpen, TrendingUp, Heart, Stethoscope, Globe } from "lucide-react";
 import sharefImage from "@assets/sharedf_1754282048093.png";
 
-export default function Story() {
+export default function About() {
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       {/* Hero Section */}

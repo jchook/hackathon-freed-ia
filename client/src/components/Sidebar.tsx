@@ -58,7 +58,7 @@ export function Sidebar() {
     { icon: Rss, label: "Feed", href: "/feed", active: location === "/feed" },
     { icon: GitCompare, label: "Comparison", href: "/comparison", active: location === "/comparison" },
     { icon: FileText, label: "Example Note", href: "/example-note", active: location === "/example-note" },
-    { icon: User, label: "Page", href: "/story", active: location === "/story" },
+    { icon: User, label: "About", href: "/about", active: location === "/about" },
   ];
 
   return (
