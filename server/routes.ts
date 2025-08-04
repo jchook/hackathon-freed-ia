@@ -33,6 +33,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/competitors", async (req, res) => {
+    try {
+      const validatedData = insertCompetitorSchema.parse(req.body);
+      const competitor = await storage.createCompetitor(validatedData);
+      res.status(201).json(competitor);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid competitor data" });
+    }
+  });
+
   app.get("/api/competitors/:id", async (req, res) => {
     try {
       const competitor = await storage.getCompetitor(req.params.id);

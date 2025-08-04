@@ -2,16 +2,20 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Sidebar } from "@/components/Sidebar";
 import { Header } from "@/components/Header";
+import { AddVendorModal } from "@/components/AddVendorModal";
+import { RefreshProgress } from "@/components/RefreshProgress";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, User, Calendar, DollarSign, CheckCircle } from "lucide-react";
+import { Users, User, Calendar, DollarSign, CheckCircle, Plus } from "lucide-react";
 import { type CompetitorWithPlans, type DashboardStats, type PricingPlan } from "@shared/schema";
 
 export default function Dashboard() {
   const [planFilter, setPlanFilter] = useState<"individuals" | "groups">("individuals");
   const [billingPeriod, setBillingPeriod] = useState<"monthly" | "annual">("monthly");
+  const [showAddVendor, setShowAddVendor] = useState(false);
+  const [showRefreshProgress, setShowRefreshProgress] = useState(false);
 
   const { data: competitors, isLoading: competitorsLoading } = useQuery<CompetitorWithPlans[]>({
     queryKey: ['/api/competitors']
@@ -43,6 +47,15 @@ export default function Dashboard() {
       return `$${Math.round(price / 100)}/year`;
     }
     return `$${Math.round(price / 100)}/month`;
+  };
+
+  const handleVendorAdded = () => {
+    setShowAddVendor(false);
+    setShowRefreshProgress(true);
+  };
+
+  const handleRefreshComplete = () => {
+    setShowRefreshProgress(false);
   };
 
   if (competitorsLoading || statsLoading) {
@@ -86,18 +99,31 @@ export default function Dashboard() {
             <CardContent>
               {/* Filter Controls */}
               <div className="flex items-center justify-between mb-6">
-                <Tabs value={planFilter} onValueChange={(value) => setPlanFilter(value as "individuals" | "groups")}>
-                  <TabsList className="grid w-64 grid-cols-2">
-                    <TabsTrigger value="individuals" className="flex items-center gap-2" data-testid="filter-individuals">
-                      <User className="w-4 h-4" />
-                      Individuals
-                    </TabsTrigger>
-                    <TabsTrigger value="groups" className="flex items-center gap-2" data-testid="filter-groups">
-                      <Users className="w-4 h-4" />
-                      Groups
-                    </TabsTrigger>
-                  </TabsList>
-                </Tabs>
+                <div className="flex items-center gap-4">
+                  <Tabs value={planFilter} onValueChange={(value) => setPlanFilter(value as "individuals" | "groups")}>
+                    <TabsList className="grid w-64 grid-cols-2">
+                      <TabsTrigger value="individuals" className="flex items-center gap-2" data-testid="filter-individuals">
+                        <User className="w-4 h-4" />
+                        Individuals
+                      </TabsTrigger>
+                      <TabsTrigger value="groups" className="flex items-center gap-2" data-testid="filter-groups">
+                        <Users className="w-4 h-4" />
+                        Groups
+                      </TabsTrigger>
+                    </TabsList>
+                  </Tabs>
+
+                  <Button
+                    onClick={() => setShowAddVendor(true)}
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center gap-2"
+                    data-testid="add-vendor-button"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add Vendor
+                  </Button>
+                </div>
 
                 <div className="flex items-center gap-2">
                   <Button
@@ -261,6 +287,18 @@ export default function Dashboard() {
           </Card>
         </div>
       </main>
+      
+      <AddVendorModal 
+        isOpen={showAddVendor}
+        onClose={() => setShowAddVendor(false)}
+        onSuccess={handleVendorAdded}
+      />
+      
+      <RefreshProgress 
+        isOpen={showRefreshProgress}
+        onClose={() => setShowRefreshProgress(false)}
+        onComplete={handleRefreshComplete}
+      />
     </div>
   );
 }
