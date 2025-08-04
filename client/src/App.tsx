@@ -7,6 +7,7 @@ import Dashboard from "@/pages/dashboard";
 import Reviews from "@/pages/reviews";
 import Feed from "@/pages/feed";
 import Comparison from "@/pages/comparison";
+import ExampleNote from "@/pages/example-note";
 
 function Router() {
   return (
@@ -16,6 +17,7 @@ function Router() {
       <Route path="/reviews" component={Reviews} />
       <Route path="/feed" component={Feed} />
       <Route path="/comparison" component={Comparison} />
+      <Route path="/example-note" component={ExampleNote} />
     </Switch>
   );
 }
