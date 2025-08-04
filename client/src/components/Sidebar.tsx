@@ -1,4 +1,4 @@
-import { BarChart3, MessageSquare, TrendingUp, Rss, GitCompare, RefreshCw, Download } from "lucide-react";
+import { BarChart3, MessageSquare, TrendingUp, Rss, GitCompare, RefreshCw, Download, Clock } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -77,7 +77,11 @@ export function Sidebar() {
         </div>
         
         {/* Action Buttons */}
-        <div className="mb-6 space-y-2">
+        <div className="mb-6 space-y-3">
+          <div className="flex items-center space-x-2 text-xs text-gray-300" data-testid="sidebar-last-updated">
+            <Clock className="w-3 h-3" />
+            <span>Updated: 2 min ago</span>
+          </div>
           <Button 
             onClick={() => refreshMutation.mutate()}
             disabled={refreshMutation.isPending}
