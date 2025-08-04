@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { Header } from "@/components/Header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,8 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileText, Play, Upload, Download, Stethoscope } from "lucide-react";
+import { FileText, Play, Pause, Upload, Download, Stethoscope } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import audioFile from "@assets/Visit to the family doctor_1754271038617.m4a";
 
 const TRANSCRIPT = `Hi, it's Doctor McClure. How are you doing today? Doing fine. Great. I know we're supposed to review your labs, but do you have any questions before we start? My ankle has been hurting. Did anything happen to it? I twisted it while running. It's been swollen and not getting much better. When did that happen? A week ago. Have you been able to walk on it since then? Yeah, just hurts. Have you been doing anything for your ankle? I tried some ice. Ibuprofen once kind of helps. Are you able to do other exercises besides running so that you can still move your body even if you have an injury? It sounds like it can help. So I think that's a great first step. Let me just do that exam on your foot. Really glad that you've been doing exercise even when you're in pain. Doing other exercises besides running so that you can still move your body even if you have an injury. Does it hurt here? No. Does it hurt here? No. Does it hurt here? That hurts a little bit. I don't think you need an x-ray. I think you have an ankle sprain. Icing it is great. Ibuprofen can help reduce swelling.`;
 
@@ -51,10 +52,28 @@ export default function ExampleNote() {
     plan: ''
   });
   const [activeTab, setActiveTab] = useState('compare');
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement>(null);
   const { toast } = useToast();
 
   const handleSectionChange = (section: keyof typeof customNote, value: string) => {
     setCustomNote(prev => ({ ...prev, [section]: value }));
+  };
+
+  const handlePlayPause = () => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+        setIsPlaying(false);
+      } else {
+        audioRef.current.play();
+        setIsPlaying(true);
+      }
+    }
+  };
+
+  const handleAudioEnded = () => {
+    setIsPlaying(false);
   };
 
   const handleDownloadNote = () => {
@@ -125,9 +144,20 @@ Source: ScribeArena Example Note Tool`;
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-4 mb-4">
-                <Button variant="outline" className="flex items-center gap-2" disabled>
-                  <Play className="w-4 h-4" />
-                  Play Audio Recording
+                <audio 
+                  ref={audioRef} 
+                  src={audioFile} 
+                  onEnded={handleAudioEnded}
+                  preload="metadata"
+                />
+                <Button 
+                  variant="outline" 
+                  className="flex items-center gap-2" 
+                  onClick={handlePlayPause}
+                  data-testid="play-audio"
+                >
+                  {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                  {isPlaying ? 'Pause Recording' : 'Play Audio Recording'}
                 </Button>
                 <Badge variant="secondary">Family Medicine Visit</Badge>
                 <Badge variant="outline">Duration: 3:45</Badge>
@@ -154,7 +184,7 @@ Source: ScribeArena Example Note Tool`;
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="compare">Compare Vendors</TabsTrigger>
-                  <TabsTrigger value="custom">Create Custom Note</TabsTrigger>
+                  <TabsTrigger value="custom">Share Experience</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="compare" className="space-y-4">
@@ -233,10 +263,10 @@ Source: ScribeArena Example Note Tool`;
 
                 <TabsContent value="custom" className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-medium">Create Your Own SOAP Note</h3>
+                    <h3 className="text-lg font-medium">Share Your Clinical Experience</h3>
                     <Button onClick={handleDownloadNote} className="flex items-center gap-2" data-testid="download-custom-note">
                       <Download className="w-4 h-4" />
-                      Download Custom Note
+                      Download Your Note
                     </Button>
                   </div>
 
@@ -325,13 +355,13 @@ Source: ScribeArena Example Note Tool`;
                 <div>
                   <h4 className="font-medium mb-2 flex items-center gap-2">
                     <Upload className="w-4 h-4" />
-                    Create Custom Notes
+                    Share Your Experience
                   </h4>
                   <ul className="text-sm text-muted-foreground space-y-1">
-                    <li>• Practice creating SOAP notes with the provided transcript</li>
-                    <li>• Use section-by-section editor for structured documentation</li>
-                    <li>• Compare your notes with AI-generated versions</li>
-                    <li>• Export your custom notes for reference</li>
+                    <li>• Document your own clinical approach with the provided transcript</li>
+                    <li>• Use section-by-section editor for structured SOAP documentation</li>
+                    <li>• Compare your clinical reasoning with AI-generated versions</li>
+                    <li>• Share your expertise and download notes for reference</li>
                   </ul>
                 </div>
               </div>
