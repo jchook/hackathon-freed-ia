@@ -182,18 +182,18 @@ export default function Comparison() {
                   <div className="grid gap-0 min-w-full" style={{ gridTemplateColumns: `200px repeat(${selectedCompetitors.length}, 1fr)` }}>
                     
                     {/* Header Row */}
-                    <div className="p-4 bg-muted font-medium border-b border-r">Vendor</div>
+                    <div className="p-5 bg-muted font-medium border-b border-r text-base">Vendor</div>
                     {selectedCompetitors.map((competitorId) => {
                       const { competitor } = getCompetitorData(competitorId);
                       return (
-                        <div key={competitorId} className="p-4 bg-muted border-b border-r last:border-r-0">
+                        <div key={competitorId} className="p-5 bg-muted border-b border-r last:border-r-0">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-white border border-gray-200 shadow-sm">
+                            <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-white border border-gray-200 shadow-sm">
                               {competitor?.name.includes("Heidi") ? (
                                 <img 
                                   src="https://www.heidihealth.com/favicon.ico" 
                                   alt="Heidi Health Logo" 
-                                  className="w-6 h-6"
+                                  className="w-7 h-7"
                                   onError={(e) => {
                                     e.currentTarget.style.display = 'none';
                                     const fallback = e.currentTarget.nextElementSibling as HTMLElement;
@@ -204,7 +204,7 @@ export default function Comparison() {
                                 <img 
                                   src="https://cdn.prod.website-files.com/6626cd90a59907680f6ccb64/6760822277db164afcfcf749_freed-logo.svg" 
                                   alt="Freed AI Logo" 
-                                  className="w-6 h-6"
+                                  className="w-7 h-7"
                                   onError={(e) => {
                                     e.currentTarget.style.display = 'none';
                                     const fallback = e.currentTarget.nextElementSibling as HTMLElement;
@@ -215,7 +215,7 @@ export default function Comparison() {
                                 <img 
                                   src="https://sunoh.ai/favicon.ico" 
                                   alt="Sunoh AI Logo" 
-                                  className="w-6 h-6"
+                                  className="w-7 h-7"
                                   onError={(e) => {
                                     e.currentTarget.style.display = 'none';
                                     const fallback = e.currentTarget.nextElementSibling as HTMLElement;
@@ -223,30 +223,30 @@ export default function Comparison() {
                                   }}
                                 />
                               )}
-                              <div className="hidden w-6 h-6 bg-gray-100 rounded-lg flex items-center justify-center text-gray-600 font-bold text-xs">
+                              <div className="hidden w-7 h-7 bg-gray-100 rounded-lg flex items-center justify-center text-gray-600 font-bold text-sm">
                                 {competitor?.name.charAt(0)}
                               </div>
                             </div>
-                            <div className="font-semibold text-sm">{competitor?.name}</div>
+                            <div className="font-semibold text-base">{competitor?.name}</div>
                           </div>
                         </div>
                       );
                     })}
 
                     {/* Website Row */}
-                    <div className="p-4 font-medium border-b border-r bg-gray-50">Website</div>
+                    <div className="p-5 font-medium border-b border-r bg-gray-50 text-base">Website</div>
                     {selectedCompetitors.map((competitorId) => {
                       const { competitor } = getCompetitorData(competitorId);
                       return (
-                        <div key={competitorId} className="p-4 border-b border-r last:border-r-0 bg-gray-50">
+                        <div key={competitorId} className="p-5 border-b border-r last:border-r-0 bg-gray-50">
                           <Button 
                             variant="outline" 
                             size="sm"
-                            className="w-full text-xs"
+                            className="w-full text-sm"
                             onClick={() => competitor?.website && window.open(competitor.website, '_blank')}
                             data-testid={`visit-website-${competitorId}`}
                           >
-                            <ExternalLink className="w-3 h-3 mr-1" />
+                            <ExternalLink className="w-4 h-4 mr-2" />
                             Visit Site
                           </Button>
                         </div>
@@ -254,16 +254,16 @@ export default function Comparison() {
                     })}
 
                     {/* Plan Selection Row */}
-                    <div className="p-4 font-medium border-b border-r">Plan Selection</div>
+                    <div className="p-5 font-medium border-b border-r text-base">Plan Selection</div>
                     {selectedCompetitors.map((competitorId) => {
                       const { pricing } = getCompetitorData(competitorId);
                       return (
-                        <div key={competitorId} className="p-4 border-b border-r last:border-r-0">
+                        <div key={competitorId} className="p-5 border-b border-r last:border-r-0">
                           <Select 
                             value={selectedPlans[competitorId] || ""} 
                             onValueChange={(value) => handlePlanSelection(competitorId, value)}
                           >
-                            <SelectTrigger className="text-xs" data-testid={`plan-select-${competitorId}`}>
+                            <SelectTrigger className="text-sm" data-testid={`plan-select-${competitorId}`}>
                               <SelectValue placeholder="Choose plan" />
                             </SelectTrigger>
                             <SelectContent>
@@ -280,12 +280,12 @@ export default function Comparison() {
                     })}
 
                     {/* Domain Rating Row */}
-                    <div className="p-4 font-medium border-b border-r bg-gray-50">Domain Rating</div>
+                    <div className="p-5 font-medium border-b border-r bg-gray-50 text-base">Domain Rating</div>
                     {selectedCompetitors.map((competitorId) => {
                       const { seo } = getCompetitorData(competitorId);
                       return (
-                        <div key={competitorId} className="p-4 border-b border-r last:border-r-0 bg-gray-50">
-                          <Badge variant="secondary" className="text-xs">
+                        <div key={competitorId} className="p-5 border-b border-r last:border-r-0 bg-gray-50">
+                          <Badge variant="secondary" className="text-sm">
                             {seo?.domainRating || 'N/A'}
                           </Badge>
                         </div>
@@ -293,18 +293,18 @@ export default function Comparison() {
                     })}
 
                     {/* Average Review Row */}
-                    <div className="p-4 font-medium border-b border-r">Average Review</div>
+                    <div className="p-5 font-medium border-b border-r text-base">Average Review</div>
                     {selectedCompetitors.map((competitorId) => {
                       const { averageRating, totalReviews } = getCompetitorData(competitorId);
                       return (
-                        <div key={competitorId} className="p-4 border-b border-r last:border-r-0">
-                          <div className="flex items-center gap-1">
-                            <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                            <span className="text-sm font-medium">
+                        <div key={competitorId} className="p-5 border-b border-r last:border-r-0">
+                          <div className="flex items-center gap-2">
+                            <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                            <span className="text-base font-medium">
                               {averageRating ? averageRating.toFixed(1) : 'N/A'}
                             </span>
                             {totalReviews > 0 && (
-                              <span className="text-xs text-muted-foreground">
+                              <span className="text-sm text-muted-foreground">
                                 ({totalReviews})
                               </span>
                             )}
@@ -314,78 +314,78 @@ export default function Comparison() {
                     })}
 
                     {/* Price Row */}
-                    <div className="p-4 font-medium border-b border-r bg-gray-50">Price</div>
+                    <div className="p-5 font-medium border-b border-r bg-gray-50 text-base">Price</div>
                     {selectedCompetitors.map((competitorId) => {
                       const selectedPlan = getSelectedPlan(competitorId);
                       return (
-                        <div key={competitorId} className="p-4 border-b border-r last:border-r-0 bg-gray-50">
+                        <div key={competitorId} className="p-5 border-b border-r last:border-r-0 bg-gray-50">
                           {selectedPlan ? (
                             <div>
-                              <div className="text-lg font-bold text-primary">
+                              <div className="text-xl font-bold text-primary">
                                 {selectedPlan.price === 0 ? 'Free' : formatPrice(selectedPlan.price || 0)}
                               </div>
                               {(selectedPlan.price || 0) > 0 && (
-                                <div className="text-xs text-muted-foreground">
+                                <div className="text-sm text-muted-foreground">
                                   per {selectedPlan.billingPeriod}
                                 </div>
                               )}
                             </div>
                           ) : (
-                            <span className="text-sm text-muted-foreground">Select plan</span>
+                            <span className="text-base text-muted-foreground">Select plan</span>
                           )}
                         </div>
                       );
                     })}
 
                     {/* Plan Name Row */}
-                    <div className="p-4 font-medium border-b border-r">Plan Name</div>
+                    <div className="p-5 font-medium border-b border-r text-base">Plan Name</div>
                     {selectedCompetitors.map((competitorId) => {
                       const selectedPlan = getSelectedPlan(competitorId);
                       return (
-                        <div key={competitorId} className="p-4 border-b border-r last:border-r-0">
+                        <div key={competitorId} className="p-5 border-b border-r last:border-r-0">
                           {selectedPlan ? (
                             <div className="flex items-center gap-2">
-                              <span className="font-medium text-sm">{selectedPlan.planName}</span>
+                              <span className="font-medium text-base">{selectedPlan.planName}</span>
                               {selectedPlan.price === 0 && (
-                                <Badge variant="secondary" className="bg-green-100 text-green-800 text-xs">
+                                <Badge variant="secondary" className="bg-green-100 text-green-800 text-sm">
                                   Free
                                 </Badge>
                               )}
                               {selectedPlan.isPromo && (
-                                <Badge variant="destructive" className="text-xs">
+                                <Badge variant="destructive" className="text-sm">
                                   Promo
                                 </Badge>
                               )}
                             </div>
                           ) : (
-                            <span className="text-sm text-muted-foreground">-</span>
+                            <span className="text-base text-muted-foreground">-</span>
                           )}
                         </div>
                       );
                     })}
 
                     {/* Features Row */}
-                    <div className="p-4 font-medium border-r bg-gray-50">Features</div>
+                    <div className="p-5 font-medium border-r bg-gray-50 text-base">Features</div>
                     {selectedCompetitors.map((competitorId) => {
                       const selectedPlan = getSelectedPlan(competitorId);
                       return (
-                        <div key={competitorId} className="p-4 border-r last:border-r-0 bg-gray-50">
+                        <div key={competitorId} className="p-5 border-r last:border-r-0 bg-gray-50">
                           {selectedPlan?.features ? (
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                               {selectedPlan.features.slice(0, 5).map((feature, index) => (
-                                <div key={index} className="flex items-start gap-1 text-xs">
-                                  <CheckCircle className="w-3 h-3 text-green-500 mt-0.5 flex-shrink-0" />
+                                <div key={index} className="flex items-start gap-2 text-sm">
+                                  <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
                                   <span>{feature}</span>
                                 </div>
                               ))}
                               {selectedPlan.features.length > 5 && (
-                                <div className="text-xs text-muted-foreground">
-                                  +{selectedPlan.features.length - 5} more
+                                <div className="text-sm text-muted-foreground">
+                                  +{selectedPlan.features.length - 5} more features
                                 </div>
                               )}
                             </div>
                           ) : (
-                            <span className="text-sm text-muted-foreground">Select plan to view features</span>
+                            <span className="text-base text-muted-foreground">Select plan to view features</span>
                           )}
                         </div>
                       );
