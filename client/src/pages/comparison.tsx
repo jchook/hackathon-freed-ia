@@ -138,17 +138,8 @@ export default function Comparison() {
                         const { competitor } = getCompetitorData(competitorId);
                         return (
                           <TableHead key={competitorId} className="text-center min-w-[250px]">
-                            <div className="flex flex-col items-center gap-2">
+                            <div className="flex flex-col items-center gap-1">
                               <span className="font-semibold">{competitor?.name}</span>
-                              <a
-                                href={competitor?.website}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-primary hover:underline text-sm flex items-center gap-1"
-                                data-testid={`link-${competitorId}`}
-                              >
-                                Visit Site <ExternalLink className="w-3 h-3" />
-                              </a>
                             </div>
                           </TableHead>
                         );
@@ -156,6 +147,27 @@ export default function Comparison() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
+                    {/* Website URL */}
+                    <TableRow>
+                      <TableCell className="font-medium">Website</TableCell>
+                      {selectedCompetitors.map((competitorId) => {
+                        const { competitor } = getCompetitorData(competitorId);
+                        return (
+                          <TableCell key={competitorId} className="text-center">
+                            <a
+                              href={competitor?.website}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-primary hover:underline text-sm flex items-center gap-1 justify-center"
+                              data-testid={`link-${competitorId}`}
+                            >
+                              {competitor?.website} <ExternalLink className="w-3 h-3" />
+                            </a>
+                          </TableCell>
+                        );
+                      })}
+                    </TableRow>
+
                     {/* Domain Rating */}
                     <TableRow>
                       <TableCell className="font-medium">Domain Rating</TableCell>
@@ -236,10 +248,33 @@ export default function Comparison() {
                                       </span>
                                     )}
                                   </div>
-                                  <div className="text-xs text-muted-foreground">
-                                    {plan.features.slice(0, 2).join(', ')}
-                                    {plan.features.length > 2 && '...'}
-                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </TableCell>
+                        );
+                      })}
+                    </TableRow>
+
+                    {/* Features */}
+                    <TableRow>
+                      <TableCell className="font-medium">Features</TableCell>
+                      {selectedCompetitors.map((competitorId) => {
+                        const { pricing } = getCompetitorData(competitorId);
+                        return (
+                          <TableCell key={competitorId} className="text-center">
+                            <div className="space-y-3">
+                              {pricing?.map((plan) => (
+                                <div key={plan.id} className="text-left">
+                                  <div className="font-medium text-sm mb-2 text-center">{plan.planName}</div>
+                                  <ul className="text-xs space-y-1">
+                                    {plan.features.map((feature, index) => (
+                                      <li key={index} className="flex items-start gap-1">
+                                        <span className="text-green-500 mt-0.5">✓</span>
+                                        <span>{feature}</span>
+                                      </li>
+                                    ))}
+                                  </ul>
                                 </div>
                               ))}
                             </div>
@@ -296,20 +331,7 @@ export default function Comparison() {
                       })}
                     </TableRow>
 
-                    {/* Schema Markup */}
-                    <TableRow>
-                      <TableCell className="font-medium">Schema Markup</TableCell>
-                      {selectedCompetitors.map((competitorId) => {
-                        const { seo } = getCompetitorData(competitorId);
-                        return (
-                          <TableCell key={competitorId} className="text-center">
-                            <div className="text-sm">
-                              {seo?.schemaMarkup || 'Not specified'}
-                            </div>
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
+
                   </TableBody>
                 </Table>
               </CardContent>
