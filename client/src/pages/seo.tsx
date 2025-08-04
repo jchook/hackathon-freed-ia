@@ -14,7 +14,15 @@ export default function SEO() {
   const [selectedPageType, setSelectedPageType] = useState<string>("homepage");
 
   const { data: seoData, isLoading } = useQuery<SeoData[]>({
-    queryKey: ['/api/seo', { pageType: selectedPageType }]
+    queryKey: selectedPageType ? ['/api/seo', selectedPageType] : ['/api/seo'],
+    queryFn: async () => {
+      const url = selectedPageType 
+        ? `/api/seo?pageType=${selectedPageType}`
+        : '/api/seo';
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('Failed to fetch SEO data');
+      return response.json();
+    }
   });
 
   if (isLoading) {
