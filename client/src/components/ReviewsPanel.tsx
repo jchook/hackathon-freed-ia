@@ -73,77 +73,56 @@ export function ReviewsPanel({ reviews, summary, competitorName }: ReviewsPanelP
               {competitorName} on {summary.platform}
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="text-center">
-                <div className="flex items-center justify-center gap-1 mb-2">
-                  {renderStars(Math.round(averageRating))}
-                </div>
-                <div className={`text-2xl font-bold ${getRatingColor(averageRating)}`}>
-                  {averageRating.toFixed(1)}
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  {summary.totalReviews} reviews
-                </p>
+          <CardContent className="space-y-8">
+            {/* Top Section - Rating Score */}
+            <div className="text-center py-6 border-b border-gray-100 dark:border-gray-800">
+              <div className="flex items-center justify-center gap-2 mb-3">
+                {renderStars(Math.round(averageRating))}
               </div>
-              
-              <div className="text-center">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  {sentimentScore >= 0 ? (
-                    <TrendingUp className="w-5 h-5 text-green-600" />
-                  ) : (
-                    <TrendingDown className="w-5 h-5 text-red-600" />
-                  )}
-                </div>
-                <div className={`text-2xl font-bold ${sentimentScore >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {sentimentScore > 0 ? '+' : ''}{sentimentScore}
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  Sentiment Score
-                </p>
+              <div className={`text-5xl font-bold mb-2 ${getRatingColor(averageRating)}`}>
+                {averageRating.toFixed(1)}
               </div>
-
-              <div className="text-center">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <Shield className="w-5 h-5 text-blue-600" />
-                </div>
-                <div className="text-2xl font-bold text-blue-600">
-                  {summary.platform}
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  Platform
-                </p>
-              </div>
+              <p className="text-lg text-muted-foreground">
+                {summary.totalReviews} reviews on {summary.platform}
+              </p>
             </div>
 
-            {/* Common Praises and Complaints */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Bottom Section - Praises and Issues */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Left Column - Praises */}
               {summary.commonPraises && summary.commonPraises.length > 0 && (
-                <div>
-                  <h4 className="font-semibold text-green-700 dark:text-green-400 mb-3">
-                    Common Praises
-                  </h4>
-                  <ul className="space-y-2">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                    <h4 className="text-lg font-semibold text-green-700 dark:text-green-400">
+                      What users love
+                    </h4>
+                  </div>
+                  <ul className="space-y-3">
                     {summary.commonPraises.map((praise, index) => (
-                      <li key={index} className="flex items-start gap-2">
-                        <TrendingUp className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                        <span className="text-sm">{praise}</span>
+                      <li key={index} className="flex items-start gap-3 p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-800">
+                        <TrendingUp className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                        <span className="text-sm font-medium text-green-800 dark:text-green-200">{praise}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
               )}
 
+              {/* Right Column - Issues */}
               {summary.commonComplaints && summary.commonComplaints.length > 0 && (
-                <div>
-                  <h4 className="font-semibold text-red-700 dark:text-red-400 mb-3">
-                    Common Issues
-                  </h4>
-                  <ul className="space-y-2">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                    <h4 className="text-lg font-semibold text-red-700 dark:text-red-400">
+                      Common concerns
+                    </h4>
+                  </div>
+                  <ul className="space-y-3">
                     {summary.commonComplaints.map((complaint, index) => (
-                      <li key={index} className="flex items-start gap-2">
-                        <TrendingDown className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
-                        <span className="text-sm">{complaint}</span>
+                      <li key={index} className="flex items-start gap-3 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800">
+                        <TrendingDown className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
+                        <span className="text-sm font-medium text-red-800 dark:text-red-200">{complaint}</span>
                       </li>
                     ))}
                   </ul>

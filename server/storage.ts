@@ -370,22 +370,22 @@ export class MemStorage implements IStorage {
       id: "review-summary-heidi",
       competitorId: "heidi-1",
       platform: "trustpilot",
-      totalReviews: 442,
-      averageRating: 44, // 4.4 stars
-      sentimentScore: 65,
+      totalReviews: 12,
+      averageRating: 37, // 3.7 stars
+      sentimentScore: 45,
       commonPraises: [
         "Saves significant time on documentation",
         "Improves patient interaction quality", 
         "Excellent transcription accuracy",
         "Easy to use interface",
-        "Good customer support"
+        "Good customer support response"
       ],
       commonComplaints: [
         "Recent updates caused reliability issues",
         "Sometimes fails to generate transcripts",
         "Occasional transcription inaccuracies",
-        "Template consistency problems",
-        "Long generation times"
+        "Connectivity and recording problems",
+        "Requires careful review of generated notes"
       ],
       lastUpdated: new Date(),
       createdAt: new Date(),
@@ -394,12 +394,24 @@ export class MemStorage implements IStorage {
     const freedReviewSummary: ReviewSummary = {
       id: "review-summary-freed",
       competitorId: "freed-1", 
-      platform: "trustpilot",
-      totalReviews: 0,
-      averageRating: 0,
-      sentimentScore: 0,
-      commonPraises: [],
-      commonComplaints: [],
+      platform: "capterra",
+      totalReviews: 12,
+      averageRating: 40, // 4.0 stars
+      sentimentScore: 55,
+      commonPraises: [
+        "Excellent value for money",
+        "Magic edit feature saves time",
+        "Simple setup and intuitive interface",
+        "Reliable and consistent performance",
+        "Great for family medicine practices"
+      ],
+      commonComplaints: [
+        "Limited customization options",
+        "Struggles with specialist terminology",
+        "Occasional sync issues with EHR",
+        "Less advanced than premium competitors",
+        "Template library could be expanded"
+      ],
       lastUpdated: new Date(),
       createdAt: new Date(),
     };
@@ -407,21 +419,21 @@ export class MemStorage implements IStorage {
     const sunohReviewSummary: ReviewSummary = {
       id: "review-summary-sunoh",
       competitorId: "sunoh-1",
-      platform: "healthcare_surveys",
-      totalReviews: 150,
+      platform: "healthcare_survey",
+      totalReviews: 5,
       averageRating: 42, // 4.2 stars
       sentimentScore: 75,
       commonPraises: [
         "Saves 2+ hours daily on documentation",
-        "High accuracy transcription",
-        "Cost-effective at $149/month",
-        "Works well with existing EHR systems",
-        "Good customer satisfaction rates"
+        "Premium ambient voice capture technology",
+        "24/7 support with quick resolution",
+        "Enterprise-grade reliability",
+        "Excellent EHR system integration"
       ],
       commonComplaints: [
-        "Limited language support beyond English",
-        "Order suggestions need improvement",
-        "Some accuracy issues with complex visits"
+        "Higher price point than competitors",
+        "Limited pricing flexibility for small practices",
+        "Complex setup for smaller clinics"
       ],
       lastUpdated: new Date(),
       createdAt: new Date(),
