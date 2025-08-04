@@ -17,7 +17,20 @@ import audioFile from "@assets/Visit to the family doctor_1754271038617.m4a";
 import type { SharedExperience, Competitor } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 
-const TRANSCRIPT = `Hi, it's Doctor McClure. How are you doing today? Doing fine. Great. I know we're supposed to review your labs, but do you have any questions before we start? My ankle has been hurting. Did anything happen to it? I twisted it while running. It's been swollen and not getting much better. When did that happen? A week ago. Have you been able to walk on it since then? Yeah, just hurts. Have you been doing anything for your ankle? I tried some ice. Ibuprofen once kind of helps. Are you able to do other exercises besides running so that you can still move your body even if you have an injury? It sounds like it can help. So I think that's a great first step. Let me just do that exam on your foot. Really glad that you've been doing exercise even when you're in pain. Doing other exercises besides running so that you can still move your body even if you have an injury. Does it hurt here? No. Does it hurt here? No. Does it hurt here? That hurts a little bit. I don't think you need an x-ray. I think you have an ankle sprain. Icing it is great. Ibuprofen can help reduce swelling.`;
+const TRANSCRIPT = `Hi, it's Doctor McClure. How are you doing today? Doing fine. Great. I know we're supposed to review your labs, but do you have any questions before we start? My ankle has been hurting. Did anything happen to it? I twisted it while running. It's been swollen and not getting much better. When did that happen? A week ago. Have you been able to walk on it since then? Yeah, just hurts. Have you been doing anything for your ankle? I tried some ice. Ibuprofen once kind of helps. Also, I wanted to ask about my current medications - I'm taking delgocitinib for my skin condition and ramipril for blood pressure. Are you able to do other exercises besides running so that you can still move your body even if you have an injury? It sounds like it can help. So I think that's a great first step. Let me just do that exam on your foot. Really glad that you've been doing exercise even when you're in pain. Doing other exercises besides running so that you can still move your body even if you have an injury. Does it hurt here? No. Does it hurt here? No. Does it hurt here? That hurts a little bit. I don't think you need an x-ray. I think you have an ankle sprain. Icing it is great. Ibuprofen can help reduce swelling. Continue your delgocitinib and ramipril as prescribed.`;
+
+// Component to highlight medications in the transcript
+const HighlightedTranscript = ({ text }: { text: string }) => {
+  const medications = ['delgocitinib', 'ramipril'];
+  
+  let highlightedText = text;
+  medications.forEach(med => {
+    const regex = new RegExp(`\\b${med}\\b`, 'gi');
+    highlightedText = highlightedText.replace(regex, `<span class="bg-green-200 dark:bg-green-800 px-1 rounded font-medium text-green-900 dark:text-green-100">${med}</span>`);
+  });
+  
+  return <div dangerouslySetInnerHTML={{ __html: highlightedText }} className="leading-relaxed" />;
+};
 
 const VENDOR_OUTPUTS = {
   'heidi-1': {
@@ -278,7 +291,7 @@ Source: ScribeArena Example Note Tool`;
               <div>
                 <h4 className="font-medium mb-2">Visit Transcript:</h4>
                 <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg text-sm">
-                  <p className="leading-relaxed">{TRANSCRIPT}</p>
+                  <HighlightedTranscript text={TRANSCRIPT} />
                 </div>
               </div>
             </CardContent>
