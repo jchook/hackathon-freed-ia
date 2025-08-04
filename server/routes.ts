@@ -11,6 +11,7 @@ import {
   insertSeoDataSchema,
   insertSharedExperienceSchema
 } from "@shared/schema";
+import { analyzeVendorInput } from "./ai-vendor-analyzer";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Dashboard stats
@@ -33,6 +34,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/competitors/analyze", async (req, res) => {
+    try {
+      const { input } = req.body;
+      if (!input || typeof input !== "string") {
+        return res.status(400).json({ error: "Input text required" });
+      }
+      
+      const analysis = await analyzeVendorInput(input);
+      res.json(analysis);
+    } catch (error) {
+      console.error("Vendor analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze vendor input" });
+    }
+  });
+
   app.post("/api/competitors", async (req, res) => {
     try {
       const validatedData = insertCompetitorSchema.parse(req.body);
@@ -52,16 +68,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(competitor);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch competitor" });
-    }
-  });
-
-  app.post("/api/competitors", async (req, res) => {
-    try {
-      const validatedData = insertCompetitorSchema.parse(req.body);
-      const competitor = await storage.createCompetitor(validatedData);
-      res.status(201).json(competitor);
-    } catch (error) {
-      res.status(400).json({ error: "Invalid competitor data" });
     }
   });
 
