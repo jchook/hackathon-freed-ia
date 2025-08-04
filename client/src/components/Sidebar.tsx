@@ -1,8 +1,63 @@
-import { BarChart3, MessageSquare, TrendingUp, Rss, GitCompare } from "lucide-react";
+import { BarChart3, MessageSquare, TrendingUp, Rss, GitCompare, RefreshCw, Download } from "lucide-react";
 import { Link, useLocation } from "wouter";
+import { Button } from "@/components/ui/button";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 export function Sidebar() {
   const [location] = useLocation();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const refreshMutation = useMutation({
+    mutationFn: () => apiRequest("POST", "/api/refresh"),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/competitors'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/alerts'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/seo'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/pricing-plans'] });
+      toast({
+        title: "Data Refreshed",
+        description: "All competitor data has been updated.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Refresh Failed",
+        description: "Unable to refresh data. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const exportMutation = useMutation({
+    mutationFn: () => apiRequest("GET", "/api/export/report"),
+    onSuccess: async (response) => {
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `scribearena-report-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      toast({
+        title: "Report Exported",
+        description: "Data report has been downloaded successfully.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Export Failed",
+        description: "Unable to export report. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
   
   const navItems = [
     { icon: BarChart3, label: "Dashboard", href: "/", active: location === "/" },
@@ -18,7 +73,29 @@ export function Sidebar() {
           <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
             <TrendingUp className="text-white w-6 h-6" />
           </div>
-          <h1 className="text-xl font-bold">PriceTracker</h1>
+          <h1 className="text-xl font-bold">ScribeArena</h1>
+        </div>
+        
+        {/* Action Buttons */}
+        <div className="mb-6 space-y-2">
+          <Button 
+            onClick={() => refreshMutation.mutate()}
+            disabled={refreshMutation.isPending}
+            className="w-full bg-primary hover:bg-blue-600 text-white"
+            data-testid="sidebar-refresh"
+          >
+            <RefreshCw className={`w-4 h-4 mr-2 ${refreshMutation.isPending ? 'animate-spin' : ''}`} />
+            Refresh Data
+          </Button>
+          <Button 
+            onClick={() => exportMutation.mutate()}
+            disabled={exportMutation.isPending}
+            className="w-full bg-green-600 hover:bg-green-700 text-white"
+            data-testid="sidebar-export"
+          >
+            <Download className="w-4 h-4 mr-2" />
+            Export Data
+          </Button>
         </div>
         
         <nav className="space-y-2">
