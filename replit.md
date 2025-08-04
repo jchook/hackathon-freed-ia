@@ -62,9 +62,20 @@ The architecture follows a clean separation of concerns with shared TypeScript s
 - **Vendor Comparison Enhancement**: Implemented max 3 vendor selection with side-by-side pricing, SEO, and feature analysis
 - **Navigation Restructure**: Moved refresh/export controls and ScribeArena branding to sidebar navigation for cleaner interface
 - **Clinical Documentation Testing**: Integrated real patient transcript with AI-generated SOAP notes from multiple vendors
+- **Shared Experience System**: Added API endpoints and display for vendor-specific clinical experience submissions with transcription duration tracking
+
+### Dashboard Enhancements (August 2025)
+- **Plan Filtering**: Added individual vs group plan filtering with clear tab controls
+- **Billing Toggle**: Implemented monthly/annual pricing toggle with button group interface
+- **Free Tier Integration**: Added free tier plans for all vendors assigned to individuals category
+- **Vertical Card Layout**: Redesigned pricing layout to stack each AI scribe as separate vertical cards with website links
+- **Simplified Interface**: Removed price alerts, trends, comparison tables, and charts for cleaner focus on core product comparison
+- **Enhanced Pricing Display**: Added annual discount pricing (20% savings) with responsive grid layout for pricing plans
 
 ### UI/UX Improvements
 - Renamed platform from "PriceTracker" to "ScribeArena" for better market positioning
 - Streamlined comparison interface by removing social media elements and optimizing for full-screen width
 - Added timestamp display near refresh controls in sidebar navigation
 - Implemented section-by-section SOAP note editor for custom clinical documentation
+- Enhanced vendor cards with larger logos, "Visit Website" buttons, and improved spacing
+- Set monthly pricing as default view for individuals with automatic free plan prioritization
