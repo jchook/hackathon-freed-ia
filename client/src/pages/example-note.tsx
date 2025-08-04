@@ -450,11 +450,79 @@ Source: ScribeArena Example Note Tool`;
                       )}
 
                       {!isLoadingExperience && !sharedExperience && (
-                        <Card>
-                          <CardContent className="p-8 text-center">
-                            <div className="text-sm text-muted-foreground">No shared experiences found for this vendor yet.</div>
-                          </CardContent>
-                        </Card>
+                        <div className="space-y-4">
+                          <Card>
+                            <CardContent className="p-8 text-center">
+                              <div className="text-sm text-muted-foreground mb-4">No shared experiences found for this vendor yet.</div>
+                              <div className="text-sm text-muted-foreground">Showing sample AI-generated SOAP note below:</div>
+                            </CardContent>
+                          </Card>
+                          
+                          {/* Sample Vendor Output */}
+                          {VENDOR_OUTPUTS[compareVendor as keyof typeof VENDOR_OUTPUTS] && (
+                            <Card data-testid="sample-vendor-output">
+                              <CardHeader>
+                                <CardTitle className="text-lg">Sample AI-Generated SOAP Note</CardTitle>
+                                <CardDescription>
+                                  Example output from {VENDOR_OUTPUTS[compareVendor as keyof typeof VENDOR_OUTPUTS].name}
+                                </CardDescription>
+                              </CardHeader>
+                              <CardContent className="space-y-4">
+                                {/* Sample Subjective Section */}
+                                <Collapsible open={soapSectionsExpanded.subjective} onOpenChange={() => toggleSoapSection('subjective')}>
+                                  <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-muted/50 rounded-lg hover:bg-muted/70 transition-colors">
+                                    <span className="font-medium">Subjective</span>
+                                    {soapSectionsExpanded.subjective ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                                  </CollapsibleTrigger>
+                                  <CollapsibleContent className="mt-2">
+                                    <div className="p-3 bg-background border rounded-lg">
+                                      <HighlightedText text={VENDOR_OUTPUTS[compareVendor as keyof typeof VENDOR_OUTPUTS].soap.subjective} />
+                                    </div>
+                                  </CollapsibleContent>
+                                </Collapsible>
+
+                                {/* Sample Objective Section */}
+                                <Collapsible open={soapSectionsExpanded.objective} onOpenChange={() => toggleSoapSection('objective')}>
+                                  <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-muted/50 rounded-lg hover:bg-muted/70 transition-colors">
+                                    <span className="font-medium">Objective</span>
+                                    {soapSectionsExpanded.objective ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                                  </CollapsibleTrigger>
+                                  <CollapsibleContent className="mt-2">
+                                    <div className="p-3 bg-background border rounded-lg">
+                                      <HighlightedText text={VENDOR_OUTPUTS[compareVendor as keyof typeof VENDOR_OUTPUTS].soap.objective} />
+                                    </div>
+                                  </CollapsibleContent>
+                                </Collapsible>
+
+                                {/* Sample Assessment Section */}
+                                <Collapsible open={soapSectionsExpanded.assessment} onOpenChange={() => toggleSoapSection('assessment')}>
+                                  <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-muted/50 rounded-lg hover:bg-muted/70 transition-colors">
+                                    <span className="font-medium">Assessment</span>
+                                    {soapSectionsExpanded.assessment ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                                  </CollapsibleTrigger>
+                                  <CollapsibleContent className="mt-2">
+                                    <div className="p-3 bg-background border rounded-lg">
+                                      <HighlightedText text={VENDOR_OUTPUTS[compareVendor as keyof typeof VENDOR_OUTPUTS].soap.assessment} />
+                                    </div>
+                                  </CollapsibleContent>
+                                </Collapsible>
+
+                                {/* Sample Plan Section */}
+                                <Collapsible open={soapSectionsExpanded.plan} onOpenChange={() => toggleSoapSection('plan')}>
+                                  <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-muted/50 rounded-lg hover:bg-muted/70 transition-colors">
+                                    <span className="font-medium">Plan</span>
+                                    {soapSectionsExpanded.plan ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                                  </CollapsibleTrigger>
+                                  <CollapsibleContent className="mt-2">
+                                    <div className="p-3 bg-background border rounded-lg">
+                                      <HighlightedText text={VENDOR_OUTPUTS[compareVendor as keyof typeof VENDOR_OUTPUTS].soap.plan} />
+                                    </div>
+                                  </CollapsibleContent>
+                                </Collapsible>
+                              </CardContent>
+                            </Card>
+                          )}
+                        </div>
                       )}
                     </div>
                   )}
