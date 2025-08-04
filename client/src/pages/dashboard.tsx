@@ -2,12 +2,6 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Sidebar } from "@/components/Sidebar";
 import { Header } from "@/components/Header";
-import { StatsOverview } from "@/components/StatsOverview";
-import { CompetitorCard } from "@/components/CompetitorCard";
-import { PricingChart } from "@/components/PricingChart";
-import { ComparisonTable } from "@/components/ComparisonTable";
-import { AlertsPanel } from "@/components/AlertsPanel";
-import { HistoryPanel } from "@/components/HistoryPanel";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -70,7 +64,13 @@ export default function Dashboard() {
         <Header />
         
         <div className="p-6 space-y-6">
-          <StatsOverview stats={stats} />
+          {/* Page Header */}
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">AI Scribe Dashboard</h1>
+            <p className="text-muted-foreground mt-2">
+              Compare AI medical scribe products and their pricing plans
+            </p>
+          </div>
           
           {/* Pricing Plans Dashboard */}
           <Card>
@@ -229,29 +229,6 @@ export default function Dashboard() {
               </div>
             </CardContent>
           </Card>
-          
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-            <div className="xl:col-span-2 space-y-4">
-              {competitors?.map((competitor) => (
-                <CompetitorCard 
-                  key={competitor.id} 
-                  competitor={competitor}
-                  data-testid={`competitor-card-${competitor.id}`}
-                />
-              ))}
-            </div>
-            
-            <div className="space-y-6">
-              <PricingChart competitors={competitors || []} />
-            </div>
-          </div>
-          
-          <ComparisonTable competitors={competitors || []} />
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <AlertsPanel />
-            <HistoryPanel competitors={competitors || []} />
-          </div>
         </div>
       </main>
     </div>
