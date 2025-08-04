@@ -1,36 +1,29 @@
+import { useState } from "react";
 import { BarChart3, MessageSquare, TrendingUp, Rss, GitCompare, RefreshCw, Download, Clock, FileText } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { RefreshProgress } from "@/components/RefreshProgress";
 
 export function Sidebar() {
   const [location] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [showRefreshProgress, setShowRefreshProgress] = useState(false);
 
-  const refreshMutation = useMutation({
-    mutationFn: () => apiRequest("POST", "/api/refresh"),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/competitors'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/alerts'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/seo'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/pricing-plans'] });
-      toast({
-        title: "Data Refreshed",
-        description: "All competitor data has been updated.",
-      });
-    },
-    onError: () => {
-      toast({
-        title: "Refresh Failed",
-        description: "Unable to refresh data. Please try again.",
-        variant: "destructive",
-      });
-    },
-  });
+  const handleRefreshComplete = () => {
+    queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
+    queryClient.invalidateQueries({ queryKey: ['/api/competitors'] });
+    queryClient.invalidateQueries({ queryKey: ['/api/alerts'] });
+    queryClient.invalidateQueries({ queryKey: ['/api/seo'] });
+    queryClient.invalidateQueries({ queryKey: ['/api/pricing-plans'] });
+    queryClient.invalidateQueries({ queryKey: ['/api/feed'] });
+    queryClient.invalidateQueries({ queryKey: ['/api/reviews'] });
+    queryClient.invalidateQueries({ queryKey: ['/api/competitors-with-reviews'] });
+    setShowRefreshProgress(false);
+  };
 
   const exportMutation = useMutation({
     mutationFn: () => apiRequest("GET", "/api/export/report"),
@@ -84,12 +77,11 @@ export function Sidebar() {
             <span>Updated: 2 min ago</span>
           </div>
           <Button 
-            onClick={() => refreshMutation.mutate()}
-            disabled={refreshMutation.isPending}
+            onClick={() => setShowRefreshProgress(true)}
             className="w-full bg-primary hover:bg-blue-600 text-white"
             data-testid="sidebar-refresh"
           >
-            <RefreshCw className={`w-4 h-4 mr-2 ${refreshMutation.isPending ? 'animate-spin' : ''}`} />
+            <RefreshCw className="w-4 h-4 mr-2" />
             Refresh Data
           </Button>
           <Button 
@@ -137,6 +129,12 @@ export function Sidebar() {
           ))}
         </nav>
       </div>
+      
+      <RefreshProgress 
+        isOpen={showRefreshProgress}
+        onClose={() => setShowRefreshProgress(false)}
+        onComplete={handleRefreshComplete}
+      />
     </aside>
   );
 }
