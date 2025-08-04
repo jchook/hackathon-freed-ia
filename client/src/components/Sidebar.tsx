@@ -1,4 +1,4 @@
-import { Building, TrendingUp, BarChart3, Bell, Download, Settings, User, MessageSquare } from "lucide-react";
+import { BarChart3, MessageSquare, TrendingUp } from "lucide-react";
 import { Link, useLocation } from "wouter";
 
 export function Sidebar() {
@@ -6,12 +6,7 @@ export function Sidebar() {
   
   const navItems = [
     { icon: BarChart3, label: "Dashboard", href: "/", active: location === "/" },
-    { icon: Building, label: "Pricing Analysis", href: "#" },
     { icon: MessageSquare, label: "Reviews", href: "/reviews", active: location === "/reviews" },
-    { icon: TrendingUp, label: "Trends", href: "#" },
-    { icon: Bell, label: "Alerts", href: "#" },
-    { icon: Download, label: "Reports", href: "#" },
-    { icon: Settings, label: "Settings", href: "#" },
   ];
 
   return (
@@ -57,18 +52,6 @@ export function Sidebar() {
             )
           ))}
         </nav>
-      </div>
-      
-      <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-gray-700">
-        <div className="flex items-center space-x-3" data-testid="sidebar-user">
-          <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center">
-            <User className="w-4 h-4" />
-          </div>
-          <div>
-            <p className="text-sm font-medium">John Smith</p>
-            <p className="text-xs text-gray-400">Business Analyst</p>
-          </div>
-        </div>
       </div>
     </aside>
   );
