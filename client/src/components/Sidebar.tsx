@@ -1,4 +1,4 @@
-import { BarChart3, MessageSquare, TrendingUp, Rss } from "lucide-react";
+import { BarChart3, MessageSquare, TrendingUp, Rss, Search } from "lucide-react";
 import { Link, useLocation } from "wouter";
 
 export function Sidebar() {
@@ -8,6 +8,7 @@ export function Sidebar() {
     { icon: BarChart3, label: "Dashboard", href: "/", active: location === "/" },
     { icon: MessageSquare, label: "Reviews", href: "/reviews", active: location === "/reviews" },
     { icon: Rss, label: "Feed", href: "/feed", active: location === "/feed" },
+    { icon: Search, label: "SEO", href: "/seo", active: location === "/seo" },
   ];
 
   return (

@@ -146,6 +146,38 @@ export type InsertReviewSummary = z.infer<typeof insertReviewSummarySchema>;
 export type FeedItem = typeof feedItems.$inferSelect;
 export type InsertFeedItem = z.infer<typeof insertFeedItemSchema>;
 
+// SEO Data Table
+export const seoData = pgTable("seo_data", {
+  id: text("id").primaryKey(),
+  competitorId: text("competitor_id").references(() => competitors.id).notNull(),
+  pageType: text("page_type").notNull(), // 'homepage', 'pricing', 'about', 'product'
+  url: text("url").notNull(),
+  title: text("title"),
+  metaDescription: text("meta_description"),
+  h1Tag: text("h1_tag"),
+  h2Tags: text("h2_tags").array(),
+  keywords: text("keywords").array(),
+  canonicalUrl: text("canonical_url"),
+  ogTitle: text("og_title"),
+  ogDescription: text("og_description"),
+  ogImage: text("og_image"),
+  twitterTitle: text("twitter_title"),
+  twitterDescription: text("twitter_description"),
+  twitterImage: text("twitter_image"),
+  schemaMarkup: text("schema_markup"),
+  domainRating: integer("domain_rating"), // Ahrefs Domain Rating (0-100)
+  lastUpdated: timestamp("last_updated").defaultNow().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const insertSeoDataSchema = createInsertSchema(seoData).omit({ 
+  id: true, 
+  createdAt: true 
+});
+
+export type SeoData = typeof seoData.$inferSelect;
+export type InsertSeoData = z.infer<typeof insertSeoDataSchema>;
+
 // Combined types for API responses
 export type CompetitorWithPlans = Competitor & {
   plans: PricingPlan[];

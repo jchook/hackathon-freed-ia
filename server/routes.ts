@@ -7,7 +7,8 @@ import {
   insertAlertSchema,
   insertReviewSchema,
   insertReviewSummarySchema,
-  insertFeedItemSchema
+  insertFeedItemSchema,
+  insertSeoDataSchema
 } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -264,6 +265,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(feedItem);
     } catch (error) {
       res.status(400).json({ error: "Invalid feed item data" });
+    }
+  });
+
+  // SEO data
+  app.get("/api/seo", async (req, res) => {
+    try {
+      const { competitorId, pageType } = req.query;
+      let seoData;
+      
+      if (competitorId) {
+        seoData = await storage.getSeoDataByCompetitor(competitorId as string);
+      } else if (pageType) {
+        seoData = await storage.getSeoDataByPageType(pageType as string);
+      } else {
+        seoData = await storage.getSeoData();
+      }
+      
+      res.json(seoData);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch SEO data" });
+    }
+  });
+
+  app.post("/api/seo", async (req, res) => {
+    try {
+      const validatedData = insertSeoDataSchema.parse(req.body);
+      const seoData = await storage.createSeoData(validatedData);
+      res.status(201).json(seoData);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid SEO data" });
     }
   });
 

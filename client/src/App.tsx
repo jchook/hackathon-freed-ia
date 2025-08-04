@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Dashboard from "@/pages/dashboard";
 import Reviews from "@/pages/reviews";
 import Feed from "@/pages/feed";
+import SEO from "@/pages/seo";
 
 function Router() {
   return (
@@ -14,6 +15,7 @@ function Router() {
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/reviews" component={Reviews} />
       <Route path="/feed" component={Feed} />
+      <Route path="/seo" component={SEO} />
     </Switch>
   );
 }

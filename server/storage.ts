@@ -13,6 +13,8 @@ import {
   type InsertReviewSummary,
   type FeedItem,
   type InsertFeedItem,
+  type SeoData,
+  type InsertSeoData,
   type CompetitorWithPlans,
   type CompetitorWithReviews,
   type DashboardStats
@@ -56,6 +58,13 @@ export interface IStorage {
   getFeedItems(): Promise<FeedItem[]>;
   getFeedItemsBySource(source: string): Promise<FeedItem[]>;
   createFeedItem(item: InsertFeedItem): Promise<FeedItem>;
+
+  // SEO Data
+  getSeoData(): Promise<SeoData[]>;
+  getSeoDataByCompetitor(competitorId: string): Promise<SeoData[]>;
+  getSeoDataByPageType(pageType: string): Promise<SeoData[]>;
+  createSeoData(seoData: InsertSeoData): Promise<SeoData>;
+  updateSeoData(id: string, seoData: Partial<InsertSeoData>): Promise<SeoData | undefined>;
   
   // Dashboard
   getCompetitorsWithPlans(): Promise<CompetitorWithPlans[]>;
@@ -71,6 +80,7 @@ export class MemStorage implements IStorage {
   private reviews: Map<string, Review> = new Map();
   private reviewSummaries: Map<string, ReviewSummary> = new Map();
   private feedItems: Map<string, FeedItem> = new Map();
+  private seoData: Map<string, SeoData> = new Map();
 
   constructor() {
     this.initializeData();
@@ -473,6 +483,116 @@ export class MemStorage implements IStorage {
     sampleFeedItems.forEach(item => {
       this.feedItems.set(item.id, item);
     });
+
+    // Initialize SEO data
+    const sampleSeoData: SeoData[] = [
+      {
+        id: "seo-heidi-homepage",
+        competitorId: "heidi-1",
+        pageType: "homepage",
+        url: "https://www.heidihealth.com",
+        title: "Heidi Health - AI Medical Scribe for Healthcare Professionals",
+        metaDescription: "Heidi Health is the AI medical scribe that understands healthcare. Streamline documentation, boost efficiency, and focus on patient care with our intelligent assistant.",
+        h1Tag: "The AI medical scribe that understands healthcare",
+        h2Tags: ["Transform your documentation workflow", "Trusted by healthcare professionals", "Secure & compliant"],
+        keywords: ["ai medical scribe", "healthcare AI", "medical documentation", "clinical notes", "EMR integration"],
+        canonicalUrl: "https://www.heidihealth.com",
+        ogTitle: "Heidi Health - AI Medical Scribe for Healthcare",
+        ogDescription: "Transform your medical documentation with AI. Heidi Health helps healthcare professionals save time and improve patient care.",
+        ogImage: "https://www.heidihealth.com/og-image.jpg",
+        twitterTitle: "Heidi Health - AI Medical Scribe",
+        twitterDescription: "The AI medical scribe that understands healthcare. Save time, improve accuracy.",
+        twitterImage: "https://www.heidihealth.com/twitter-image.jpg",
+        schemaMarkup: "Organization, WebSite, Product",
+        domainRating: 78,
+        lastUpdated: new Date(),
+        createdAt: new Date(),
+      },
+      {
+        id: "seo-heidi-pricing",
+        competitorId: "heidi-1",
+        pageType: "pricing",
+        url: "https://www.heidihealth.com/pricing",
+        title: "Pricing - Heidi Health AI Medical Scribe Plans",
+        metaDescription: "Choose the perfect Heidi Health plan for your practice. Transparent pricing for AI medical scribe services with flexible options for individual practitioners and teams.",
+        h1Tag: "Simple, transparent pricing",
+        h2Tags: ["For individuals", "For teams", "Enterprise solutions"],
+        keywords: ["heidi pricing", "medical scribe cost", "ai healthcare pricing", "medical documentation pricing"],
+        canonicalUrl: "https://www.heidihealth.com/pricing",
+        ogTitle: "Heidi Health Pricing - AI Medical Scribe Plans",
+        ogDescription: "Transparent pricing for AI medical scribe services. Choose the plan that fits your practice.",
+        ogImage: "https://www.heidihealth.com/pricing-og.jpg",
+        domainRating: 78,
+        lastUpdated: new Date(),
+        createdAt: new Date(),
+      },
+      {
+        id: "seo-freed-homepage",
+        competitorId: "freed-1",
+        pageType: "homepage",
+        url: "https://www.getfreed.ai",
+        title: "Freed - The AI Medical Scribe Built for Clinicians",
+        metaDescription: "Freed is the #1 AI medical scribe that listens, transcribes, and writes medical documentation for you. Focus on patients, not paperwork. Try Freed today.",
+        h1Tag: "The AI medical scribe built for clinicians",
+        h2Tags: ["Listen, transcribe, document", "Built by clinicians", "HIPAA compliant & secure"],
+        keywords: ["ai medical scribe", "clinical documentation", "medical transcription", "ehr integration", "hipaa compliant"],
+        canonicalUrl: "https://www.getfreed.ai",
+        ogTitle: "Freed - AI Medical Scribe for Clinicians",
+        ogDescription: "The #1 AI medical scribe that listens, transcribes, and writes medical documentation. Focus on patients, not paperwork.",
+        ogImage: "https://www.getfreed.ai/og-image.jpg",
+        twitterTitle: "Freed - AI Medical Scribe",
+        twitterDescription: "Listen, transcribe, document. The AI scribe built for clinicians.",
+        twitterImage: "https://www.getfreed.ai/twitter-image.jpg",
+        schemaMarkup: "Organization, WebSite, Product, SoftwareApplication",
+        domainRating: 85,
+        lastUpdated: new Date(),
+        createdAt: new Date(),
+      },
+      {
+        id: "seo-freed-pricing",
+        competitorId: "freed-1",
+        pageType: "pricing",
+        url: "https://www.getfreed.ai/pricing",
+        title: "Pricing - Freed AI Medical Scribe Plans & Costs",
+        metaDescription: "Transparent pricing for Freed AI medical scribe. Plans starting at $99/month. See how much time and money you can save with our AI documentation assistant.",
+        h1Tag: "Pricing that scales with your practice",
+        h2Tags: ["Individual plan", "Group plans", "Enterprise solutions"],
+        keywords: ["freed pricing", "ai scribe cost", "medical documentation pricing", "clinical ai pricing"],
+        canonicalUrl: "https://www.getfreed.ai/pricing",
+        ogTitle: "Freed Pricing - AI Medical Scribe Plans",
+        ogDescription: "Transparent pricing for AI medical scribe services. Plans starting at $99/month.",
+        ogImage: "https://www.getfreed.ai/pricing-og.jpg",
+        domainRating: 85,
+        lastUpdated: new Date(),
+        createdAt: new Date(),
+      },
+      {
+        id: "seo-sunoh-homepage",
+        competitorId: "sunoh-1",
+        pageType: "homepage",
+        url: "https://www.sunoh.ai",
+        title: "Sunoh AI - Intelligent Medical Documentation Assistant",
+        metaDescription: "Sunoh AI transforms healthcare documentation with intelligent AI. Reduce administrative burden, improve accuracy, and enhance patient care with our medical scribe.",
+        h1Tag: "Intelligent medical documentation for modern healthcare",
+        h2Tags: ["AI-powered efficiency", "Seamless integration", "Enhanced patient care"],
+        keywords: ["medical ai", "healthcare documentation", "clinical ai assistant", "medical scribe automation"],
+        canonicalUrl: "https://www.sunoh.ai",
+        ogTitle: "Sunoh AI - Medical Documentation Assistant",
+        ogDescription: "Transform healthcare documentation with intelligent AI. Reduce administrative burden and enhance patient care.",
+        ogImage: "https://www.sunoh.ai/og-image.jpg",
+        twitterTitle: "Sunoh AI - Medical Documentation",
+        twitterDescription: "Intelligent AI for modern healthcare documentation.",
+        twitterImage: "https://www.sunoh.ai/twitter-image.jpg",
+        schemaMarkup: "Organization, WebSite, Product",
+        domainRating: 72,
+        lastUpdated: new Date(),
+        createdAt: new Date(),
+      },
+    ];
+
+    sampleSeoData.forEach(data => {
+      this.seoData.set(data.id, data);
+    });
   }
 
   async getCompetitors(): Promise<Competitor[]> {
@@ -762,6 +882,39 @@ export class MemStorage implements IStorage {
     };
     this.feedItems.set(id, feedItem);
     return feedItem;
+  }
+
+  // SEO Data methods
+  async getSeoData(): Promise<SeoData[]> {
+    return Array.from(this.seoData.values());
+  }
+
+  async getSeoDataByCompetitor(competitorId: string): Promise<SeoData[]> {
+    return Array.from(this.seoData.values()).filter(data => data.competitorId === competitorId);
+  }
+
+  async getSeoDataByPageType(pageType: string): Promise<SeoData[]> {
+    return Array.from(this.seoData.values()).filter(data => data.pageType === pageType);
+  }
+
+  async createSeoData(seoData: InsertSeoData): Promise<SeoData> {
+    const id = randomUUID();
+    const newSeoData: SeoData = {
+      id,
+      ...seoData,
+      createdAt: new Date(),
+    };
+    this.seoData.set(id, newSeoData);
+    return newSeoData;
+  }
+
+  async updateSeoData(id: string, seoData: Partial<InsertSeoData>): Promise<SeoData | undefined> {
+    const existing = this.seoData.get(id);
+    if (!existing) return undefined;
+    
+    const updated = { ...existing, ...seoData, lastUpdated: new Date() };
+    this.seoData.set(id, updated);
+    return updated;
   }
 }
 
