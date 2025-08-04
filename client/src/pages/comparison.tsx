@@ -52,7 +52,14 @@ export default function Comparison() {
     const competitorWithReviews = competitorsWithReviews?.find(c => c.id === competitorId);
     const seo = seoData?.find(s => s.competitorId === competitorId && s.pageType === 'homepage');
     const pricing = pricingPlans?.filter(p => p.competitorId === competitorId);
-    return { competitor, competitorWithReviews, seo, pricing };
+    
+    // Calculate average rating from review summary (scale from 50 to 5.0)
+    const averageRating = competitorWithReviews?.reviewSummary?.averageRating 
+      ? competitorWithReviews.reviewSummary.averageRating / 10 
+      : null;
+    const totalReviews = competitorWithReviews?.reviewSummary?.totalReviews || 0;
+    
+    return { competitor, competitorWithReviews, seo, pricing, averageRating, totalReviews };
   };
 
   // Auto-select cheapest paid plan for individuals when data loads
@@ -165,7 +172,7 @@ export default function Comparison() {
           {selectedCompetitors.length > 0 && (
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
               {selectedCompetitors.map((competitorId) => {
-                const { competitor, competitorWithReviews, seo, pricing } = getCompetitorData(competitorId);
+                const { competitor, competitorWithReviews, seo, pricing, averageRating, totalReviews } = getCompetitorData(competitorId);
                 const selectedPlan = getSelectedPlan(competitorId);
                 
                 return (
@@ -266,11 +273,11 @@ export default function Comparison() {
                           <div className="flex items-center gap-1">
                             <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                             <span className="text-sm font-medium">
-                              {competitorWithReviews?.averageRating?.toFixed(1) || 'N/A'}
+                              {averageRating ? averageRating.toFixed(1) : 'N/A'}
                             </span>
-                            {competitorWithReviews?.totalReviews && (
+                            {totalReviews > 0 && (
                               <span className="text-xs text-muted-foreground">
-                                ({competitorWithReviews.totalReviews})
+                                ({totalReviews})
                               </span>
                             )}
                           </div>
