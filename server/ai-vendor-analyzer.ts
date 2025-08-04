@@ -76,9 +76,9 @@ Guidelines:
     return {
       vendorName: result.vendorName,
       description: result.description,
-      website: result.website.startsWith("http") ? result.website : `https://${result.website}`,
-      reviewSources: result.reviewSources || [],
-      newsSources: result.newsSources || [],
+      website: (result.website && result.website.startsWith("http")) ? result.website : `https://${result.website || result.vendorName.toLowerCase().replace(/\s+/g, "")}.com`,
+      reviewSources: Array.isArray(result.reviewSources) ? result.reviewSources : [],
+      newsSources: Array.isArray(result.newsSources) ? result.newsSources : [],
       confidence: result.confidence || 0.5,
       reasoning: result.reasoning || "Analysis completed"
     };

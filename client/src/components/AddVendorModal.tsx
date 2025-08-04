@@ -324,7 +324,7 @@ export function AddVendorModal({ isOpen, onClose, onSuccess }: AddVendorModalPro
                   </div>
                 </div>
 
-                {vendorAnalysis.reviewSources.length > 0 && (
+                {vendorAnalysis.reviewSources && vendorAnalysis.reviewSources.length > 0 && (
                   <div>
                     <Label className="text-sm font-medium flex items-center gap-2">
                       <Star className="w-4 h-4" />
@@ -353,7 +353,7 @@ export function AddVendorModal({ isOpen, onClose, onSuccess }: AddVendorModalPro
                   </div>
                 )}
 
-                {vendorAnalysis.newsSources.length > 0 && (
+                {vendorAnalysis.newsSources && vendorAnalysis.newsSources.length > 0 && (
                   <div>
                     <Label className="text-sm font-medium flex items-center gap-2">
                       <Rss className="w-4 h-4" />
