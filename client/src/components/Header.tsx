@@ -67,9 +67,9 @@ export function Header() {
     <header className="bg-white border-b border-gray-200 px-6 py-4" data-testid="header">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900" data-testid="header-title">
-            Competitor Pricing Dashboard
-          </h2>
+          <h1 className="text-2xl font-bold text-gray-900" data-testid="header-title">
+            ScribeArena
+          </h1>
           <p className="text-gray-600 mt-1" data-testid="header-subtitle">
             Real-time pricing intelligence for AI medical scribe solutions
           </p>
