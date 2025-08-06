@@ -126,6 +126,39 @@ export default function Feed() {
       vendor: "Heidi Health"
     },
     {
+      id: "delta-11",
+      title: "Nabla Introduces Real-Time Billing/Coding Assistant",
+      subheading: "Introduced real-time billing/coding assistant that flags billing issues and nudges documentation during encounters. Also expanded nurse/inpatient tools.",
+      sourceUrl: "https://hospitalogy.com/articles/2025-06-18/breaking-down-nabla-sword-and-commons-clinics-recent-raises/",
+      category: "Features",
+      subcategory: "Feature Launch",
+      severity: 7,
+      date: "2025-06-18",
+      vendor: "Nabla"
+    },
+    {
+      id: "delta-12",
+      title: "PDQI-9 Validation Study Shows AI Scribe Quality",
+      subheading: "Introduced PDQI-9 validation study showing AI scribe notes scalable across specialties, scoring ~4.20/5 vs human 4.25/5.",
+      sourceUrl: "https://arxiv.org/abs/2505.17047",
+      category: "Research",
+      subcategory: "Evaluation Metric",
+      severity: 5,
+      date: "2025-05-15",
+      vendor: "Field Study"
+    },
+    {
+      id: "delta-13",
+      title: "Peterson Institute Questions AI Scribe ROI",
+      subheading: "Peterson Institute report finds limited evidence health systems save time with scribes—or lower costs—even as adoption climbs.",
+      sourceUrl: "https://www.statnews.com/2025/03/27/do-ai-scribes-help-health-systems-save-time-health-tech/",
+      category: "Research",
+      subcategory: "ROI/Operational Insight",
+      severity: 8,
+      date: "2025-03-27",
+      vendor: "Multiple (Market)"
+    },
+    {
       id: "delta-9",
       title: "Freed AI Raises $30M Series A",
       subheading: "Freed AI announced a $30 million Series A led by Sequoia Capital. The company has 17,000 paying clinicians, has saved more than 2.5 million hours of clinicians' time and achieved 4× year-over-year ARR growth. New features include specialty-specific notes, a custom template builder, pre-charting and EHR integration via browser extension.",
@@ -137,6 +170,17 @@ export default function Feed() {
       vendor: "Freed AI"
     },
     {
+      id: "delta-14",
+      title: "Nabla Rolls Out Magic Edit Template Customizer",
+      subheading: "Rolled out 'Magic Edit' note template customizer – allows physicians to control what to include/exclude contextually.",
+      sourceUrl: "https://hospitalogy.com/articles/2025-02-12/nabla-restoring-the-joy-of-medicine/",
+      category: "Features",
+      subcategory: "Personalization",
+      severity: 6,
+      date: "2025-02-12",
+      vendor: "Nabla"
+    },
+    {
       id: "delta-10",
       title: "DeepScribe Partners with Pearl Health ACO REACH",
       subheading: "DeepScribe became Pearl Health's preferred ambient AI partner for more than 3,500 primary care providers participating in the ACO REACH program. The integration pulls forward previous notes, generates new notes automatically and has adoption rates over 80%; DeepScribe holds a 98.8 KLAS score.",
@@ -146,6 +190,61 @@ export default function Feed() {
       severity: 7,
       date: "2025-01-14",
       vendor: "DeepScribe"
+    },
+    {
+      id: "delta-15",
+      title: "Sporo Health Outperforms GPT-4o in Clinical Accuracy",
+      subheading: "ArXiv study shows Sporo's specialized agentic architecture outperforms GPT-4o in clinical note accuracy (F1 ~75%), per clinician surveys.",
+      sourceUrl: "https://arxiv.org/abs/2411.06713",
+      category: "Research",
+      subcategory: "Performance Benchmark",
+      severity: 6,
+      date: "2024-11-01",
+      vendor: "Sporo Health"
+    },
+    {
+      id: "delta-16",
+      title: "Sporo Health vs GPT-4o Mini Comparative Study",
+      subheading: "Another comparative evaluation shows Sporo beats GPT-4o Mini in recall, precision, and hallucination reduction.",
+      sourceUrl: "https://arxiv.org/abs/2410.15528",
+      category: "Research",
+      subcategory: "Comparative Study",
+      severity: 5,
+      date: "2024-10-01",
+      vendor: "Sporo Health"
+    },
+    {
+      id: "delta-17",
+      title: "Market Analysis: Only 6 Vendors Dominate Enterprise",
+      subheading: "Gartner/STAT analysis: although > 50 scribe vendors exist, only ~6 dominate enterprise deployments—nuance, Abridge, Nabla, etc.",
+      sourceUrl: "https://www.statnews.com/2024/07/30/generative-ai-health-care-adoption-ambient-scribes/",
+      category: "Research",
+      subcategory: "Vendor Consolidation",
+      severity: 7,
+      date: "2024-07-30",
+      vendor: "Industry Landscape"
+    },
+    {
+      id: "delta-18",
+      title: "HCA Pilots Augmedix AI Scribe in 4 Emergency Rooms",
+      subheading: "HCA piloted Augmedix AI scribe in 4 ERs, with human-in-loop cleanup, showing continuous learning and workflow efficiency.",
+      sourceUrl: "https://hospitalogy.com/articles/2023-12-17/medallion-signed-sealed-credentialed/",
+      category: "Partnerships",
+      subcategory: "Pilot Deployment",
+      severity: 6,
+      date: "2023-12-01",
+      vendor: "Augmedix + HCA"
+    },
+    {
+      id: "delta-19",
+      title: "AWS Launches HealthScribe HIPAA-Eligible Service",
+      subheading: "AWS launched HealthScribe—a HIPAA-eligible generative AI service to allow EHR partners to build ambient note apps with partners like 3M M*Modal, Babylon.",
+      sourceUrl: "https://hospitalogy.com/articles/2023-08-01/amazon-healthcare-ai-play-healthscribe/",
+      category: "Platform",
+      subcategory: "Infrastructure Feature",
+      severity: 8,
+      date: "2023-08-01",
+      vendor: "AWS / HealthScribe"
     }
   ]);
 
@@ -189,7 +288,9 @@ export default function Feed() {
       "Reviews": Star,
       "API/SDK": Code,
       "Media": Tv,
-      "Blog/Newsletter": FileText
+      "Blog/Newsletter": FileText,
+      "Research": FileText,
+      "Platform": Code
     };
     const IconComponent = icons[category] || FileText;
     return <IconComponent className="w-4 h-4" />;
