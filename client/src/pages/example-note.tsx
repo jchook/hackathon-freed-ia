@@ -268,13 +268,13 @@ export default function ExampleNote() {
                       </Card>
                     )}
 
-                    {/* Latest Shared Experience */}
+                    {/* Example Note */}
                     {sharedExperience && (
-                      <Card data-testid="latest-shared-experience">
+                      <Card data-testid="example-note">
                         <CardHeader>
                           <div className="flex items-center justify-between">
                             <div>
-                              <CardTitle className="text-lg">Latest Shared Experience</CardTitle>
+                              <CardTitle className="text-lg">Example Note</CardTitle>
                               <CardDescription className="flex items-center gap-4 mt-1">
                                 <span className="flex items-center gap-1">
                                   <User className="w-4 h-4" />
