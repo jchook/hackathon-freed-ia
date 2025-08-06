@@ -35,19 +35,8 @@ export default function Feed() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  // Real competitive intelligence data
+  // Real competitive intelligence data (holding out the top item for refresh demo)
   const [deltas, setDeltas] = useState<Delta[]>([
-    {
-      id: "delta-1",
-      title: "Ambience Healthcare Raises $243M Series C",
-      subheading: "Ambience Healthcare announced a $243 million Series C round co-led by Oak HC/FT and Andreessen Horowitz. The company, which offers an ambient AI platform for documentation, coding and clinical documentation integrity (CDI), now supports over 100 specialties and more than 100 ambulatory subspecialties.",
-      sourceUrl: "https://www.ambiencehealthcare.com/blog/ambience-healthcare-announces-243-million-series-c-to-scale-its-ai-platform-for-health-systems",
-      category: "Fundraising",
-      subcategory: "Series C",
-      severity: 9,
-      date: "2025-07-29",
-      vendor: "Ambience Healthcare"
-    },
     {
       id: "delta-2",
       title: "Suki AI Expands Leadership Team",
@@ -248,30 +237,148 @@ export default function Feed() {
     }
   ]);
 
+  // Hold out feed items - these get added when refresh is clicked
+  const [nextFeedItems] = useState([
+    {
+      id: `refresh-${Date.now()}`,
+      title: "Heidi Health July 2025 Release",
+      content: "Heidi's July 2025 release adds auto-filled PDF forms, beta automated patient calls, 110-language transcription, smart dictation tabs, Epic EHR integration, a unified Integration Marketplace and assorted mobile/UI performance tweaks.",
+      source: "heidi",
+      sourceUrl: "https://www.heidihealth.com/changelog/july-2025-updates",
+      publishedAt: "2025-07-15T00:00:00.000Z",
+      tags: ["features", "epic-integration", "marketplace", "high-priority"]
+    },
+    {
+      id: `refresh-${Date.now() + 1}`,
+      title: "Sunoh AI Partners with Microsoft Teams",
+      content: "New integration allows seamless documentation during virtual patient consultations, expanding Sunoh's platform reach into telemedicine workflows.",
+      source: "sunoh",
+      sourceUrl: "https://sunoh.ai/microsoft-partnership",
+      publishedAt: new Date().toISOString(),
+      tags: ["partnerships", "telemedicine", "integration"]
+    },
+    {
+      id: `refresh-${Date.now() + 2}`,
+      title: "Epic Systems Expands AI Scribe Capabilities", 
+      content: "Epic announces native AI documentation features in next EHR update, potentially disrupting third-party scribe market with built-in functionality.",
+      source: "market",
+      sourceUrl: "https://epic.com/ai-scribe-expansion",
+      publishedAt: new Date().toISOString(),
+      tags: ["epic", "ehr", "competition", "ai-scribe"]
+    },
+    {
+      id: `refresh-${Date.now() + 3}`,
+      title: "Heidi Health Reports Security Incident",
+      content: "Minor security incident affecting 2,000 users resolved within 4 hours. Company implements additional security measures and offers free credit monitoring.",
+      source: "heidi",
+      sourceUrl: "https://heidihealth.com/security-update", 
+      publishedAt: new Date().toISOString(),
+      tags: ["security", "incident", "response"]
+    },
+    {
+      id: `refresh-${Date.now() + 4}`,
+      title: "Abridge Announces Enterprise Pricing Update",
+      content: "Enterprise plans increase by 15% effective next quarter, citing increased infrastructure costs and enhanced AI model capabilities.",
+      source: "abridge",
+      sourceUrl: "https://abridge.com/pricing-update",
+      publishedAt: new Date().toISOString(),
+      tags: ["pricing", "enterprise", "increase"]
+    }
+  ]);
+
+  const [currentFeedIndex, setCurrentFeedIndex] = useState(0);
+
   const addDemoDelta = useMutation({
     mutationFn: async () => {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 500));
-      return true;
+      // Simulate loading time
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Get the next feed item to add
+      const selectedItem = nextFeedItems[currentFeedIndex % nextFeedItems.length];
+
+      // Send to Slack endpoint
+      const slackResponse = await apiRequest("/api/slack/send-feed-alerts", {
+        method: "POST",
+        body: {
+          feedItems: [selectedItem]
+        }
+      });
+
+      // Generate insights for high-impact items
+      const insightsResponse = await apiRequest("/api/insights/generate", {
+        method: "POST",
+        body: {
+          feedItem: selectedItem
+        }
+      });
+
+      return { 
+        feedItem: selectedItem, 
+        slackResult: slackResponse,
+        insightsResult: insightsResponse
+      };
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      // Map tags to proper categories
+      const tagToCategoryMap: Record<string, string> = {
+        "features": "Features",
+        "fundraising": "Fundraising",
+        "partnerships": "Partnerships", 
+        "epic": "Competitor Entry",
+        "epic-integration": "Partnerships",
+        "security": "Security",
+        "pricing": "Pricing",
+        "telemedicine": "Partnerships",
+        "ehr": "Partnerships",
+        "competition": "Competitor Entry",
+        "enterprise": "Features",
+        "marketplace": "Features"
+      };
+
+      const primaryTag = data.feedItem.tags?.[0] || "general";
+      const category = tagToCategoryMap[primaryTag] || "Features";
+      
+      // Determine severity based on content
+      let severity = 6;
+      if (data.feedItem.title.toLowerCase().includes("heidi") && (data.feedItem.content.toLowerCase().includes("epic") || data.feedItem.tags?.includes("high-priority"))) {
+        severity = 9; // High severity for Heidi + Epic integration or high-priority items
+      } else if (data.feedItem.source === "ambience") {
+        severity = 9;
+      } else {
+        severity = Math.floor(Math.random() * 4) + 6;
+      }
+      
       const newDelta: Delta = {
-        id: `delta-${Date.now()}`,
-        title: "Sunoh AI Partners with Microsoft Teams",
-        subheading: "New integration allows seamless documentation during virtual patient consultations",
-        sourceUrl: "https://sunoh.ai/microsoft-partnership", 
-        category: "Partnerships",
-        subcategory: "Platform Integration",
-        severity: 7,
-        date: new Date().toISOString().split('T')[0],
-        vendor: "Sunoh AI"
+        id: data.feedItem.id,
+        title: data.feedItem.title,
+        subheading: data.feedItem.content,
+        sourceUrl: data.feedItem.sourceUrl,
+        category: category,
+        subcategory: data.feedItem.tags?.[1] ? data.feedItem.tags[1].replace("-", " ").replace(/\b\w/g, l => l.toUpperCase()) : "New Feature Release",
+        severity: severity,
+        date: new Date(data.feedItem.publishedAt).toISOString().split('T')[0],
+        vendor: data.feedItem.source === "heidi" ? "Heidi Health" : data.feedItem.source.charAt(0).toUpperCase() + data.feedItem.source.slice(1)
       };
       
-      setDeltas(prev => [newDelta, ...prev]);
+      console.log("Adding new delta:", newDelta);
+      setDeltas(prev => {
+        const updated = [newDelta, ...prev];
+        console.log("Updated deltas count:", updated.length);
+        return updated;
+      });
+      setCurrentFeedIndex(prev => prev + 1); // Move to next feed item for next refresh
+      
+      const slackSuccess = data.slackResult?.summary?.successful > 0;
+      const insightsGenerated = data.insightsResult?.shouldGenerate;
+      
+      let description = `New competitive intel: "${data.feedItem.title}"`;
+      if (slackSuccess) description += " and alert sent to Slack";
+      if (insightsGenerated) description += " with AI insights generated";
+      if (!slackSuccess && !insightsGenerated) description += " (processing complete)";
       
       toast({
-        title: "New Delta Added",
-        description: "Demo delta has been added to the feed.",
+        title: "Feed Refreshed",
+        description: description,
       });
     }
   });
@@ -391,7 +498,7 @@ export default function Feed() {
               data-testid="refresh-button"
             >
               <RefreshCw className={`w-4 h-4 mr-2 ${addDemoDelta.isPending ? 'animate-spin' : ''}`} />
-              Add Demo Delta
+              {addDemoDelta.isPending ? 'Analyzing...' : 'Refresh Feed'}
             </Button>
           </div>
 
