@@ -29,8 +29,9 @@ services:
     container_name: scribearena_app
     restart: unless-stopped
     ports:
-      - "5000:5000"
+      - "5001:5001"
     environment:
+      - PORT=5001
       - NODE_ENV=development
       - DATABASE_URL=postgresql://scribearena_user:scribearena_password@postgres:5432/scribearena
       - OPENAI_API_KEY=${OPENAI_API_KEY}
