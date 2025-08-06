@@ -34,10 +34,42 @@ const VENDOR_OUTPUTS = {
   'heidi-1': {
     name: 'Heidi Health',
     soap: {
-      subjective: `Patient reports ankle pain lasting one week following a running injury. States ankle is swollen and "not getting much better." Pain persists with walking but patient able to ambulate. Has tried ice and ibuprofen with some relief. Reports ibuprofen "kind of helps." Patient continues other exercises besides running. Current medications include delgocitinib for skin condition and ramipril for hypertension.`,
-      objective: `Physical examination of ankle performed. Point tenderness elicited on palpation at one specific location. No tenderness noted at two other examination points. Patient ambulating without significant distress.`,
-      assessment: `Ankle sprain (likely grade 1-2 based on presentation and examination findings). No indication for radiographic imaging at this time.`,
-      plan: `Continue current management with ice and ibuprofen for anti-inflammatory effect and pain control. Patient education provided regarding continued non-impact exercise. Continue current medications: delgocitinib as prescribed for dermatologic condition, ramipril for blood pressure management. Follow-up as needed if symptoms worsen or fail to improve.`
+      subjective: `Reports right ankle pain.
+
+Pain started a week ago after twisting the ankle while running. Swelling present and not improving. Able to walk but painful.
+
+Tried ice and ibuprofen, which provided some relief. Not wrapping or supporting the ankle.
+
+Stepped on a rock on a trail and twisted ankle to the right (supination).
+
+Similar, less severe episodes in the past.
+
+Not running since injury, but performing other exercises.
+
+Reports feeling tired. Noted increased thirst and frequent urination.
+
+Past Medical History:
+- Family history of diabetes.`,
+      objective: `Foot and ankle examination: Tenderness noted. No pain in areas suggesting need for X-ray.
+
+Investigations with results: Haemoglobin A1c (HbA1c) reported as high.`,
+      assessment: `1. Right ankle sprain
+2. Elevated blood sugar / Diabetes - Type 2 Diabetes Mellitus
+3. Other conditions requiring follow-up`,
+      plan: `1. Right ankle sprain
+- Icing, ibuprofen, and Tylenol for pain.
+- Elevating the ankle.
+- Provide ankle wrap for stability.
+
+2. Elevated blood sugar / Diabetes
+- Assessment: Type 2 Diabetes Mellitus.
+- Investigations planned: Blood test for current blood sugar level (finger prick). Labs ordered to check cholesterol, electrolytes, and blood work.
+- Treatment planned: Reduce sugar-sweetened beverages. Counselling provided regarding dietary changes, specifically reducing carbohydrates and sugary drinks. Encouraged switching to water or sparkling water.
+- Relevant referrals: Referral to an eye doctor for eye examination.
+- Follow-up: Follow-up visit for diabetes education within 2-3 weeks. Follow-up in about a month to discuss progress with dietary changes.
+
+3. Other
+- Foot test to be performed today.`
     }
   },
   'freed-1': {
