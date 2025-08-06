@@ -1,21 +1,16 @@
 import { useState, useRef } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Sidebar } from "@/components/Sidebar";
 import { Header } from "@/components/Header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { FileText, Play, Pause, Upload, Download, Stethoscope, Clock, User, Share2, ChevronDown, ChevronUp } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { FileText, Play, Pause, Stethoscope, Clock, User, ChevronDown, ChevronUp } from "lucide-react";
+import { Label } from "@/components/ui/label";
 import audioFile from "@assets/Visit to the family doctor_1754271038617.m4a";
-import type { SharedExperience, Competitor } from "@shared/schema";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import type { Competitor, SharedExperience } from "@shared/schema";
 
 const TRANSCRIPT = `Hi, it's Doctor McClure. How are you doing today? Doing fine. Great. I know we're supposed to review your labs, but do you have any questions before we start? My ankle has been hurting. Did anything happen to it? I twisted it while running. It's been swollen and not getting much better. When did that happen? A week ago. Have you been able to walk on it since then? Yeah, just hurts. Have you been doing anything for your ankle? I tried some ice. Ibuprofen once kind of helps. Also, I wanted to ask about my current medications - I'm taking delgocitinib for my skin condition and ramipril for blood pressure. Are you able to do other exercises besides running so that you can still move your body even if you have an injury? It sounds like it can help. So I think that's a great first step. Let me just do that exam on your foot. Really glad that you've been doing exercise even when you're in pain. Doing other exercises besides running so that you can still move your body even if you have an injury. Does it hurt here? No. Does it hurt here? No. Does it hurt here? That hurts a little bit. I don't think you need an x-ray. I think you have an ankle sprain. Icing it is great. Ibuprofen can help reduce swelling. Continue your delgocitinib and ramipril as prescribed.`;
 
@@ -63,21 +58,7 @@ const VENDOR_OUTPUTS = {
 };
 
 export default function ExampleNote() {
-  const [selectedVendor, setSelectedVendor] = useState<string>('');
-  const [compareVendor, setCompareVendor] = useState<string>('');
-  const [customNote, setCustomNote] = useState({
-    subjective: '',
-    objective: '',
-    assessment: '',
-    plan: ''
-  });
-  const [clinicianData, setClinicianData] = useState({
-    name: '',
-    specialty: '',
-    transcriptionDuration: 0,
-    notes: ''
-  });
-  const [activeTab, setActiveTab] = useState('compare');
+  const [compareVendor, setCompareVendor] = useState<string>('freed-1');
   const [isPlaying, setIsPlaying] = useState(false);
   const [soapSectionsExpanded, setSoapSectionsExpanded] = useState({
     subjective: true,
@@ -86,105 +67,32 @@ export default function ExampleNote() {
     plan: true
   });
   const audioRef = useRef<HTMLAudioElement>(null);
-  const { toast } = useToast();
 
   // Fetch competitors for the vendor selector
   const { data: competitors = [] } = useQuery<Competitor[]>({
     queryKey: ['/api/competitors'],
   });
 
-  // Mutation for submitting shared experience
-  const shareExperience = useMutation({
-    mutationFn: async (experienceData: any) => {
-      return apiRequest('/api/shared-experiences', {
-        method: 'POST',
-        body: JSON.stringify(experienceData),
-      });
-    },
-    onSuccess: () => {
-      toast({
-        title: "Success",
-        description: "Your experience has been shared with the community",
-      });
-      // Reset form
-      setCustomNote({ subjective: '', objective: '', assessment: '', plan: '' });
-      setClinicianData({ name: '', specialty: '', transcriptionDuration: 0, notes: '' });
-      setSelectedVendor('');
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: "Failed to share experience. Please try again.",
-        variant: "destructive",
-      });
-    },
+  // Fetch latest shared experience for compare vendor
+  const { data: sharedExperience, isLoading: isLoadingExperience } = useQuery<SharedExperience>({
+    queryKey: ['/api/competitors', compareVendor, 'latest-shared-experience'],
+    enabled: !!compareVendor,
   });
-
-  const handleSectionChange = (section: keyof typeof customNote, value: string) => {
-    setCustomNote(prev => ({ ...prev, [section]: value }));
-  };
-
-  const handleClinicianDataChange = (field: keyof typeof clinicianData, value: string | number) => {
-    setClinicianData(prev => ({ ...prev, [field]: value }));
-  };
 
   const handlePlayPause = () => {
     if (audioRef.current) {
       if (isPlaying) {
         audioRef.current.pause();
-        setIsPlaying(false);
       } else {
         audioRef.current.play();
-        setIsPlaying(true);
       }
+      setIsPlaying(!isPlaying);
     }
-  };
-
-  const handleSubmitExperience = () => {
-    if (!selectedVendor) {
-      toast({
-        title: "Error",
-        description: "Please select a vendor first",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!customNote.subjective || !customNote.objective || !customNote.assessment || !customNote.plan) {
-      toast({
-        title: "Error", 
-        description: "Please fill in all SOAP note sections",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const experienceData = {
-      competitorId: selectedVendor,
-      transcriptId: "family-doctor-visit-1",
-      clinicianName: clinicianData.name || "Anonymous",
-      clinicianSpecialty: clinicianData.specialty || "General Practice",
-      subjective: customNote.subjective,
-      objective: customNote.objective,
-      assessment: customNote.assessment,
-      plan: customNote.plan,
-      transcriptionDuration: clinicianData.transcriptionDuration || null,
-      notes: clinicianData.notes || null,
-      isPublic: true
-    };
-
-    shareExperience.mutate(experienceData);
   };
 
   const handleAudioEnded = () => {
     setIsPlaying(false);
   };
-
-  // Fetch latest shared experience for compare vendor
-  const { data: sharedExperience, isLoading: isLoadingExperience } = useQuery({
-    queryKey: ['/api/competitors', compareVendor, 'latest-shared-experience'],
-    enabled: !!compareVendor,
-  });
 
   const toggleSoapSection = (section: keyof typeof soapSectionsExpanded) => {
     setSoapSectionsExpanded(prev => ({
@@ -197,45 +105,6 @@ export default function ExampleNote() {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-  };
-
-  const handleDownloadNote = () => {
-    const currentNote = activeTab === 'compare' ? VENDOR_OUTPUTS[selectedVendor as keyof typeof VENDOR_OUTPUTS] : {
-      name: 'Custom Note',
-      soap: customNote
-    };
-    
-    const noteContent = `SOAP Note - ${currentNote.name}
-    
-SUBJECTIVE:
-${currentNote.soap.subjective}
-
-OBJECTIVE:
-${currentNote.soap.objective}
-
-ASSESSMENT:
-${currentNote.soap.assessment}
-
-PLAN:
-${currentNote.soap.plan}
-
-Generated on: ${new Date().toLocaleDateString()}
-Source: ScribeArena Example Note Tool`;
-
-    const blob = new Blob([noteContent], { type: 'text/plain' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `soap-note-${currentNote.name.toLowerCase().replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    window.URL.revokeObjectURL(url);
-    document.body.removeChild(a);
-    
-    toast({
-      title: "Note Downloaded",
-      description: "SOAP note has been downloaded successfully."
-    });
   };
 
   return (
@@ -253,8 +122,6 @@ Source: ScribeArena Example Note Tool`;
               Test how different AI scribes handle the same patient visit and generate SOAP notes
             </p>
           </div>
-
-
 
           {/* Audio and Transcript Section */}
           <Card data-testid="transcript-section">
@@ -306,512 +173,245 @@ Source: ScribeArena Example Note Tool`;
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="compare">Compare Vendors</TabsTrigger>
-                  <TabsTrigger value="custom">Share Experience</TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="compare" className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <Label htmlFor="compare-vendor-select" className="text-sm font-medium">
-                        Select Vendor:
-                      </Label>
-                      <Select value={compareVendor} onValueChange={setCompareVendor} data-testid="compare-vendor-select">
-                        <SelectTrigger className="w-48" id="compare-vendor-select">
-                          <SelectValue placeholder="Choose vendor to compare..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {competitors.map((competitor) => (
-                            <SelectItem key={competitor.id} value={competitor.id}>
-                              {competitor.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <Label htmlFor="compare-vendor-select" className="text-sm font-medium">
+                    Select Vendor:
+                  </Label>
+                  <Select value={compareVendor} onValueChange={setCompareVendor} data-testid="compare-vendor-select">
+                    <SelectTrigger className="w-48" id="compare-vendor-select">
+                      <SelectValue placeholder="Choose vendor to compare..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {competitors.map((competitor) => (
+                        <SelectItem key={competitor.id} value={competitor.id}>
+                          {competitor.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {!compareVendor ? (
+                  <div className="text-center py-12">
+                    <div className="max-w-md mx-auto">
+                      <FileText className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                      <h3 className="text-lg font-medium mb-2">Select a Vendor Above</h3>
+                      <p className="text-muted-foreground text-sm">
+                        Choose an AI scribe vendor to view the latest shared experience and compare outputs.
+                      </p>
                     </div>
-                    {compareVendor && (
-                      <Button onClick={handleDownloadNote} className="flex items-center gap-2" data-testid="download-note">
-                        <Download className="w-4 h-4" />
-                        Download Note
-                      </Button>
-                    )}
                   </div>
+                ) : (
+                  <div className="space-y-6">
+                    {/* Freed AI Video Demo */}
+                    {compareVendor === 'freed-1' && (
+                      <Card data-testid="freed-video-demo">
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2">
+                            <Play className="w-5 h-5" />
+                            Freed AI Demo Video
+                          </CardTitle>
+                          <CardDescription>
+                            Watch how Freed AI processes clinical encounters in real-time
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="aspect-video w-full rounded-lg overflow-hidden bg-black">
+                            <iframe
+                              width="100%"
+                              height="100%"
+                              src="https://www.youtube.com/embed/ueSwbb7we44"
+                              title="Freed AI Demo - Real-time Medical Scribe"
+                              frameBorder="0"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                              allowFullScreen
+                              className="w-full h-full"
+                              data-testid="freed-demo-video"
+                            />
+                          </div>
+                          <div className="mt-3 text-sm text-muted-foreground">
+                            See Freed AI in action with real clinical documentation workflows
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
 
-                  {!compareVendor ? (
-                    <div className="text-center py-12">
-                      <div className="max-w-md mx-auto">
-                        <FileText className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                        <h3 className="text-lg font-medium mb-2">Select a Vendor Above</h3>
-                        <p className="text-muted-foreground text-sm">
-                          Choose an AI scribe vendor to view the latest shared experience and compare outputs.
-                        </p>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="space-y-6">
-                      {/* Freed AI Video Demo */}
-                      {compareVendor === 'freed-1' && (
-                        <Card data-testid="freed-video-demo">
-                          <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                              <Play className="w-5 h-5" />
-                              Freed AI Demo Video
-                            </CardTitle>
-                            <CardDescription>
-                              Watch how Freed AI processes clinical encounters in real-time
-                            </CardDescription>
-                          </CardHeader>
-                          <CardContent>
-                            <div className="aspect-video w-full rounded-lg overflow-hidden bg-black">
-                              <iframe
-                                width="100%"
-                                height="100%"
-                                src="https://www.youtube.com/embed/ueSwbb7we44"
-                                title="Freed AI Demo - Real-time Medical Scribe"
-                                frameBorder="0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                allowFullScreen
-                                className="w-full h-full"
-                                data-testid="freed-demo-video"
-                              />
-                            </div>
-                            <div className="mt-3 text-sm text-muted-foreground">
-                              See Freed AI in action with real clinical documentation workflows
-                            </div>
-                          </CardContent>
-                        </Card>
-                      )}
-
-                      {/* Latest Shared Experience */}
-                      {sharedExperience && (
-                        <Card data-testid="latest-shared-experience">
-                          <CardHeader>
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <CardTitle className="text-lg">Latest Shared Experience</CardTitle>
-                                <CardDescription className="flex items-center gap-4 mt-1">
-                                  <span className="flex items-center gap-1">
-                                    <User className="w-4 h-4" />
-                                    {sharedExperience.clinicianName || 'Anonymous'}
+                    {/* Latest Shared Experience */}
+                    {sharedExperience && (
+                      <Card data-testid="latest-shared-experience">
+                        <CardHeader>
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <CardTitle className="text-lg">Latest Shared Experience</CardTitle>
+                              <CardDescription className="flex items-center gap-4 mt-1">
+                                <span className="flex items-center gap-1">
+                                  <User className="w-4 h-4" />
+                                  {sharedExperience.clinicianName || 'Anonymous'}
+                                </span>
+                                <Badge variant="outline">{sharedExperience.clinicianSpecialty || 'General Practice'}</Badge>
+                                {sharedExperience.transcriptionDuration && (
+                                  <span className="flex items-center gap-1 text-xs">
+                                    <Clock className="w-3 h-3" />
+                                    {formatDuration(sharedExperience.transcriptionDuration)} generation time
                                   </span>
-                                  <Badge variant="outline">{sharedExperience.clinicianSpecialty || 'General Practice'}</Badge>
-                                  {sharedExperience.transcriptionDuration && (
-                                    <span className="flex items-center gap-1 text-xs">
-                                      <Clock className="w-3 h-3" />
-                                      {formatDuration(sharedExperience.transcriptionDuration)} generation time
-                                    </span>
-                                  )}
-                                </CardDescription>
-                              </div>
-                              <div className="text-xs text-muted-foreground">
-                                {new Date(sharedExperience.createdAt!).toLocaleDateString()}
-                              </div>
+                                )}
+                              </CardDescription>
                             </div>
-                          </CardHeader>
-                          <CardContent className="space-y-4">
-                            {/* Subjective Section */}
-                            <Collapsible open={soapSectionsExpanded.subjective} onOpenChange={() => toggleSoapSection('subjective')}>
-                              <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-muted/50 rounded-lg hover:bg-muted/70 transition-colors">
-                                <span className="font-medium">Subjective</span>
-                                {soapSectionsExpanded.subjective ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                              </CollapsibleTrigger>
-                              <CollapsibleContent className="mt-2">
-                                <div className="p-3 bg-background border rounded-lg">
-                                  <HighlightedText text={sharedExperience.subjective} />
-                                </div>
-                              </CollapsibleContent>
-                            </Collapsible>
-
-                            {/* Objective Section */}
-                            <Collapsible open={soapSectionsExpanded.objective} onOpenChange={() => toggleSoapSection('objective')}>
-                              <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-muted/50 rounded-lg hover:bg-muted/70 transition-colors">
-                                <span className="font-medium">Objective</span>
-                                {soapSectionsExpanded.objective ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                              </CollapsibleTrigger>
-                              <CollapsibleContent className="mt-2">
-                                <div className="p-3 bg-background border rounded-lg">
-                                  <HighlightedText text={sharedExperience.objective} />
-                                </div>
-                              </CollapsibleContent>
-                            </Collapsible>
-
-                            {/* Assessment Section */}
-                            <Collapsible open={soapSectionsExpanded.assessment} onOpenChange={() => toggleSoapSection('assessment')}>
-                              <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-muted/50 rounded-lg hover:bg-muted/70 transition-colors">
-                                <span className="font-medium">Assessment</span>
-                                {soapSectionsExpanded.assessment ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                              </CollapsibleTrigger>
-                              <CollapsibleContent className="mt-2">
-                                <div className="p-3 bg-background border rounded-lg">
-                                  <HighlightedText text={sharedExperience.assessment} />
-                                </div>
-                              </CollapsibleContent>
-                            </Collapsible>
-
-                            {/* Plan Section */}
-                            <Collapsible open={soapSectionsExpanded.plan} onOpenChange={() => toggleSoapSection('plan')}>
-                              <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-muted/50 rounded-lg hover:bg-muted/70 transition-colors">
-                                <span className="font-medium">Plan</span>
-                                {soapSectionsExpanded.plan ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                              </CollapsibleTrigger>
-                              <CollapsibleContent className="mt-2">
-                                <div className="p-3 bg-background border rounded-lg">
-                                  <HighlightedText text={sharedExperience.plan} />
-                                </div>
-                              </CollapsibleContent>
-                            </Collapsible>
-
-                            {/* Additional Comments */}
-                            {sharedExperience.notes && (
-                              <div className="pt-4 border-t">
-                                <h4 className="font-medium text-sm mb-2">Additional Comments</h4>
-                                <p className="text-sm text-muted-foreground italic">"{sharedExperience.notes}"</p>
+                            <div className="text-xs text-muted-foreground">
+                              {new Date(sharedExperience.createdAt!).toLocaleDateString()}
+                            </div>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          {/* Subjective Section */}
+                          <Collapsible open={soapSectionsExpanded.subjective} onOpenChange={() => toggleSoapSection('subjective')}>
+                            <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-muted/50 rounded-lg hover:bg-muted/70 transition-colors">
+                              <span className="font-medium">Subjective</span>
+                              {soapSectionsExpanded.subjective ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                            </CollapsibleTrigger>
+                            <CollapsibleContent className="mt-2">
+                              <div className="p-3 bg-background border rounded-lg">
+                                <HighlightedText text={sharedExperience.subjective} />
                               </div>
-                            )}
-                          </CardContent>
-                        </Card>
-                      )}
+                            </CollapsibleContent>
+                          </Collapsible>
 
-                      {isLoadingExperience && (
+                          {/* Objective Section */}
+                          <Collapsible open={soapSectionsExpanded.objective} onOpenChange={() => toggleSoapSection('objective')}>
+                            <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-muted/50 rounded-lg hover:bg-muted/70 transition-colors">
+                              <span className="font-medium">Objective</span>
+                              {soapSectionsExpanded.objective ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                            </CollapsibleTrigger>
+                            <CollapsibleContent className="mt-2">
+                              <div className="p-3 bg-background border rounded-lg">
+                                <HighlightedText text={sharedExperience.objective} />
+                              </div>
+                            </CollapsibleContent>
+                          </Collapsible>
+
+                          {/* Assessment Section */}
+                          <Collapsible open={soapSectionsExpanded.assessment} onOpenChange={() => toggleSoapSection('assessment')}>
+                            <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-muted/50 rounded-lg hover:bg-muted/70 transition-colors">
+                              <span className="font-medium">Assessment</span>
+                              {soapSectionsExpanded.assessment ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                            </CollapsibleTrigger>
+                            <CollapsibleContent className="mt-2">
+                              <div className="p-3 bg-background border rounded-lg">
+                                <HighlightedText text={sharedExperience.assessment} />
+                              </div>
+                            </CollapsibleContent>
+                          </Collapsible>
+
+                          {/* Plan Section */}
+                          <Collapsible open={soapSectionsExpanded.plan} onOpenChange={() => toggleSoapSection('plan')}>
+                            <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-muted/50 rounded-lg hover:bg-muted/70 transition-colors">
+                              <span className="font-medium">Plan</span>
+                              {soapSectionsExpanded.plan ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                            </CollapsibleTrigger>
+                            <CollapsibleContent className="mt-2">
+                              <div className="p-3 bg-background border rounded-lg">
+                                <HighlightedText text={sharedExperience.plan} />
+                              </div>
+                            </CollapsibleContent>
+                          </Collapsible>
+
+                          {/* Additional Comments */}
+                          {sharedExperience.notes && (
+                            <div className="pt-4 border-t">
+                              <h4 className="font-medium text-sm mb-2">Additional Comments</h4>
+                              <p className="text-sm text-muted-foreground italic">"{sharedExperience.notes}"</p>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    {isLoadingExperience && (
+                      <Card>
+                        <CardContent className="p-8 text-center">
+                          <div className="text-sm text-muted-foreground">Loading shared experience...</div>
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    {!isLoadingExperience && !sharedExperience && (
+                      <div className="space-y-4">
                         <Card>
                           <CardContent className="p-8 text-center">
-                            <div className="text-sm text-muted-foreground">Loading shared experience...</div>
+                            <div className="text-sm text-muted-foreground mb-4">No shared experiences found for this vendor yet.</div>
+                            <div className="text-sm text-muted-foreground">Showing sample AI-generated SOAP note below:</div>
                           </CardContent>
                         </Card>
-                      )}
+                        
+                        {/* Sample Vendor Output */}
+                        {VENDOR_OUTPUTS[compareVendor as keyof typeof VENDOR_OUTPUTS] && (
+                          <Card data-testid="sample-vendor-output">
+                            <CardHeader>
+                              <CardTitle className="text-lg">Sample AI-Generated SOAP Note</CardTitle>
+                              <CardDescription>
+                                Example output from {VENDOR_OUTPUTS[compareVendor as keyof typeof VENDOR_OUTPUTS].name}
+                              </CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                              {/* Sample Subjective Section */}
+                              <Collapsible open={soapSectionsExpanded.subjective} onOpenChange={() => toggleSoapSection('subjective')}>
+                                <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-muted/50 rounded-lg hover:bg-muted/70 transition-colors">
+                                  <span className="font-medium">Subjective</span>
+                                  {soapSectionsExpanded.subjective ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                                </CollapsibleTrigger>
+                                <CollapsibleContent className="mt-2">
+                                  <div className="p-3 bg-background border rounded-lg">
+                                    <HighlightedText text={VENDOR_OUTPUTS[compareVendor as keyof typeof VENDOR_OUTPUTS].soap.subjective} />
+                                  </div>
+                                </CollapsibleContent>
+                              </Collapsible>
 
-                      {!isLoadingExperience && !sharedExperience && (
-                        <div className="space-y-4">
-                          <Card>
-                            <CardContent className="p-8 text-center">
-                              <div className="text-sm text-muted-foreground mb-4">No shared experiences found for this vendor yet.</div>
-                              <div className="text-sm text-muted-foreground">Showing sample AI-generated SOAP note below:</div>
+                              {/* Sample Objective Section */}
+                              <Collapsible open={soapSectionsExpanded.objective} onOpenChange={() => toggleSoapSection('objective')}>
+                                <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-muted/50 rounded-lg hover:bg-muted/70 transition-colors">
+                                  <span className="font-medium">Objective</span>
+                                  {soapSectionsExpanded.objective ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                                </CollapsibleTrigger>
+                                <CollapsibleContent className="mt-2">
+                                  <div className="p-3 bg-background border rounded-lg">
+                                    <HighlightedText text={VENDOR_OUTPUTS[compareVendor as keyof typeof VENDOR_OUTPUTS].soap.objective} />
+                                  </div>
+                                </CollapsibleContent>
+                              </Collapsible>
+
+                              {/* Sample Assessment Section */}
+                              <Collapsible open={soapSectionsExpanded.assessment} onOpenChange={() => toggleSoapSection('assessment')}>
+                                <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-muted/50 rounded-lg hover:bg-muted/70 transition-colors">
+                                  <span className="font-medium">Assessment</span>
+                                  {soapSectionsExpanded.assessment ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                                </CollapsibleTrigger>
+                                <CollapsibleContent className="mt-2">
+                                  <div className="p-3 bg-background border rounded-lg">
+                                    <HighlightedText text={VENDOR_OUTPUTS[compareVendor as keyof typeof VENDOR_OUTPUTS].soap.assessment} />
+                                  </div>
+                                </CollapsibleContent>
+                              </Collapsible>
+
+                              {/* Sample Plan Section */}
+                              <Collapsible open={soapSectionsExpanded.plan} onOpenChange={() => toggleSoapSection('plan')}>
+                                <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-muted/50 rounded-lg hover:bg-muted/70 transition-colors">
+                                  <span className="font-medium">Plan</span>
+                                  {soapSectionsExpanded.plan ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                                </CollapsibleTrigger>
+                                <CollapsibleContent className="mt-2">
+                                  <div className="p-3 bg-background border rounded-lg">
+                                    <HighlightedText text={VENDOR_OUTPUTS[compareVendor as keyof typeof VENDOR_OUTPUTS].soap.plan} />
+                                  </div>
+                                </CollapsibleContent>
+                              </Collapsible>
                             </CardContent>
                           </Card>
-                          
-                          {/* Sample Vendor Output */}
-                          {VENDOR_OUTPUTS[compareVendor as keyof typeof VENDOR_OUTPUTS] && (
-                            <Card data-testid="sample-vendor-output">
-                              <CardHeader>
-                                <CardTitle className="text-lg">Sample AI-Generated SOAP Note</CardTitle>
-                                <CardDescription>
-                                  Example output from {VENDOR_OUTPUTS[compareVendor as keyof typeof VENDOR_OUTPUTS].name}
-                                </CardDescription>
-                              </CardHeader>
-                              <CardContent className="space-y-4">
-                                {/* Sample Subjective Section */}
-                                <Collapsible open={soapSectionsExpanded.subjective} onOpenChange={() => toggleSoapSection('subjective')}>
-                                  <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-muted/50 rounded-lg hover:bg-muted/70 transition-colors">
-                                    <span className="font-medium">Subjective</span>
-                                    {soapSectionsExpanded.subjective ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                                  </CollapsibleTrigger>
-                                  <CollapsibleContent className="mt-2">
-                                    <div className="p-3 bg-background border rounded-lg">
-                                      <HighlightedText text={VENDOR_OUTPUTS[compareVendor as keyof typeof VENDOR_OUTPUTS].soap.subjective} />
-                                    </div>
-                                  </CollapsibleContent>
-                                </Collapsible>
-
-                                {/* Sample Objective Section */}
-                                <Collapsible open={soapSectionsExpanded.objective} onOpenChange={() => toggleSoapSection('objective')}>
-                                  <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-muted/50 rounded-lg hover:bg-muted/70 transition-colors">
-                                    <span className="font-medium">Objective</span>
-                                    {soapSectionsExpanded.objective ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                                  </CollapsibleTrigger>
-                                  <CollapsibleContent className="mt-2">
-                                    <div className="p-3 bg-background border rounded-lg">
-                                      <HighlightedText text={VENDOR_OUTPUTS[compareVendor as keyof typeof VENDOR_OUTPUTS].soap.objective} />
-                                    </div>
-                                  </CollapsibleContent>
-                                </Collapsible>
-
-                                {/* Sample Assessment Section */}
-                                <Collapsible open={soapSectionsExpanded.assessment} onOpenChange={() => toggleSoapSection('assessment')}>
-                                  <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-muted/50 rounded-lg hover:bg-muted/70 transition-colors">
-                                    <span className="font-medium">Assessment</span>
-                                    {soapSectionsExpanded.assessment ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                                  </CollapsibleTrigger>
-                                  <CollapsibleContent className="mt-2">
-                                    <div className="p-3 bg-background border rounded-lg">
-                                      <HighlightedText text={VENDOR_OUTPUTS[compareVendor as keyof typeof VENDOR_OUTPUTS].soap.assessment} />
-                                    </div>
-                                  </CollapsibleContent>
-                                </Collapsible>
-
-                                {/* Sample Plan Section */}
-                                <Collapsible open={soapSectionsExpanded.plan} onOpenChange={() => toggleSoapSection('plan')}>
-                                  <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-muted/50 rounded-lg hover:bg-muted/70 transition-colors">
-                                    <span className="font-medium">Plan</span>
-                                    {soapSectionsExpanded.plan ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                                  </CollapsibleTrigger>
-                                  <CollapsibleContent className="mt-2">
-                                    <div className="p-3 bg-background border rounded-lg">
-                                      <HighlightedText text={VENDOR_OUTPUTS[compareVendor as keyof typeof VENDOR_OUTPUTS].soap.plan} />
-                                    </div>
-                                  </CollapsibleContent>
-                                </Collapsible>
-                              </CardContent>
-                            </Card>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </TabsContent>
-
-                <TabsContent value="custom" className="space-y-6">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-medium">Share Your Clinical Experience</h3>
-                    <Button onClick={handleDownloadNote} className="flex items-center gap-2" data-testid="download-custom-note">
-                      <Download className="w-4 h-4" />
-                      Download Your Note
-                    </Button>
-                  </div>
-
-                  {/* Section 1: EHR Scribe Vendor Selection */}
-                  <Card data-testid="vendor-selection">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <User className="w-5 h-5" />
-                        EHR Scribe Vendor Selection
-                      </CardTitle>
-                      <CardDescription>
-                        Choose which AI scribe vendor you'd like to test with this patient visit
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="vendor-select">AI Scribe Vendor *</Label>
-                          <Select value={selectedVendor} onValueChange={setSelectedVendor} data-testid="vendor-select">
-                            <SelectTrigger id="vendor-select">
-                              <SelectValue placeholder="Select a vendor to test..." />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {competitors.map((competitor) => (
-                                <SelectItem key={competitor.id} value={competitor.id}>
-                                  {competitor.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="clinician-name">Your Name (Optional)</Label>
-                          <Input 
-                            id="clinician-name"
-                            placeholder="Dr. Smith"
-                            value={clinicianData.name}
-                            onChange={(e) => handleClinicianDataChange('name', e.target.value)}
-                            data-testid="input-clinician-name"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="specialty">Specialty (Optional)</Label>
-                          <Input 
-                            id="specialty"
-                            placeholder="Internal Medicine"
-                            value={clinicianData.specialty}
-                            onChange={(e) => handleClinicianDataChange('specialty', e.target.value)}
-                            data-testid="input-specialty"
-                          />
-                        </div>
+                        )}
                       </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Section 2: SOAP Note Fields */}
-                  <Card data-testid="soap-note-fields">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <FileText className="w-5 h-5" />
-                        SOAP Note Documentation
-                      </CardTitle>
-                      <CardDescription>
-                        Document your clinical assessment using the SOAP format
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="grid gap-4">
-                        <div>
-                          <Label htmlFor="subjective" className="text-sm font-medium">
-                            Subjective *
-                          </Label>
-                          <Textarea
-                            id="subjective"
-                            placeholder="Patient's chief complaint, history of present illness, review of systems..."
-                            value={customNote.subjective}
-                            onChange={(e) => handleSectionChange('subjective', e.target.value)}
-                            className="min-h-[100px] mt-2"
-                            data-testid="input-subjective"
-                          />
-                        </div>
-
-                        <div>
-                          <Label htmlFor="objective" className="text-sm font-medium">
-                            Objective *
-                          </Label>
-                          <Textarea
-                            id="objective"
-                            placeholder="Physical examination findings, vital signs, diagnostic test results..."
-                            value={customNote.objective}
-                            onChange={(e) => handleSectionChange('objective', e.target.value)}
-                            className="min-h-[100px] mt-2"
-                            data-testid="input-objective"
-                          />
-                        </div>
-
-                        <div>
-                          <Label htmlFor="assessment" className="text-sm font-medium">
-                            Assessment *
-                          </Label>
-                          <Textarea
-                            id="assessment"
-                            placeholder="Clinical diagnosis, differential diagnosis, clinical reasoning..."
-                            value={customNote.assessment}
-                            onChange={(e) => handleSectionChange('assessment', e.target.value)}
-                            className="min-h-[100px] mt-2"
-                            data-testid="input-assessment"
-                          />
-                        </div>
-
-                        <div>
-                          <Label htmlFor="plan" className="text-sm font-medium">
-                            Plan *
-                          </Label>
-                          <Textarea
-                            id="plan"
-                            placeholder="Treatment plan, medications, follow-up instructions, patient education..."
-                            value={customNote.plan}
-                            onChange={(e) => handleSectionChange('plan', e.target.value)}
-                            className="min-h-[100px] mt-2"
-                            data-testid="input-plan"
-                          />
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Section 3: Generation Feedback */}
-                  <Card data-testid="generation-feedback">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Clock className="w-5 h-5" />
-                        Generation Feedback
-                      </CardTitle>
-                      <CardDescription>
-                        Share your experience with the AI scribe generation process
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="grid gap-4">
-                        <div>
-                          <Label htmlFor="duration" className="text-sm font-medium">
-                            Estimated Generation Time (seconds)
-                          </Label>
-                          <Input 
-                            id="duration"
-                            type="number"
-                            placeholder="e.g., 45"
-                            value={clinicianData.transcriptionDuration}
-                            onChange={(e) => handleClinicianDataChange('transcriptionDuration', parseInt(e.target.value) || 0)}
-                            className="mt-2 max-w-xs"
-                            data-testid="input-duration"
-                          />
-                          <p className="text-xs text-muted-foreground mt-1">
-                            How long did it take for the AI to generate the note?
-                          </p>
-                        </div>
-
-                        <div>
-                          <Label htmlFor="notes" className="text-sm font-medium">
-                            Additional Comments (Optional)
-                          </Label>
-                          <Textarea
-                            id="notes"
-                            placeholder="Share your thoughts on accuracy, ease of use, formatting quality, areas for improvement..."
-                            value={clinicianData.notes}
-                            onChange={(e) => handleClinicianDataChange('notes', e.target.value)}
-                            className="min-h-[80px] mt-2"
-                            data-testid="input-notes"
-                          />
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-              </Tabs>
-            </CardContent>
-          </Card>
-
-          {/* Submit Experience Section */}
-          {activeTab === 'custom' && (
-            <Card data-testid="submit-experience">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <h3 className="text-lg font-semibold">Share Your Clinical Experience</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Help the medical community by sharing your SOAP note for this standardized visit
-                    </p>
-                  </div>
-                  <Button 
-                    onClick={handleSubmitExperience}
-                    disabled={!selectedVendor || shareExperience.isPending}
-                    className="flex items-center gap-2"
-                    data-testid="button-submit-experience"
-                  >
-                    {shareExperience.isPending ? (
-                      <>
-                        <Clock className="w-4 h-4 animate-spin" />
-                        Submitting...
-                      </>
-                    ) : (
-                      <>
-                        <Share2 className="w-4 h-4" />
-                        Share Experience
-                      </>
                     )}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Usage Instructions */}
-          <Card data-testid="usage-instructions">
-            <CardHeader>
-              <CardTitle>How to Use</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h4 className="font-medium mb-2 flex items-center gap-2">
-                    <FileText className="w-4 h-4" />
-                    Compare AI Scribes
-                  </h4>
-                  <ul className="text-sm text-muted-foreground space-y-1">
-                    <li>• Select different vendors to see their SOAP note outputs</li>
-                    <li>• Compare clinical documentation quality and structure</li>
-                    <li>• Evaluate how each AI handles the same patient encounter</li>
-                    <li>• Download notes for detailed analysis</li>
-                  </ul>
-                </div>
-                
-                <div>
-                  <h4 className="font-medium mb-2 flex items-center gap-2">
-                    <Upload className="w-4 h-4" />
-                    Share Your Experience
-                  </h4>
-                  <ul className="text-sm text-muted-foreground space-y-1">
-                    <li>• Document your own clinical approach with the provided transcript</li>
-                    <li>• Use section-by-section editor for structured SOAP documentation</li>
-                    <li>• Compare your clinical reasoning with AI-generated versions</li>
-                    <li>• Share your expertise and download notes for reference</li>
-                  </ul>
-                </div>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
