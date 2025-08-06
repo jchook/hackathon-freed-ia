@@ -58,6 +58,8 @@ The architecture follows a clean separation of concerns with shared TypeScript s
 ## Recent Updates (August 2025)
 
 ### Major Feature Additions
+- **Delta Intelligence System**: Added comprehensive Deltas summary page with 6 tracking categories and individual Delta Feed with real-time competitive intelligence
+- **Enhanced Feed with Filtering**: Rebuilt Feed page as time-series delta tracking with fuzzy search, severity filtering, and categorized intelligence cards
 - **Example Note Tool**: Added comprehensive SOAP note comparison functionality allowing clinicians to test AI scribe outputs using standardized patient visits
 - **Vendor Comparison Enhancement**: Implemented max 3 vendor selection with side-by-side pricing, SEO, and feature analysis
 - **Navigation Restructure**: Moved refresh/export controls and ScribeArena branding to sidebar navigation for cleaner interface
@@ -84,3 +86,11 @@ The architecture follows a clean separation of concerns with shared TypeScript s
 - Made reviews tab content take full width for better readability
 - Added "Show 10 more" pagination button with loading animation for reviews (displays 10 initially, loads 10 more on demand)
 - Expanded sample review data to 29 total reviews across all vendors for realistic pagination demonstration
+
+### Delta Intelligence Features (January 2025)
+- **Deltas Summary Page**: Six comprehensive tracking categories including pricing changes, feature updates, market position, customer sentiment, compliance updates, and integration ecosystem
+- **Delta Feed Page**: Individual delta cards in chronological time series with title, subheading, source links, category/subcategory tags, severity ratings (0-10 with color-coded indicators), and dates
+- **Advanced Filtering**: Real-time fuzzy text search across all delta fields and severity-based filtering (High 8-10, Med 5-7, Low 0-4)
+- **Category System**: 12 delta categories covering fundraising, pricing, features, competitor entry, security, personnel, partnerships, reviews, API/SDK releases, media appearances, blog content, and data breaches
+- **Demo Functionality**: "Add Demo Delta" button with loading animation that adds new sample deltas to demonstrate real-time feed updates
+- **Navigation Reorganization**: Feed tab repositioned below Deltas in sidebar navigation for logical information hierarchy

@@ -1,91 +1,197 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useState, useMemo } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Sidebar } from "@/components/Sidebar";
 import { Header } from "@/components/Header";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Rss, ExternalLink, Calendar, Filter, Tag } from "lucide-react";
-import { type FeedItem } from "@shared/schema";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { 
+  Rss, ExternalLink, Calendar, Filter, Search, RefreshCw,
+  DollarSign, Users, TrendingUp, FileText, Tv, 
+  Handshake, UserPlus, Zap, Star, Code, Shield,
+  Building, TrendingDown, AlertTriangle, CheckCircle
+} from "lucide-react";
 import { format } from "date-fns";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+
+interface Delta {
+  id: string;
+  title: string;
+  subheading: string;
+  sourceUrl: string;
+  category: string;
+  subcategory: string;
+  severity: number;
+  date: string;
+  vendor: string;
+}
 
 export default function Feed() {
-  const [selectedSource, setSelectedSource] = useState<string | null>(null);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [severityFilter, setSeverityFilter] = useState<string>("all");
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
 
-  const { data: feedItems, isLoading } = useQuery<FeedItem[]>({
-    queryKey: ['/api/feed', selectedSource, selectedTags],
-    queryFn: () => {
-      const params = new URLSearchParams();
-      if (selectedSource) params.append('source', selectedSource);
-      if (selectedTags.length > 0) params.append('tags', selectedTags.join(','));
-      return fetch(`/api/feed?${params.toString()}`).then(res => res.json());
+  // Demo data - in real app this would come from API
+  const [deltas, setDeltas] = useState<Delta[]>([
+    {
+      id: "delta-1",
+      title: "Heidi Health Raises $40M Series B",
+      subheading: "AI medical scribe platform secures funding from Andreessen Horowitz to expand EHR integrations",
+      sourceUrl: "https://techcrunch.com/heidi-health-series-b",
+      category: "Fundraising",
+      subcategory: "Series B",
+      severity: 8,
+      date: "2025-01-15",
+      vendor: "Heidi Health"
+    },
+    {
+      id: "delta-2", 
+      title: "Freed AI Increases Enterprise Pricing",
+      subheading: "Monthly subscription increases from $199 to $229 for enterprise plans effective February 1st",
+      sourceUrl: "https://freed.ai/pricing",
+      category: "Pricing",
+      subcategory: "Price Increase",
+      severity: 6,
+      date: "2025-01-14",
+      vendor: "Freed AI"
+    },
+    {
+      id: "delta-3",
+      title: "Sunoh AI Launches Mobile App",
+      subheading: "New iOS and Android companion apps enable voice capture and real-time transcription",
+      sourceUrl: "https://sunoh.ai/blog/mobile-app-launch",
+      category: "Features", 
+      subcategory: "Mobile Platform",
+      severity: 5,
+      date: "2025-01-13",
+      vendor: "Sunoh AI"
+    },
+    {
+      id: "delta-4",
+      title: "Epic Systems Announces AI Scribe Integration",
+      subheading: "Healthcare giant enters competitive space with built-in ambient documentation features",
+      sourceUrl: "https://epic.com/ai-scribe-announcement",
+      category: "Competitor Entry",
+      subcategory: "EHR Integration",
+      severity: 9,
+      date: "2025-01-12",
+      vendor: "Epic Systems"
+    },
+    {
+      id: "delta-5",
+      title: "Heidi Health Data Breach Incident",
+      subheading: "Unauthorized access to patient transcription data affects 15,000 users, investigation ongoing",
+      sourceUrl: "https://security.heidi.ai/breach-report",
+      category: "Security",
+      subcategory: "Data Breach",
+      severity: 10,
+      date: "2025-01-11",
+      vendor: "Heidi Health"
+    },
+    {
+      id: "delta-6",
+      title: "Freed AI Hires Former Google Health VP",
+      subheading: "Sarah Chen joins as Chief Medical Officer to lead clinical accuracy initiatives",
+      sourceUrl: "https://freed.ai/blog/sarah-chen-joins",
+      category: "Personnel",
+      subcategory: "Executive Hire",
+      severity: 4,
+      date: "2025-01-10",
+      vendor: "Freed AI"
+    }
+  ]);
+
+  const addDemoDelta = useMutation({
+    mutationFn: async () => {
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      return true;
+    },
+    onSuccess: () => {
+      const newDelta: Delta = {
+        id: `delta-${Date.now()}`,
+        title: "Sunoh AI Partners with Microsoft Teams",
+        subheading: "New integration allows seamless documentation during virtual patient consultations",
+        sourceUrl: "https://sunoh.ai/microsoft-partnership", 
+        category: "Partnerships",
+        subcategory: "Platform Integration",
+        severity: 7,
+        date: new Date().toISOString().split('T')[0],
+        vendor: "Sunoh AI"
+      };
+      
+      setDeltas(prev => [newDelta, ...prev]);
+      
+      toast({
+        title: "New Delta Added",
+        description: "Demo delta has been added to the feed.",
+      });
     }
   });
 
-  if (isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="text-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading feed...</p>
-        </div>
-      </div>
-    );
-  }
-
-  const sources = [
-    { id: 'heidi', name: 'Heidi Health', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' },
-    { id: 'freed', name: 'Freed AI', color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' },
-    { id: 'sunoh', name: 'Sunoh AI', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300' },
-    { id: 'market', name: 'Market News', color: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300' },
-  ];
-
-  const availableTags = [
-    'product-update',
-    'integration',
-    'funding',
-    'security',
-    'market-research',
-    'beta',
-    'forms',
-    'automation',
-    'calls',
-    'epic',
-    'ehr',
-    'series-a',
-    'sequoia',
-    'hipaa',
-    'privacy',
-    'templates',
-    'customization',
-    'productivity'
-  ];
-
-  const handleTagToggle = (tag: string) => {
-    setSelectedTags(prev => 
-      prev.includes(tag) 
-        ? prev.filter(t => t !== tag)
-        : [...prev, tag]
-    );
-  };
-
-  const getSourceInfo = (source: string) => {
-    return sources.find(s => s.id === source) || { id: source, name: source, color: 'bg-gray-100 text-gray-800' };
-  };
-
-  const getTagColor = (tag: string) => {
-    const tagColors: Record<string, string> = {
-      'product-update': 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950 dark:text-blue-300',
-      'integration': 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950 dark:text-purple-300',
-      'funding': 'bg-green-50 text-green-700 border-green-200 dark:bg-green-950 dark:text-green-300',
-      'security': 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950 dark:text-red-300',
-      'market-research': 'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950 dark:text-orange-300',
-      'beta': 'bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-950 dark:text-yellow-300',
+  const getCategoryIcon = (category: string) => {
+    const icons: Record<string, any> = {
+      "Fundraising": DollarSign,
+      "Pricing": TrendingUp,
+      "Features": Zap,
+      "Competitor Entry": Building,
+      "Security": Shield,
+      "Personnel": UserPlus,
+      "Partnerships": Handshake,
+      "Reviews": Star,
+      "API/SDK": Code,
+      "Media": Tv,
+      "Blog/Newsletter": FileText
     };
-    return tagColors[tag] || 'bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-950 dark:text-gray-300';
+    const IconComponent = icons[category] || FileText;
+    return <IconComponent className="w-4 h-4" />;
   };
+
+  const getSeverityColor = (severity: number) => {
+    if (severity >= 8) return "bg-red-500";
+    if (severity >= 5) return "bg-orange-500"; 
+    return "bg-green-500";
+  };
+
+  const getSeverityLabel = (severity: number) => {
+    if (severity >= 8) return "High";
+    if (severity >= 5) return "Med";
+    return "Low";
+  };
+
+  // Fuzzy search and filtering
+  const filteredDeltas = useMemo(() => {
+    let filtered = deltas;
+
+    // Text search
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase();
+      filtered = filtered.filter(delta => 
+        delta.title.toLowerCase().includes(searchLower) ||
+        delta.subheading.toLowerCase().includes(searchLower) ||
+        delta.vendor.toLowerCase().includes(searchLower) ||
+        delta.category.toLowerCase().includes(searchLower) ||
+        delta.subcategory.toLowerCase().includes(searchLower)
+      );
+    }
+
+    // Severity filter
+    if (severityFilter !== "all") {
+      const severityThreshold = parseInt(severityFilter);
+      filtered = filtered.filter(delta => {
+        if (severityFilter === "high") return delta.severity >= 8;
+        if (severityFilter === "med") return delta.severity >= 5 && delta.severity < 8;
+        if (severityFilter === "low") return delta.severity < 5;
+        return true;
+      });
+    }
+
+    return filtered.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  }, [deltas, searchTerm, severityFilter]);
 
   return (
     <div className="flex h-screen bg-dashboard-bg" data-testid="feed-container">
@@ -97,169 +203,131 @@ export default function Feed() {
         <div className="p-6 space-y-6">
           {/* Page Header */}
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Industry Feed</h1>
+            <h1 className="text-3xl font-bold text-foreground">Delta Feed</h1>
             <p className="text-muted-foreground mt-2">
-              Latest updates, announcements, and market insights from AI medical scribe vendors
+              Real-time competitive intelligence and market changes across AI medical scribe vendors
             </p>
           </div>
 
-          {/* Source Filters */}
-          <Card data-testid="source-filters">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Filter className="w-5 h-5" />
-                Filter by Source
-              </CardTitle>
-              <CardDescription>
-                Filter updates by vendor or view all market activity
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-3">
-                <Button
-                  variant={selectedSource === null ? "default" : "outline"}
-                  onClick={() => setSelectedSource(null)}
-                  className="h-9"
-                  data-testid="filter-all"
-                >
-                  All Sources
-                </Button>
-                {sources.map((source) => (
-                  <Button
-                    key={source.id}
-                    variant={selectedSource === source.id ? "default" : "outline"}
-                    onClick={() => setSelectedSource(source.id)}
-                    className="h-9"
-                    data-testid={`filter-${source.id}`}
-                  >
-                    {source.name}
-                  </Button>
-                ))}
+          {/* Filters and Controls */}
+          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+            <div className="flex gap-4 flex-1 max-w-2xl">
+              {/* Search Input */}
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <Input
+                  placeholder="Search deltas by title, vendor, or category..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                  data-testid="search-input"
+                />
               </div>
-            </CardContent>
-          </Card>
 
-          {/* Tag Filters */}
-          <Card data-testid="tag-filters">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Tag className="w-5 h-5" />
-                Filter by Tags
-              </CardTitle>
-              <CardDescription>
-                Select multiple tags to filter updates. Leave empty to show all tags.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                {availableTags.map((tag) => (
-                  <div key={tag} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`tag-${tag}`}
-                      checked={selectedTags.includes(tag)}
-                      onCheckedChange={() => handleTagToggle(tag)}
-                      data-testid={`tag-checkbox-${tag}`}
-                    />
-                    <label 
-                      htmlFor={`tag-${tag}`} 
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                    >
-                      {tag}
-                    </label>
-                  </div>
-                ))}
-              </div>
-              
-              {/* Clear Tags Button */}
-              {selectedTags.length > 0 && (
-                <div className="mt-4">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setSelectedTags([])}
-                    data-testid="clear-tags"
-                  >
-                    Clear All Tags ({selectedTags.length})
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+              {/* Severity Filter */}
+              <Select value={severityFilter} onValueChange={setSeverityFilter}>
+                <SelectTrigger className="w-40" data-testid="severity-filter">
+                  <Filter className="w-4 h-4 mr-2" />
+                  <SelectValue placeholder="Severity" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Severity</SelectItem>
+                  <SelectItem value="high">High (8-10)</SelectItem>
+                  <SelectItem value="med">Med (5-7)</SelectItem>
+                  <SelectItem value="low">Low (0-4)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-          {/* Feed Items */}
+            {/* Refresh Button */}
+            <Button 
+              onClick={() => addDemoDelta.mutate()}
+              disabled={addDemoDelta.isPending}
+              data-testid="refresh-button"
+            >
+              <RefreshCw className={`w-4 h-4 mr-2 ${addDemoDelta.isPending ? 'animate-spin' : ''}`} />
+              Add Demo Delta
+            </Button>
+          </div>
+
+          {/* Results Count */}
+          <div className="text-sm text-muted-foreground">
+            Showing {filteredDeltas.length} of {deltas.length} deltas
+          </div>
+
+          {/* Delta Cards */}
           <div className="space-y-4">
-            {feedItems?.length === 0 ? (
+            {filteredDeltas.length === 0 ? (
               <Card>
-                <CardContent className="text-center py-12">
-                  <Rss className="w-16 h-16 mx-auto mb-4 text-muted-foreground opacity-50" />
-                  <h3 className="text-lg font-semibold mb-2">No Updates Available</h3>
+                <CardContent className="p-8 text-center">
+                  <Rss className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">No deltas found</h3>
                   <p className="text-muted-foreground">
-                    {selectedSource 
-                      ? `No updates from ${getSourceInfo(selectedSource).name} at this time.`
-                      : "No feed updates are currently available."}
+                    Try adjusting your search terms or filters to see more results.
                   </p>
                 </CardContent>
               </Card>
             ) : (
-              feedItems?.map((item) => {
-                const sourceInfo = getSourceInfo(item.source);
-                return (
-                  <Card key={item.id} className="hover:shadow-md transition-shadow" data-testid={`feed-item-${item.id}`}>
-                    <CardHeader className="pb-3">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Badge variant="secondary" className={sourceInfo.color}>
-                              {sourceInfo.name}
-                            </Badge>
-                            <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                              <Calendar className="w-4 h-4" />
-                              {format(new Date(item.publishedAt), 'MMM d, yyyy')}
-                            </div>
-                          </div>
-                          <CardTitle className="text-xl leading-tight">
-                            {item.title}
-                          </CardTitle>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          asChild
-                          className="flex-shrink-0"
-                        >
-                          <a
-                            href={item.sourceUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            data-testid={`external-link-${item.id}`}
-                          >
-                            <ExternalLink className="w-4 h-4" />
-                          </a>
-                        </Button>
+              filteredDeltas.map((delta) => (
+                <Card key={delta.id} className="hover:shadow-lg transition-shadow duration-200" data-testid={`delta-card-${delta.id}`}>
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <CardTitle className="text-lg leading-tight mb-2">{delta.title}</CardTitle>
+                        <p className="text-sm text-muted-foreground leading-relaxed">{delta.subheading}</p>
                       </div>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <p className="text-muted-foreground leading-relaxed mb-4">
-                        {item.content}
-                      </p>
-                      {item.tags && item.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-2">
-                          {item.tags.map((tag, index) => (
-                            <Badge
-                              key={index}
-                              variant="outline"
-                              className={`text-xs ${getTagColor(tag)}`}
-                              data-testid={`tag-${tag}`}
-                            >
-                              {tag.replace('-', ' ')}
-                            </Badge>
-                          ))}
+                      
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        {/* Severity Indicator */}
+                        <div className="flex items-center gap-2">
+                          <div className={`w-3 h-3 rounded-full ${getSeverityColor(delta.severity)}`}></div>
+                          <span className="text-sm text-muted-foreground">{getSeverityLabel(delta.severity)}</span>
                         </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                );
-              })
+                      </div>
+                    </div>
+                  </CardHeader>
+                  
+                  <CardContent className="pt-0">
+                    <div className="flex flex-wrap items-center gap-3">
+                      {/* Category Badge */}
+                      <Badge variant="secondary" className="flex items-center gap-1">
+                        {getCategoryIcon(delta.category)}
+                        {delta.category}
+                      </Badge>
+                      
+                      {/* Subcategory Badge */}
+                      <Badge variant="outline" className="text-xs">
+                        {delta.subcategory}
+                      </Badge>
+                      
+                      {/* Vendor Badge */}
+                      <Badge variant="default" className="text-xs">
+                        {delta.vendor}
+                      </Badge>
+                      
+                      <div className="flex-1"></div>
+                      
+                      {/* Date and Source Link */}
+                      <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-1">
+                          <Calendar className="w-3 h-3" />
+                          {format(new Date(delta.date), 'MMM d, yyyy')}
+                        </div>
+                        
+                        <a 
+                          href={delta.sourceUrl} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1 text-primary hover:text-primary/80 transition-colors"
+                        >
+                          <ExternalLink className="w-3 h-3" />
+                          Source
+                        </a>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
             )}
           </div>
         </div>

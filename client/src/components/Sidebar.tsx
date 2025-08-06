@@ -55,8 +55,8 @@ export function Sidebar() {
   const navItems = [
     { icon: BarChart3, label: "Dashboard", href: "/", active: location === "/" },
     { icon: Activity, label: "Deltas", href: "/deltas", active: location === "/deltas" },
-    { icon: MessageSquare, label: "Reviews", href: "/reviews", active: location === "/reviews" },
     { icon: Rss, label: "Feed", href: "/feed", active: location === "/feed" },
+    { icon: MessageSquare, label: "Reviews", href: "/reviews", active: location === "/reviews" },
     { icon: GitCompare, label: "Comparison", href: "/comparison", active: location === "/comparison" },
     { icon: FileText, label: "Example Note", href: "/example-note", active: location === "/example-note" },
     { icon: User, label: "About", href: "/about", active: location === "/about" },
