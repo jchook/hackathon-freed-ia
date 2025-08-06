@@ -351,6 +351,39 @@ Source: ScribeArena Example Note Tool`;
                     </div>
                   ) : (
                     <div className="space-y-6">
+                      {/* Freed AI Video Demo */}
+                      {compareVendor === 'freed-1' && (
+                        <Card data-testid="freed-video-demo">
+                          <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                              <Play className="w-5 h-5" />
+                              Freed AI Demo Video
+                            </CardTitle>
+                            <CardDescription>
+                              Watch how Freed AI processes clinical encounters in real-time
+                            </CardDescription>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="aspect-video w-full rounded-lg overflow-hidden bg-black">
+                              <iframe
+                                width="100%"
+                                height="100%"
+                                src="https://www.youtube.com/embed/ueSwbb7we44"
+                                title="Freed AI Demo - Real-time Medical Scribe"
+                                frameBorder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                allowFullScreen
+                                className="w-full h-full"
+                                data-testid="freed-demo-video"
+                              />
+                            </div>
+                            <div className="mt-3 text-sm text-muted-foreground">
+                              See Freed AI in action with real clinical documentation workflows
+                            </div>
+                          </CardContent>
+                        </Card>
+                      )}
+
                       {/* Latest Shared Experience */}
                       {sharedExperience && (
                         <Card data-testid="latest-shared-experience">
