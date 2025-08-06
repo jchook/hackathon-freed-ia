@@ -7,6 +7,7 @@ import Dashboard from "@/pages/dashboard";
 import Deltas from "@/pages/deltas";
 import Reviews from "@/pages/reviews";
 import Feed from "@/pages/feed";
+import Insights from "@/pages/insights";
 import Comparison from "@/pages/comparison";
 import ExampleNote from "@/pages/example-note";
 import Scribes from "@/pages/scribes";
@@ -20,6 +21,7 @@ function Router() {
       <Route path="/deltas" component={Deltas} />
       <Route path="/reviews" component={Reviews} />
       <Route path="/feed" component={Feed} />
+      <Route path="/insights" component={Insights} />
       <Route path="/comparison" component={Comparison} />
       <Route path="/example-note" component={ExampleNote} />
       <Route path="/scribes" component={Scribes} />

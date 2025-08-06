@@ -17,6 +17,8 @@ import {
   type InsertSeoData,
   type SharedExperience,
   type InsertSharedExperience,
+  type Insight,
+  type InsertInsight,
   type CompetitorWithPlans,
   type CompetitorWithReviews,
   type DashboardStats,
@@ -28,7 +30,8 @@ import {
   reviewSummary,
   feedItems,
   seoData,
-  sharedExperiences
+  sharedExperiences,
+  insights
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { db } from "./db";
@@ -101,6 +104,7 @@ export class MemStorage implements IStorage {
   private feedItems: Map<string, FeedItem> = new Map();
   private seoData: Map<string, SeoData> = new Map();
   private sharedExperiences: Map<string, SharedExperience> = new Map();
+  private insights: Map<string, Insight> = new Map();
 
   constructor() {
     this.initializeData();
@@ -1505,6 +1509,36 @@ Musculoskeletal: Positive for ankle pain and swelling.`,
     };
     this.sharedExperiences.set(id, newExperience);
     return newExperience;
+  }
+
+  // Insights methods
+  async getInsights(): Promise<Insight[]> {
+    return Array.from(this.insights.values()).sort(
+      (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
+    );
+  }
+
+  async getInsightsByFeedItem(feedItemId: string): Promise<Insight[]> {
+    return Array.from(this.insights.values())
+      .filter(insight => insight.feedItemId === feedItemId)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  async getInsightsByImpact(impact: string): Promise<Insight[]> {
+    return Array.from(this.insights.values())
+      .filter(insight => insight.impact === impact)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  async createInsight(insight: InsertInsight): Promise<Insight> {
+    const id = randomUUID();
+    const newInsight: Insight = {
+      id,
+      ...insight,
+      createdAt: new Date(),
+    };
+    this.insights.set(id, newInsight);
+    return newInsight;
   }
 }
 

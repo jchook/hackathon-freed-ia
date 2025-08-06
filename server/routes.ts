@@ -12,6 +12,8 @@ import {
   insertSharedExperienceSchema
 } from "@shared/schema";
 import { analyzeVendorInput } from "./ai-vendor-analyzer";
+import { slackService } from "./slack-service";
+import { insightsService } from "./insights-service";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Health check endpoint for Docker
@@ -177,6 +179,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Data refresh initiated", timestamp: new Date().toISOString() });
     } catch (error) {
       res.status(500).json({ error: "Failed to refresh data" });
+    }
+  });
+
+  // Send feed items to Slack
+  app.post("/api/slack/send-feed-alerts", async (req, res) => {
+    try {
+      const { feedItems } = req.body;
+      
+      if (!Array.isArray(feedItems) || feedItems.length === 0) {
+        return res.status(400).json({ error: "feedItems array is required and must not be empty" });
+      }
+
+      const results = [];
+      
+      for (const feedItem of feedItems) {
+        try {
+          const slackResult = await slackService.sendFeedAlert(feedItem);
+          results.push({
+            feedItemId: feedItem.id,
+            title: feedItem.title,
+            slackStatus: slackResult
+          });
+        } catch (error) {
+          results.push({
+            feedItemId: feedItem.id,
+            title: feedItem.title,
+            slackStatus: { success: false, error: error.message }
+          });
+        }
+      }
+
+      const successCount = results.filter(r => r.slackStatus.success).length;
+      const failureCount = results.length - successCount;
+
+      res.json({
+        message: `Sent ${successCount} feed alerts to Slack`,
+        timestamp: new Date().toISOString(),
+        summary: {
+          total: results.length,
+          successful: successCount,
+          failed: failureCount
+        },
+        results
+      });
+
+    } catch (error) {
+      console.error("Slack send error:", error);
+      res.status(500).json({ error: "Failed to send feed alerts to Slack" });
     }
   });
 
@@ -383,6 +433,92 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(experience);
     } catch (error) {
       res.status(400).json({ error: "Invalid shared experience data" });
+    }
+  });
+
+  // Insights endpoints
+  app.get("/api/insights", async (req, res) => {
+    try {
+      const { impact } = req.query;
+      
+      let insights;
+      if (impact) {
+        insights = await storage.getInsightsByImpact(impact as string);
+      } else {
+        insights = await storage.getInsights();
+      }
+      
+      res.json(insights);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch insights" });
+    }
+  });
+
+  app.get("/api/feed/:feedItemId/insights", async (req, res) => {
+    try {
+      const insights = await storage.getInsightsByFeedItem(req.params.feedItemId);
+      res.json(insights);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch insights for feed item" });
+    }
+  });
+
+  // Generate insights for a feed item
+  app.post("/api/insights/generate", async (req, res) => {
+    try {
+      const { feedItem } = req.body;
+      
+      if (!feedItem) {
+        return res.status(400).json({ error: "Feed item is required" });
+      }
+
+      // First, check if we should generate insights
+      const analysis = await insightsService.shouldGenerateInsight(feedItem);
+      
+      if (!analysis.shouldGenerate) {
+        return res.json({
+          message: "No insights generated",
+          reasoning: analysis.reasoning,
+          shouldGenerate: false
+        });
+      }
+
+      // Generate the insight
+      const generatedInsight = await insightsService.generateInsight(feedItem, analysis);
+      
+      // Save to storage
+      const savedInsight = await storage.createInsight({
+        feedItemId: feedItem.id,
+        title: generatedInsight.title,
+        summary: generatedInsight.summary,
+        categories: generatedInsight.categories,
+        impact: generatedInsight.impact,
+        insights: generatedInsight.insights,
+        actionItems: generatedInsight.actionItems,
+        mentions: generatedInsight.mentions
+      });
+
+      // Send to Slack with insights context
+      if (generatedInsight.mentions.length > 0) {
+        const slackResult = await slackService.sendInsightAlert(savedInsight);
+        
+        res.json({
+          message: "Insights generated successfully",
+          insight: savedInsight,
+          slackStatus: slackResult,
+          shouldGenerate: true
+        });
+      } else {
+        res.json({
+          message: "Insights generated successfully",
+          insight: savedInsight,
+          shouldGenerate: true
+        });
+      }
+
+    } catch (error) {
+      console.error("Insights generation error:", error);
+      res.status(500).json({ error: "Failed to generate insights" });
     }
   });
 
