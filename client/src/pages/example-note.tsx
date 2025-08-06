@@ -24,7 +24,10 @@ const HighlightedText = ({ text }: { text: string }) => {
     highlightedText = highlightedText.replace(regex, `<span class="bg-green-200 dark:bg-green-800 px-1 rounded font-medium text-green-900 dark:text-green-100">${med}</span>`);
   });
   
-  return <div dangerouslySetInnerHTML={{ __html: highlightedText }} className="leading-relaxed" />;
+  // Convert line breaks to HTML br tags to preserve formatting
+  highlightedText = highlightedText.replace(/\n/g, '<br>');
+  
+  return <div dangerouslySetInnerHTML={{ __html: highlightedText }} className="leading-relaxed whitespace-pre-wrap" />;
 };
 
 const VENDOR_OUTPUTS = {
