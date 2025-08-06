@@ -1,0 +1,990 @@
+	
+Competitor	Domain/Website
+Abridge	abridge.com
+Accel EQ	acceleq.ai
+Aesthetics360	aesthetics360.com
+Aiva	aivahealth.com
+Amazon AWS HealthScribe	aws.amazon.com/healthscribe
+Ambience Healthcare	ambiencehealthcare.com
+Ambient Clinical AWARE	ambientclinical.com
+Andy	andy.health
+Athelas	athelas.com
+Augmedix	augmedix.com
+AutoMynd	automynd.com
+AutoScribe by Mutuo Health	mutuohealth.com
+AvodMD	avodmd.com
+Bells AI	bells.ai
+Blueprint AI	blueprintai.com
+CareCloud (cirrusAI)	carecloud.com
+CareCortex	carecortex.ai
+CarePilot	carepilot.ai
+Chartnote	chartnote.com
+CircleHealth AI	circlehealth.ai
+Clinical Notes AI	clinicalnotes.ai
+Commune Ambient AI	commune.us
+Contrast	contrast.health
+Corti Assistant	corti.ai
+CureMD AI Scribe	curemd.com
+DeepCura AI	deepcura.com
+DeepScribe	deepscribe.ai
+Deliberate AI	deliberate.ai
+Doximity Scribe	doximity.com
+Eleos Health	eleos.health
+Empathia AI	empathia.ai
+Expert AI	expert.ai
+Fluency Align (3M Solventum)	3m.com/fluencyalign
+Google Cloud MedLM	cloud.google.com/solutions/ai/medlm
+Halo Medical Solutions	halomedicalsolutions.com
+Heidi Health	heidihealth.com.au
+IKS Health	ikshealth.com
+iMedX InstaNote	imedx.com/instanote
+Innovaccer InScribe	innovaccer.com
+InsightHealth Aura	insighthealth.ai
+iScribe	iscribehealth.com
+JotPsych	jotpsych.com
+Knowtex	knowtex.ai
+Lyrebird Health	lyrebirdhealth.com
+Mariana AI	marianaai.com
+Marvix AI	marvix.ai
+Mdhub	mdhub.ai
+Mediary	mediary.ai
+MEDIT	medit.com
+MedSync	medsync.ai
+Mentalyc	mentalyc.com
+Mpilo	mpilo.ai
+Nabla	nabla.com
+Nextgen Ambient Assistant	nextgen.com
+Notewand	notewand.com
+Nuance (Dragon Ambient eXperience/DAX Copilot, Dragon Medical One)	nuance.com
+Nudge AI	nudge.ai
+NVoq	nvoq.com
+OmniMD AI Medical Scribe	omnimd.com
+OnCall AI	oncall.ai
+OneChart	onechart.app
+Oracle Clinical Digital Assistant	oracle.com/industries/healthcare
+Oracle Health Clinical AI Agent	oracle.com/industries/healthcare
+PatientNotes	patientnotes.ai
+Playback Health Pro	playbackhealth.com
+Refleta	refleta.com
+RevMaxx	revmaxx.ai
+River Records	river.health
+Robin Healthcare	robinhealthcare.com
+S10 AI	s10.ai
+Sayvant	sayvant.com
+ScribeAI	scribeai.co
+ScribeAmerica Speke	scribeamerica.com/speke
+Scribeberry	scribeberry.com
+ScribeEMR	scribeemr.com
+ScribeHealth AI	scribehealth.ai
+ScribeMD	scribemd.ai
+ScribeRyte	scriberyte.com
+Shine AI	shine.ai
+SimboAlphus	simbo.ai
+SOAPME.ai	soapme.ai
+SOAPNotesAI	soapnotesai.com
+SOAPsuds	soapsuds.ai
+Solvntum Fluency Direct	3m.com/fluency-direct
+Sprynt AI Medical Scribe	sprynt.ai
+Suki AI	suki.ai
+Sully AI	sully.ai
+Sunoh.ai	sunoh.ai
+SwiftlyNote	swiftlynote.com
+Tali AI	tali.ai
+Tebra Note Assist	tebra.com
+TheraPulse	therapulse.app
+Tortus OSLER	tortus.ai
+Twofold Health	twofold.health
+Upheal	upheal.com
+Veradigm Ambient Scribe	veradigm.com
+Vero Scribe	veroscribe.ai
+Videra Health	viderahealth.com
+Wavo Health AI Scribe	wavohealth.com
+Zirr AI	zirr.ai
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
