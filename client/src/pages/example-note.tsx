@@ -40,7 +40,35 @@ const VENDOR_OUTPUTS = {
   'freed-1': {
     name: 'Freed AI',
     soap: {
-      subjective: `Patient presented with ankle pain and swelling for 1 week after a twisting injury while running. His medical history includes hypertension and a skin condition, managed with ramipril and delgocitinib respectively. Examination revealed localized ankle tenderness. Diagnosed with an ankle sprain, he was advised to continue ice application, take ibuprofen as needed for pain, and modify exercise activities while maintaining his current medications for hypertension and skin condition.`,
+      subjective: `Chief Complaint
+Ankle pain and swelling for 1 week after twisting it while running
+
+History of Present Illness
+The patient presents for a follow-up visit to review labs and reports a new complaint of ankle pain. The patient twisted their ankle while running one week ago, resulting in swelling and persistent pain.
+
+The patient describes the ankle as swollen and not improving significantly since the injury occurred. They have been able to walk on the affected ankle, but it continues to cause discomfort. The patient has attempted self-treatment with ice application and has taken ibuprofen once, which provided some relief. The ankle pain is impacting their ability to run, but they express interest in exploring alternative exercises to maintain physical activity while managing the injury.
+
+The patient is currently taking delgocitinib for an unspecified skin condition and ramipril for blood pressure management. They inquire about these current medications, suggesting adherence to their prescribed regimen.
+
+Medical History
+- Hypertension, controlled with medication
+- Skin condition requiring treatment
+- Ankle sprain, occurred one week ago
+
+Medications and Supplements
+- Delgocitinib
+  - For skin condition
+- Ramipril
+  - For blood pressure
+- Ibuprofen
+  - Taken once for ankle pain
+  - Helps with pain
+
+Social History
+- Exercise: Patient engages in running
+
+Review of Systems
+Musculoskeletal: Positive for ankle pain and swelling.`,
       objective: `Physical examination of the ankle was performed. The provider conducted a focused examination with palpation at multiple points. The patient denied pain at two specific examination sites but reported pain at a third location. The patient appeared to be ambulating without severe distress.`,
       assessment: `Based on the history and physical examination findings, the patient appears to have sustained an ankle sprain. The mechanism of injury (twisting while running), timeline (one week), and examination findings are consistent with this diagnosis. No fracture is suspected based on clinical presentation, and imaging is not indicated at this time.`,
       plan: `Recommended continued conservative management including ice therapy and ibuprofen for anti-inflammatory effects. Patient counseled on the benefits of maintaining physical activity with modifications (avoiding running temporarily while continuing other exercises). Continue current medications: ramipril for hypertension management and delgocitinib for dermatologic treatment as previously prescribed. Patient advised to follow up if symptoms worsen or do not improve with conservative measures.`
