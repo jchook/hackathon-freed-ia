@@ -300,6 +300,39 @@ export default function ExampleNote() {
                       </Card>
                     )}
 
+                    {/* Heidi Health Video Demo */}
+                    {compareVendor === 'heidi-1' && (
+                      <Card data-testid="heidi-video-demo">
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2">
+                            <Play className="w-5 h-5" />
+                            Heidi Health Demo Video
+                          </CardTitle>
+                          <CardDescription>
+                            See how Heidi Health streamlines clinical documentation
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="aspect-video w-full rounded-lg overflow-hidden bg-black">
+                            <iframe
+                              width="100%"
+                              height="100%"
+                              src="https://www.youtube.com/embed/59LRt6X2TsY"
+                              title="Heidi Health Demo - AI Medical Scribe"
+                              frameBorder="0"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                              allowFullScreen
+                              className="w-full h-full"
+                              data-testid="heidi-demo-video"
+                            />
+                          </div>
+                          <div className="mt-3 text-sm text-muted-foreground">
+                            Watch Heidi Health's AI-powered clinical documentation in action
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
+
                     {/* Example Note */}
                     {sharedExperience && (
                       <Card data-testid="example-note">
