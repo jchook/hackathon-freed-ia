@@ -1,10 +1,9 @@
 import { Sidebar } from "@/components/Sidebar";
 import { Header } from "@/components/Header";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Users, BookOpen, TrendingUp, Heart, Stethoscope, Globe } from "lucide-react";
-import sharefImage from "@assets/sharedf_1754282048093.png";
+import { User, MapPin, Briefcase, GraduationCap, Heart } from "lucide-react";
+import sharelfProfileImage from "@assets/sharef_1754525452177.png";
 
 export default function About() {
   return (
@@ -14,195 +13,191 @@ export default function About() {
       <main className="flex-1 overflow-y-auto">
         <Header />
         
-        <div className="p-6">
-          <div className="max-w-4xl mx-auto space-y-8">
-            {/* Page Header */}
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">About ScribeArena</h1>
-              <p className="text-muted-foreground mt-2">
-                Building a community to help clinicians navigate the future of ambient scribe technology
-              </p>
+        <div className="p-6 space-y-6">
+          {/* Profile Header */}
+          <div className="flex flex-col lg:flex-row gap-6 items-start">
+            <div className="flex-shrink-0">
+              <div className="w-48 h-48 rounded-xl overflow-hidden shadow-lg bg-white">
+                <img 
+                  src={sharelfProfileImage} 
+                  alt="Dr. Sharef" 
+                  className="w-full h-full object-cover"
+                  data-testid="profile-image"
+                />
+              </div>
             </div>
-
-            {/* Hero Section */}
-            <div className="text-center space-y-4">
-              <div className="flex justify-center mb-6">
-                <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-primary/20">
-                  <img 
-                    src={sharefImage} 
-                    alt="Dr. Sharef" 
-                    className="w-full h-full object-cover"
-                  />
+            <div className="flex-1 space-y-4">
+              <div>
+                <h1 className="text-4xl font-bold text-foreground mb-2">
+                  Dr. Sharef
+                </h1>
+                <p className="text-xl text-muted-foreground mb-4">
+                  Founder & Clinical Director, ScribeArena
+                </p>
+                <div className="flex flex-wrap gap-3 mb-4">
+                  <Badge variant="secondary" className="flex items-center gap-1">
+                    <Briefcase className="w-3 h-3" />
+                    Family Physician
+                  </Badge>
+                  <Badge variant="secondary" className="flex items-center gap-1">
+                    <GraduationCap className="w-3 h-3" />
+                    MD
+                  </Badge>
+                  <Badge variant="secondary" className="flex items-center gap-1">
+                    <MapPin className="w-3 h-3" />
+                    Canada
+                  </Badge>
                 </div>
               </div>
-              <h2 className="text-2xl font-bold tracking-tight">Meet Dr. Sharef</h2>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                A clinician's mission to create a supportive community for ambient scribe adoption
-              </p>
             </div>
+          </div>
 
-            {/* Introduction Card */}
-            <Card>
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <Stethoscope className="w-6 h-6 text-primary" />
-                  <CardTitle className="text-xl">My Story</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-lg leading-relaxed">
-                  My name is <strong>Sharef</strong>, and I am a clinician who has witnessed firsthand the rapid evolution 
-                  of healthcare technology. As ambient scribe solutions began transforming clinical documentation, 
-                  I realized that many of my colleagues were struggling to navigate this new landscape.
-                </p>
-                <p className="leading-relaxed">
-                  The promise of AI-powered medical scribes is immense – reducing documentation burden, improving 
-                  patient interaction time, and enhancing clinical workflow efficiency. However, the reality is that 
-                  choosing the right solution, understanding regulatory requirements, and implementing best practices 
-                  can be overwhelming for busy healthcare professionals.
-                </p>
-              </CardContent>
-            </Card>
+          {/* About Section */}
+          <Card data-testid="about-section">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <User className="w-5 h-5" />
+                About Dr. Sharef
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-base leading-relaxed">
+                Dr. Sharef is a practicing family physician and healthcare technology innovator who created 
+                ScribeArena to help fellow clinicians navigate the rapidly evolving landscape of AI medical 
+                scribe solutions. With firsthand experience in clinical practice and a deep understanding 
+                of healthcare workflows, he recognized the need for comprehensive, unbiased competitive 
+                intelligence in the ambient documentation space.
+              </p>
+              <p className="text-base leading-relaxed">
+                As both a clinician and technology advocate, Dr. Sharef brings unique insights into the 
+                challenges healthcare professionals face with clinical documentation. His work focuses on 
+                bridging the gap between cutting-edge AI technology and practical clinical applications, 
+                ensuring that healthcare providers have the information they need to make informed decisions 
+                about AI scribe adoption.
+              </p>
+            </CardContent>
+          </Card>
 
-            {/* Mission Statement */}
-            <Card className="border-primary/20">
+          {/* Vision & Mission */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card data-testid="vision-card">
               <CardHeader>
-                <div className="flex items-center gap-3">
-                  <Heart className="w-6 h-6 text-red-500" />
-                  <CardTitle className="text-xl">The Mission</CardTitle>
-                </div>
+                <CardTitle className="flex items-center gap-2">
+                  <Heart className="w-5 h-5" />
+                  Vision
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-lg leading-relaxed">
-                  I created <strong>ScribeArena</strong> to make it easy for other clinicians to navigate the world of 
-                  ambient scribe technology, stay informed about regulations, follow industry news, and most importantly, 
-                  create a community where we can share best practices and learn from each other's experiences.
+                <p className="text-sm leading-relaxed">
+                  To create a supportive community where healthcare professionals can share experiences, 
+                  learn from each other, and confidently adopt AI scribe technologies that truly improve 
+                  patient care and reduce clinical documentation burden.
                 </p>
               </CardContent>
             </Card>
 
-            {/* What We Offer */}
-            <div className="grid md:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <TrendingUp className="w-5 h-5 text-blue-500" />
-                    <CardTitle>Market Intelligence</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="leading-relaxed">
-                    Real-time pricing tracking, vendor comparisons, and performance analytics to help you make 
-                    informed decisions about AI scribe solutions.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <BookOpen className="w-5 h-5 text-green-500" />
-                    <CardTitle>Regulatory Guidance</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="leading-relaxed">
-                    Stay up-to-date with HIPAA compliance, FDA regulations, and industry standards that affect 
-                    ambient scribe implementation in healthcare settings.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <Users className="w-5 h-5 text-purple-500" />
-                    <CardTitle>Community Platform</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="leading-relaxed">
-                    Connect with fellow clinicians, share experiences, and learn from real-world implementations 
-                    across different specialties and practice settings.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <Globe className="w-5 h-5 text-orange-500" />
-                    <CardTitle>Industry News</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="leading-relaxed">
-                    Curated updates from leading vendors, breakthrough research, and emerging trends in 
-                    AI-powered clinical documentation technology.
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Vision Section */}
-            <Card className="bg-gradient-to-r from-primary/5 to-secondary/5">
+            <Card data-testid="mission-card">
               <CardHeader>
-                <CardTitle className="text-xl text-center">Our Vision</CardTitle>
+                <CardTitle>Mission</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-lg leading-relaxed text-center">
-                  I envision a future where every clinician has access to the information, tools, and community 
-                  support needed to successfully integrate ambient scribe technology into their practice.
+              <CardContent>
+                <p className="text-sm leading-relaxed">
+                  ScribeArena provides comprehensive competitive intelligence and real-world testing 
+                  of AI medical scribe platforms, empowering healthcare professionals to make 
+                  evidence-based decisions about ambient documentation technology adoption.
                 </p>
-                
-                <Separator className="my-6" />
-                
-                <div className="grid md:grid-cols-3 gap-4 text-center">
-                  <div className="space-y-2">
-                    <Badge variant="secondary" className="text-sm px-3 py-1">
-                      Informed Decisions
-                    </Badge>
-                    <p className="text-sm text-muted-foreground">
-                      Evidence-based vendor selection and implementation strategies
-                    </p>
-                  </div>
-                  <div className="space-y-2">
-                    <Badge variant="secondary" className="text-sm px-3 py-1">
-                      Shared Knowledge
-                    </Badge>
-                    <p className="text-sm text-muted-foreground">
-                      Community-driven best practices and lessons learned
-                    </p>
-                  </div>
-                  <div className="space-y-2">
-                    <Badge variant="secondary" className="text-sm px-3 py-1">
-                      Better Patient Care
-                    </Badge>
-                    <p className="text-sm text-muted-foreground">
-                      More time with patients through efficient documentation
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Call to Action */}
-            <Card className="border-primary">
-              <CardContent className="p-8 text-center space-y-4">
-                <h3 className="text-2xl font-semibold">Join Our Community</h3>
-                <p className="text-muted-foreground max-w-2xl mx-auto">
-                  Whether you're just beginning to explore ambient scribe solutions or you're an experienced user 
-                  looking to optimize your workflow, ScribeArena is here to support your journey. Together, we can 
-                  shape the future of clinical documentation.
-                </p>
-                <div className="flex justify-center gap-2 pt-4">
-                  <Badge variant="outline">Community</Badge>
-                  <Badge variant="outline">Innovation</Badge>
-                  <Badge variant="outline">Excellence</Badge>
-                </div>
               </CardContent>
             </Card>
           </div>
+
+          {/* Platform Impact */}
+          <Card data-testid="impact-section">
+            <CardHeader>
+              <CardTitle>Platform Impact</CardTitle>
+              <CardDescription>
+                Building the future of clinical documentation through community-driven intelligence
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="text-center p-4 bg-muted/50 rounded-lg">
+                  <div className="text-2xl font-bold text-primary mb-2">100+</div>
+                  <div className="text-sm text-muted-foreground">AI Scribe Vendors Tracked</div>
+                </div>
+                <div className="text-center p-4 bg-muted/50 rounded-lg">
+                  <div className="text-2xl font-bold text-primary mb-2">Real-time</div>
+                  <div className="text-sm text-muted-foreground">Competitive Intelligence</div>
+                </div>
+                <div className="text-center p-4 bg-muted/50 rounded-lg">
+                  <div className="text-2xl font-bold text-primary mb-2">Clinical</div>
+                  <div className="text-sm text-muted-foreground">Testing Environment</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Community Focus */}
+          <Card data-testid="community-section">
+            <CardHeader>
+              <CardTitle>Building a Clinical Community</CardTitle>
+              <CardDescription>
+                Sharing experiences and best practices for ambient scribe adoption
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-base leading-relaxed mb-4">
+                Dr. Sharef's vision extends beyond competitive analysis to fostering a supportive 
+                community where clinicians can share their experiences with AI scribe technology. 
+                Through ScribeArena, healthcare professionals connect to discuss implementation 
+                challenges, share success stories, and collectively advance the adoption of 
+                ambient documentation tools that truly serve patient care.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <Badge>Clinician-Led</Badge>
+                <Badge>Evidence-Based</Badge>
+                <Badge>Community-Driven</Badge>
+                <Badge>Patient-Focused</Badge>
+                <Badge>Innovation-Forward</Badge>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Professional Background */}
+          <Card data-testid="background-section">
+            <CardHeader>
+              <CardTitle>Professional Background</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex items-start gap-3">
+                <Briefcase className="w-5 h-5 mt-1 text-muted-foreground" />
+                <div>
+                  <h4 className="font-medium">Family Medicine Practice</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Practicing family physician with extensive experience in primary care 
+                    and clinical documentation challenges
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <GraduationCap className="w-5 h-5 mt-1 text-muted-foreground" />
+                <div>
+                  <h4 className="font-medium">Medical Education</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Medical degree with specialization in family medicine and healthcare technology integration
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <Heart className="w-5 h-5 mt-1 text-muted-foreground" />
+                <div>
+                  <h4 className="font-medium">Healthcare Innovation</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Passionate advocate for technology solutions that improve patient care and reduce physician burnout
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </main>
     </div>
