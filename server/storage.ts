@@ -889,6 +889,9 @@ export class MemStorage implements IStorage {
         sourceUrl: "https://www.heidihealth.com/changelog/july-2025-updates",
         publishedAt: new Date("2025-07-23"),
         tags: ["product-update", "forms", "automation"],
+        severity: 7,
+        category: "Features",
+        subcategory: "Product Updates",
         createdAt: new Date(),
       },
       {
@@ -900,6 +903,9 @@ export class MemStorage implements IStorage {
         sourceUrl: "https://www.heidihealth.com/changelog/july-2025-updates",
         publishedAt: new Date("2025-07-23"),
         tags: ["product-update", "calls", "automation", "beta"],
+        severity: 6,
+        category: "Features",
+        subcategory: "Product Updates",
         createdAt: new Date(),
       },
       {
@@ -911,6 +917,9 @@ export class MemStorage implements IStorage {
         sourceUrl: "https://www.heidihealth.com/changelog/july-2025-updates",
         publishedAt: new Date("2025-07-23"),
         tags: ["integration", "epic", "ehr"],
+        severity: 8,
+        category: "Features",
+        subcategory: "EHR Integration",
         createdAt: new Date(),
       },
       {
@@ -922,6 +931,9 @@ export class MemStorage implements IStorage {
         sourceUrl: "https://www.getfreed.ai/blog/freed-raises-series-a",
         publishedAt: new Date("2025-01-15"),
         tags: ["funding", "series-a", "sequoia"],
+        severity: 9,
+        category: "Fundraising",
+        subcategory: "Series A",
         createdAt: new Date(),
       },
       {
@@ -933,6 +945,9 @@ export class MemStorage implements IStorage {
         sourceUrl: "https://www.getfreed.ai/blog/how-freed-handles-data-privacy-compliance",
         publishedAt: new Date("2025-01-10"),
         tags: ["security", "hipaa", "privacy"],
+        severity: 6,
+        category: "Security",
+        subcategory: "Compliance",
         createdAt: new Date(),
       },
       {
@@ -944,6 +959,9 @@ export class MemStorage implements IStorage {
         sourceUrl: "https://www.getfreed.ai/blog/freed-template-library",
         publishedAt: new Date("2025-01-05"),
         tags: ["templates", "customization", "productivity"],
+        severity: 5,
+        category: "Features",
+        subcategory: "Product Updates",
         createdAt: new Date(),
       },
       {
@@ -955,6 +973,9 @@ export class MemStorage implements IStorage {
         sourceUrl: "https://www.heidihealth.com/changelog/tasks-and-past-sessions-as-context",
         publishedAt: new Date("2025-06-05"),
         tags: ["tasks", "context", "workflow"],
+        severity: 6,
+        category: "Features",
+        subcategory: "Workflow",
         createdAt: new Date(),
       },
       {
@@ -966,6 +987,9 @@ export class MemStorage implements IStorage {
         sourceUrl: "https://example.com/market-research",
         publishedAt: new Date("2025-01-20"),
         tags: ["market-research", "growth", "adoption"],
+        severity: 7,
+        category: "Market",
+        subcategory: "Industry Trends",
         createdAt: new Date(),
       },
     ];

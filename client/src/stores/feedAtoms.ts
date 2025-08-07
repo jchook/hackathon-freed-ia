@@ -1,16 +1,19 @@
 import { atom } from 'jotai';
 
+// Client-side FeedItem type that matches the database schema but with optional fields
 export interface FeedItem {
   id: string;
   title: string;
   content: string;
   source: string;
   sourceUrl: string;
-  publishedAt: string;
+  publishedAt: string; // Keep as string for client-side
   tags: string[];
   severity?: number;
   category?: string;
   subcategory?: string;
+  competitorId?: string | null;
+  createdAt?: string | null;
 }
 
 // Initial feed items data
@@ -242,7 +245,10 @@ const nextFeedItems: FeedItem[] = [
     source: "heidi",
     sourceUrl: "https://www.heidihealth.com/changelog/july-2025-updates",
     publishedAt: "2025-07-15T00:00:00.000Z",
-    tags: ["features", "epic-integration", "marketplace", "high-priority"]
+    tags: ["features", "epic-integration", "marketplace", "high-priority"],
+    severity: 9,
+    category: "Features",
+    subcategory: "Product Updates"
   },
   {
     id: `refresh-${Date.now() + 1}`,
@@ -251,7 +257,10 @@ const nextFeedItems: FeedItem[] = [
     source: "sunoh",
     sourceUrl: "https://sunoh.ai/microsoft-partnership",
     publishedAt: new Date().toISOString(),
-    tags: ["partnerships", "telemedicine", "integration"]
+    tags: ["partnerships", "telemedicine", "integration"],
+    severity: 7,
+    category: "Partnerships",
+    subcategory: "Telemedicine Integration"
   },
   {
     id: `refresh-${Date.now() + 2}`,
@@ -260,7 +269,10 @@ const nextFeedItems: FeedItem[] = [
     source: "market",
     sourceUrl: "https://epic.com/ai-scribe-expansion",
     publishedAt: new Date().toISOString(),
-    tags: ["epic", "ehr", "competition", "ai-scribe"]
+    tags: ["epic", "ehr", "competition", "ai-scribe"],
+    severity: 8,
+    category: "Competitor Entry",
+    subcategory: "EHR Integration",
   },
   {
     id: `refresh-${Date.now() + 3}`,
@@ -269,7 +281,10 @@ const nextFeedItems: FeedItem[] = [
     source: "heidi",
     sourceUrl: "https://heidihealth.com/security-update", 
     publishedAt: new Date().toISOString(),
-    tags: ["security", "incident", "response"]
+    tags: ["security", "incident", "response"],
+    severity: 8,
+    category: "Security",
+    subcategory: "Incident Response",
   },
   {
     id: `refresh-${Date.now() + 4}`,
@@ -278,7 +293,10 @@ const nextFeedItems: FeedItem[] = [
     source: "abridge",
     sourceUrl: "https://abridge.com/pricing-update",
     publishedAt: new Date().toISOString(),
-    tags: ["pricing", "enterprise", "increase"]
+    tags: ["pricing", "enterprise", "increase"],
+    severity: 8,
+    category: "Pricing",
+    subcategory: "Enterprise Pricing"
   }
 ];
 

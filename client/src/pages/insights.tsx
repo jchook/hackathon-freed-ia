@@ -1,6 +1,8 @@
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import remarkBreaks from "remark-breaks";
 import { Sidebar } from "@/components/Sidebar";
 import { Header } from "@/components/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -203,8 +205,80 @@ export default function Insights() {
                     </div>
 
                     {/* Insights Content */}
-                    <div className="markdown-content">
-                      <ReactMarkdown>{insight.content}</ReactMarkdown>
+                    <div className="markdown-content prose prose-sm max-w-none dark:prose-invert">
+                      <ReactMarkdown 
+                        remarkPlugins={[remarkGfm, remarkBreaks]}
+                        components={{
+                          // Custom styling for tables
+                          table: ({ children }) => (
+                            <div className="overflow-x-auto">
+                              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                {children}
+                              </table>
+                            </div>
+                          ),
+                          thead: ({ children }) => (
+                            <thead className="bg-gray-50 dark:bg-gray-800">{children}</thead>
+                          ),
+                          tbody: ({ children }) => (
+                            <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                              {children}
+                            </tbody>
+                          ),
+                          tr: ({ children }) => (
+                            <tr className="hover:bg-gray-50 dark:hover:bg-gray-800">{children}</tr>
+                          ),
+                          th: ({ children }) => (
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                              {children}
+                            </th>
+                          ),
+                          td: ({ children }) => (
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                              {children}
+                            </td>
+                          ),
+                          // Custom styling for checkboxes
+                          input: ({ type, checked, ...props }) => {
+                            if (type === 'checkbox') {
+                              return (
+                                <input
+                                  type="checkbox"
+                                  checked={checked}
+                                  readOnly
+                                  className="mr-2 h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary"
+                                  {...props}
+                                />
+                              );
+                            }
+                            return <input type={type} {...props} />;
+                          },
+                          // Custom styling for code blocks
+                          code: ({ node, className, children, ...props }: any) => {
+                            const match = /language-(\w+)/.exec(className || '');
+                            const isInline = !match;
+                            return !isInline ? (
+                              <pre className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 overflow-x-auto">
+                                <code className={className} {...props}>
+                                  {children}
+                                </code>
+                              </pre>
+                            ) : (
+                              <code className="bg-gray-100 dark:bg-gray-100 px-1 py-0.5 rounded text-sm" {...props}>
+                                {children}
+                              </code>
+                            );
+                          },
+                          // Custom styling for blockquotes
+                          blockquote: ({ children }) => (
+                            <blockquote className="border-l-4 border-primary pl-4 italic text-gray-600 dark:text-gray-400">
+                              {children}
+                            </blockquote>
+                          ),
+                        }}
+                      >
+                        {insight.content}
+                      </ReactMarkdown>
                     </div>
 
                     {/* Footer */}
