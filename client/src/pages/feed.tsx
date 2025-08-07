@@ -35,73 +35,216 @@ export default function Feed() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  // Demo data - in real app this would come from API
+  // Real competitive intelligence data
   const [deltas, setDeltas] = useState<Delta[]>([
     {
       id: "delta-1",
-      title: "Heidi Health Raises $40M Series B",
-      subheading: "AI medical scribe platform secures funding from Andreessen Horowitz to expand EHR integrations",
-      sourceUrl: "https://techcrunch.com/heidi-health-series-b",
+      title: "Ambience Healthcare Raises $243M Series C",
+      subheading: "Ambience Healthcare announced a $243 million Series C round co-led by Oak HC/FT and Andreessen Horowitz. The company, which offers an ambient AI platform for documentation, coding and clinical documentation integrity (CDI), now supports over 100 specialties and more than 100 ambulatory subspecialties.",
+      sourceUrl: "https://www.ambiencehealthcare.com/blog/ambience-healthcare-announces-243-million-series-c-to-scale-its-ai-platform-for-health-systems",
       category: "Fundraising",
-      subcategory: "Series B",
-      severity: 8,
-      date: "2025-01-15",
-      vendor: "Heidi Health"
+      subcategory: "Series C",
+      severity: 9,
+      date: "2025-07-29",
+      vendor: "Ambience Healthcare"
     },
     {
-      id: "delta-2", 
-      title: "Freed AI Increases Enterprise Pricing",
-      subheading: "Monthly subscription increases from $199 to $229 for enterprise plans effective February 1st",
-      sourceUrl: "https://freed.ai/pricing",
-      category: "Pricing",
-      subcategory: "Price Increase",
+      id: "delta-2",
+      title: "Suki AI Expands Leadership Team",
+      subheading: "Suki expanded its leadership team by appointing Dr. Kevin Wang as Chief Medical Officer, Joe Chang as Chief Technology Officer and Dr. Vikram Khanna as Chief Customer Officer. CEO Punit Soni said these seasoned leaders would help scale Suki's intelligent assistive solutions.",
+      sourceUrl: "https://suki.ai",
+      category: "Personnel",
+      subcategory: "Executive Hires",
       severity: 6,
-      date: "2025-01-14",
-      vendor: "Freed AI"
+      date: "2025-07-24",
+      vendor: "Suki AI"
     },
     {
       id: "delta-3",
-      title: "Sunoh AI Launches Mobile App",
-      subheading: "New iOS and Android companion apps enable voice capture and real-time transcription",
-      sourceUrl: "https://sunoh.ai/blog/mobile-app-launch",
-      category: "Features", 
-      subcategory: "Mobile Platform",
+      title: "Heidi Health Releases Forms & Calls Features",
+      subheading: "Heidi Health released several updates. Its Forms feature automatically fills PDF forms based on visit details, while Calls (beta) lets clinicians automate routine patient calls and respond to queries.",
+      sourceUrl: "https://heidihealth.com",
+      category: "Features",
+      subcategory: "Product Updates",
       severity: 5,
-      date: "2025-01-13",
-      vendor: "Sunoh AI"
-    },
-    {
-      id: "delta-4",
-      title: "Epic Systems Announces AI Scribe Integration",
-      subheading: "Healthcare giant enters competitive space with built-in ambient documentation features",
-      sourceUrl: "https://epic.com/ai-scribe-announcement",
-      category: "Competitor Entry",
-      subcategory: "EHR Integration",
-      severity: 9,
-      date: "2025-01-12",
-      vendor: "Epic Systems"
-    },
-    {
-      id: "delta-5",
-      title: "Heidi Health Data Breach Incident",
-      subheading: "Unauthorized access to patient transcription data affects 15,000 users, investigation ongoing",
-      sourceUrl: "https://security.heidi.ai/breach-report",
-      category: "Security",
-      subcategory: "Data Breach",
-      severity: 10,
-      date: "2025-01-11",
+      date: "2025-07-23",
       vendor: "Heidi Health"
     },
     {
+      id: "delta-4",
+      title: "Abridge Announces Abridge Inside for Inpatient",
+      subheading: "Abridge announced 'Abridge Inside for Inpatient,' a module integrated with Epic that generates inpatient notes. The launch coincided with Abridge's Series E raise, and Abridge forecast 50 million encounters annually with international expansion. Nemours Children's evaluation saw a 32% drop in after-hours charting.",
+      sourceUrl: "https://2minutemedicine.com",
+      category: "Features",
+      subcategory: "Product Launch",
+      severity: 8,
+      date: "2025-07-07",
+      vendor: "Abridge"
+    },
+    {
+      id: "delta-5",
+      title: "Abridge Raises $300M Series E at $5B+ Valuation",
+      subheading: "According to StatNews snippets, Abridge raised a $300 million Series E led by Andreessen Horowitz with a valuation above $5 billion, coming just months after a February $250 million round. The company claimed over 150 enterprise customers.",
+      sourceUrl: "https://statnews.com",
+      category: "Fundraising",
+      subcategory: "Series E",
+      severity: 10,
+      date: "2025-07-01",
+      vendor: "Abridge"
+    },
+    {
       id: "delta-6",
-      title: "Freed AI Hires Former Google Health VP",
-      subheading: "Sarah Chen joins as Chief Medical Officer to lead clinical accuracy initiatives",
-      sourceUrl: "https://freed.ai/blog/sarah-chen-joins",
-      category: "Personnel",
-      subcategory: "Executive Hire",
-      severity: 4,
-      date: "2025-01-10",
+      title: "Suki AI Integrates with MEDITECH Expanse",
+      subheading: "Suki announced that it became the first ambient AI solution integrated with MEDITECH Expanse. The integration allows ambiently generated notes and dictation to flow directly into MEDITECH, enabling clinicians to reduce administrative burden. Over 100,000 encounters and 1,000 providers had already used the Expanse integration.",
+      sourceUrl: "https://suki.ai",
+      category: "Partnerships",
+      subcategory: "EHR Integration",
+      severity: 7,
+      date: "2025-07-01",
+      vendor: "Suki AI"
+    },
+    {
+      id: "delta-7",
+      title: "Community Health Network Adopts Nuance DAX Copilot",
+      subheading: "Nuance (Microsoft) announced that Community Health Network in Indiana adopted the Dragon Medical Platform (including DAX Copilot) and Microsoft Azure as part of a multi-year digital transformation. Community expanded DAX Copilot to 400 clinicians and integrated Epic on Azure.",
+      sourceUrl: "https://news.nuance.com",
+      category: "Partnerships",
+      subcategory: "Health System Adoption",
+      severity: 6,
+      date: "2025-06-25",
+      vendor: "Nuance/Microsoft"
+    },
+    {
+      id: "delta-8",
+      title: "Heidi Health Launches Integration Marketplace & Smart Dictation",
+      subheading: "Heidi introduced an integration marketplace that lets practices manage connections to multiple EHRs, along with Smart Dictation (automatic grammar handling) and the ability to write notes directly in Epic. The changelog also noted Heidi supports 110+ languages for transcription.",
+      sourceUrl: "https://heidihealth.com",
+      category: "Features",
+      subcategory: "Integration Platform",
+      severity: 6,
+      date: "2025-06-21",
+      vendor: "Heidi Health"
+    },
+    {
+      id: "delta-11",
+      title: "Nabla Introduces Real-Time Billing/Coding Assistant",
+      subheading: "Introduced real-time billing/coding assistant that flags billing issues and nudges documentation during encounters. Also expanded nurse/inpatient tools.",
+      sourceUrl: "https://hospitalogy.com/articles/2025-06-18/breaking-down-nabla-sword-and-commons-clinics-recent-raises/",
+      category: "Features",
+      subcategory: "Feature Launch",
+      severity: 7,
+      date: "2025-06-18",
+      vendor: "Nabla"
+    },
+    {
+      id: "delta-12",
+      title: "PDQI-9 Validation Study Shows AI Scribe Quality",
+      subheading: "Introduced PDQI-9 validation study showing AI scribe notes scalable across specialties, scoring ~4.20/5 vs human 4.25/5.",
+      sourceUrl: "https://arxiv.org/abs/2505.17047",
+      category: "Research",
+      subcategory: "Evaluation Metric",
+      severity: 5,
+      date: "2025-05-15",
+      vendor: "Field Study"
+    },
+    {
+      id: "delta-13",
+      title: "Peterson Institute Questions AI Scribe ROI",
+      subheading: "Peterson Institute report finds limited evidence health systems save time with scribes—or lower costs—even as adoption climbs.",
+      sourceUrl: "https://www.statnews.com/2025/03/27/do-ai-scribes-help-health-systems-save-time-health-tech/",
+      category: "Research",
+      subcategory: "ROI/Operational Insight",
+      severity: 8,
+      date: "2025-03-27",
+      vendor: "Multiple (Market)"
+    },
+    {
+      id: "delta-9",
+      title: "Freed AI Raises $30M Series A",
+      subheading: "Freed AI announced a $30 million Series A led by Sequoia Capital. The company has 17,000 paying clinicians, has saved more than 2.5 million hours of clinicians' time and achieved 4× year-over-year ARR growth. New features include specialty-specific notes, a custom template builder, pre-charting and EHR integration via browser extension.",
+      sourceUrl: "https://businesswire.com",
+      category: "Fundraising",
+      subcategory: "Series A",
+      severity: 8,
+      date: "2025-03-05",
       vendor: "Freed AI"
+    },
+    {
+      id: "delta-14",
+      title: "Nabla Rolls Out Magic Edit Template Customizer",
+      subheading: "Rolled out 'Magic Edit' note template customizer – allows physicians to control what to include/exclude contextually.",
+      sourceUrl: "https://hospitalogy.com/articles/2025-02-12/nabla-restoring-the-joy-of-medicine/",
+      category: "Features",
+      subcategory: "Personalization",
+      severity: 6,
+      date: "2025-02-12",
+      vendor: "Nabla"
+    },
+    {
+      id: "delta-10",
+      title: "DeepScribe Partners with Pearl Health ACO REACH",
+      subheading: "DeepScribe became Pearl Health's preferred ambient AI partner for more than 3,500 primary care providers participating in the ACO REACH program. The integration pulls forward previous notes, generates new notes automatically and has adoption rates over 80%; DeepScribe holds a 98.8 KLAS score.",
+      sourceUrl: "https://deepscribe.ai",
+      category: "Partnerships",
+      subcategory: "ACO Partnership",
+      severity: 7,
+      date: "2025-01-14",
+      vendor: "DeepScribe"
+    },
+    {
+      id: "delta-15",
+      title: "Sporo Health Outperforms GPT-4o in Clinical Accuracy",
+      subheading: "ArXiv study shows Sporo's specialized agentic architecture outperforms GPT-4o in clinical note accuracy (F1 ~75%), per clinician surveys.",
+      sourceUrl: "https://arxiv.org/abs/2411.06713",
+      category: "Research",
+      subcategory: "Performance Benchmark",
+      severity: 6,
+      date: "2024-11-01",
+      vendor: "Sporo Health"
+    },
+    {
+      id: "delta-16",
+      title: "Sporo Health vs GPT-4o Mini Comparative Study",
+      subheading: "Another comparative evaluation shows Sporo beats GPT-4o Mini in recall, precision, and hallucination reduction.",
+      sourceUrl: "https://arxiv.org/abs/2410.15528",
+      category: "Research",
+      subcategory: "Comparative Study",
+      severity: 5,
+      date: "2024-10-01",
+      vendor: "Sporo Health"
+    },
+    {
+      id: "delta-17",
+      title: "Market Analysis: Only 6 Vendors Dominate Enterprise",
+      subheading: "Gartner/STAT analysis: although > 50 scribe vendors exist, only ~6 dominate enterprise deployments—nuance, Abridge, Nabla, etc.",
+      sourceUrl: "https://www.statnews.com/2024/07/30/generative-ai-health-care-adoption-ambient-scribes/",
+      category: "Research",
+      subcategory: "Vendor Consolidation",
+      severity: 7,
+      date: "2024-07-30",
+      vendor: "Industry Landscape"
+    },
+    {
+      id: "delta-18",
+      title: "HCA Pilots Augmedix AI Scribe in 4 Emergency Rooms",
+      subheading: "HCA piloted Augmedix AI scribe in 4 ERs, with human-in-loop cleanup, showing continuous learning and workflow efficiency.",
+      sourceUrl: "https://hospitalogy.com/articles/2023-12-17/medallion-signed-sealed-credentialed/",
+      category: "Partnerships",
+      subcategory: "Pilot Deployment",
+      severity: 6,
+      date: "2023-12-01",
+      vendor: "Augmedix + HCA"
+    },
+    {
+      id: "delta-19",
+      title: "AWS Launches HealthScribe HIPAA-Eligible Service",
+      subheading: "AWS launched HealthScribe—a HIPAA-eligible generative AI service to allow EHR partners to build ambient note apps with partners like 3M M*Modal, Babylon.",
+      sourceUrl: "https://hospitalogy.com/articles/2023-08-01/amazon-healthcare-ai-play-healthscribe/",
+      category: "Platform",
+      subcategory: "Infrastructure Feature",
+      severity: 8,
+      date: "2023-08-01",
+      vendor: "AWS / HealthScribe"
     }
   ]);
 
@@ -145,7 +288,9 @@ export default function Feed() {
       "Reviews": Star,
       "API/SDK": Code,
       "Media": Tv,
-      "Blog/Newsletter": FileText
+      "Blog/Newsletter": FileText,
+      "Research": FileText,
+      "Platform": Code
     };
     const IconComponent = icons[category] || FileText;
     return <IconComponent className="w-4 h-4" />;

@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { BarChart3, MessageSquare, TrendingUp, Rss, GitCompare, RefreshCw, Download, Clock, FileText, User, Activity } from "lucide-react";
+import { BarChart3, MessageSquare, TrendingUp, Rss, GitCompare, RefreshCw, Download, Clock, FileText, User, Activity, Building2 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { RefreshProgress } from "@/components/RefreshProgress";
+import logoImage from "@assets/Gemini_Generated_Image_da5ni7da5ni7da5n (1)_1754525964468.jpeg";
 
 export function Sidebar() {
   const [location] = useLocation();
@@ -59,17 +60,22 @@ export function Sidebar() {
     { icon: MessageSquare, label: "Reviews", href: "/reviews", active: location === "/reviews" },
     { icon: GitCompare, label: "Comparison", href: "/comparison", active: location === "/comparison" },
     { icon: FileText, label: "Example Note", href: "/example-note", active: location === "/example-note" },
+    { icon: Building2, label: "Scribes", href: "/scribes", active: location === "/scribes" },
     { icon: User, label: "About", href: "/about", active: location === "/about" },
   ];
 
   return (
     <aside className="w-64 bg-sidebar-bg text-white flex-shrink-0" data-testid="sidebar">
       <div className="p-6">
-        <div className="flex items-center space-x-3 mb-8" data-testid="sidebar-logo">
-          <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-            <TrendingUp className="text-white w-6 h-6" />
+        <div className="mb-8" data-testid="sidebar-logo">
+          <div className="w-full h-20 rounded-lg overflow-hidden mb-4">
+            <img 
+              src={logoImage} 
+              alt="ScribeArena Logo" 
+              className="w-full h-full object-cover"
+            />
           </div>
-          <h1 className="text-xl font-bold">ScribeArena</h1>
+          <h1 className="text-xl font-bold text-center">ScribeArena</h1>
         </div>
         
         {/* Action Buttons */}

@@ -60,7 +60,7 @@ The architecture follows a clean separation of concerns with shared TypeScript s
 ### Major Feature Additions
 - **Delta Intelligence System**: Added comprehensive Deltas summary page with 6 tracking categories and individual Delta Feed with real-time competitive intelligence
 - **Enhanced Feed with Filtering**: Rebuilt Feed page as time-series delta tracking with fuzzy search, severity filtering, and categorized intelligence cards
-- **Example Note Tool**: Added comprehensive SOAP note comparison functionality allowing clinicians to test AI scribe outputs using standardized patient visits
+- **Example Note Tool**: Added comprehensive SOAP note comparison functionality allowing clinicians to test AI scribe outputs using standardized patient visits with embedded video demonstrations
 - **Vendor Comparison Enhancement**: Implemented max 3 vendor selection with side-by-side pricing, SEO, and feature analysis
 - **Navigation Restructure**: Moved refresh/export controls and ScribeArena branding to sidebar navigation for cleaner interface
 - **Clinical Documentation Testing**: Integrated real patient transcript with AI-generated SOAP notes from multiple vendors
@@ -82,6 +82,7 @@ The architecture follows a clean separation of concerns with shared TypeScript s
 - Added timestamp display near refresh controls in sidebar navigation
 - Implemented section-by-section SOAP note editor for custom clinical documentation
 - Enhanced vendor cards with larger logos, "Visit Website" buttons, and improved spacing
+- Added YouTube video embed for Freed AI demo (https://www.youtube.com/watch?v=ueSwbb7we44) in Example Note tool
 - Set monthly pricing as default view for individuals with automatic free plan prioritization
 - Made reviews tab content take full width for better readability
 - Added "Show 10 more" pagination button with loading animation for reviews (displays 10 initially, loads 10 more on demand)
