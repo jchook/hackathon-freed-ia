@@ -493,8 +493,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         summary: generatedInsight.summary,
         categories: generatedInsight.categories,
         impact: generatedInsight.impact,
-        insights: generatedInsight.insights,
-        actionItems: generatedInsight.actionItems,
+        content: generatedInsight.content,
         mentions: generatedInsight.mentions
       });
 
