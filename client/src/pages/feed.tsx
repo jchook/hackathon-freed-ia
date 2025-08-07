@@ -68,8 +68,45 @@ export default function Feed() {
       const selectedItem = nextFeedItems[currentFeedIndex % nextFeedItems.length];
       console.log("Selected feed item:", selectedItem);
 
+      // Map tags to proper categories
+      const tagToCategoryMap: Record<string, string> = {
+        "features": "Features",
+        "fundraising": "Fundraising", 
+        "partnerships": "Partnerships",
+        "epic": "Competitor Entry",
+        "epic-integration": "Partnerships",
+        "security": "Security",
+        "pricing": "Pricing",
+        "telemedicine": "Partnerships",
+        "ehr": "Partnerships",
+        "competition": "Competitor Entry",
+        "enterprise": "Features",
+        "marketplace": "Features"
+      };
+
+      // Determine severity and category
+      const primaryTag = selectedItem.tags?.[0] || "general";
+      const category = tagToCategoryMap[primaryTag] || "Features";
+      let severity = 6;
+      
+      if (selectedItem.title.toLowerCase().includes("heidi") && (selectedItem.content.toLowerCase().includes("epic") || selectedItem.tags?.includes("high-priority"))) {
+        severity = 9; // High severity for Heidi + Epic integration or high-priority items
+      } else if (selectedItem.source === "ambience") {
+        severity = 9;
+      } else {
+        severity = Math.floor(Math.random() * 4) + 6;
+      }
+
+      // Create enhanced feed item with severity and category
+      const enhancedFeedItem: FeedItem = {
+        ...selectedItem,
+        severity,
+        category,
+        subcategory: selectedItem.tags?.[1] ? selectedItem.tags[1].replace("-", " ").replace(/\b\w/g, (l: string) => l.toUpperCase()) : "New Feature Release"
+      };
+
       // Check if this item is high relevance for insights
-      const shouldGenerateInsights = isHighRelevanceForInsights(selectedItem);
+      const shouldGenerateInsights = isHighRelevanceForInsights(enhancedFeedItem);
       
       if (shouldGenerateInsights) {
         setIsGeneratingInsights(true);
@@ -78,7 +115,7 @@ export default function Feed() {
 
       // Send to Slack endpoint
       const slackResponse = await apiRequest("POST", "/api/slack/send-feed-alerts", {
-        feedItems: [selectedItem]
+        feedItems: [enhancedFeedItem]
       });
       const slackResult = await slackResponse.json();
 
@@ -87,7 +124,7 @@ export default function Feed() {
       if (shouldGenerateInsights) {
         try {
           const insightsResponse = await apiRequest("POST", "/api/insights/generate", {
-            feedItem: selectedItem
+            feedItem: enhancedFeedItem
           });
           insightsResult = await insightsResponse.json();
         } catch (error) {
@@ -116,54 +153,17 @@ export default function Feed() {
       console.log("addDemoDelta mutation successful:", data);
       setIsGeneratingInsights(false);
       
-      // Map tags to proper categories
-      const tagToCategoryMap: Record<string, string> = {
-        "features": "Features",
-        "fundraising": "Fundraising", 
-        "partnerships": "Partnerships",
-        "epic": "Competitor Entry",
-        "epic-integration": "Partnerships",
-        "security": "Security",
-        "pricing": "Pricing",
-        "telemedicine": "Partnerships",
-        "ehr": "Partnerships",
-        "competition": "Competitor Entry",
-        "enterprise": "Features",
-        "marketplace": "Features"
-      };
-
-      // Determine severity and category
-      const primaryTag = data.feedItem.tags?.[0] || "general";
-      const category = tagToCategoryMap[primaryTag] || "Features";
-      let severity = 6;
-      
-      if (data.feedItem.title.toLowerCase().includes("heidi") && (data.feedItem.content.toLowerCase().includes("epic") || data.feedItem.tags?.includes("high-priority"))) {
-        severity = 9; // High severity for Heidi + Epic integration or high-priority items
-      } else if (data.feedItem.source === "ambience") {
-        severity = 9;
-      } else {
-        severity = Math.floor(Math.random() * 4) + 6;
-      }
-
-      // Add category and severity to the feed item
-      const enhancedFeedItem: FeedItem = {
-        ...data.feedItem,
-        severity,
-        category,
-        subcategory: data.feedItem.tags?.[1] ? data.feedItem.tags[1].replace("-", " ").replace(/\b\w/g, (l: string) => l.toUpperCase()) : "New Feature Release"
-      };
-      
-      console.log("Adding new feed item:", enhancedFeedItem);
+      console.log("Adding new feed item:", data.feedItem);
       
       // Use global state helper to add feed item
-      addFeedItem(enhancedFeedItem);
+      addFeedItem(data.feedItem);
       
       // Mark this item as newly added for animation
-      markAsNewlyAdded(enhancedFeedItem.id);
+      markAsNewlyAdded(data.feedItem.id);
       
       // Remove the "newly added" status after animation completes
       setTimeout(() => {
-        removeNewlyAdded(enhancedFeedItem.id);
+        removeNewlyAdded(data.feedItem.id);
       }, 2000); // Remove after 2 seconds
       
       // Increment feed index for next refresh

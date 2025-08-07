@@ -1,6 +1,13 @@
 import OpenAI from "openai";
 import type { FeedItem, Insight } from "../shared/schema";
 
+// Extended FeedItem type that includes severity, category, and subcategory
+interface ExtendedFeedItem extends FeedItem {
+  severity?: number;
+  category?: string;
+  subcategory?: string;
+}
+
 let openai: OpenAI | null = null;
 
 function getOpenAIClient(): OpenAI | null {
@@ -135,108 +142,21 @@ interface GeneratedInsight {
 }
 
 export class InsightsService {
-  async shouldGenerateInsight(feedItem: FeedItem): Promise<InsightGenerationResult> {
-    // If no API key, use simple heuristics to determine if we should generate insights
-    if (!hasApiKey()) {
-      const isHighImpact = feedItem.title.toLowerCase().includes('heidi') || 
-                          feedItem.tags?.includes('high-priority') ||
-                          feedItem.title.toLowerCase().includes('funding') ||
-                          feedItem.title.toLowerCase().includes('partnership') ||
-                          feedItem.title.toLowerCase().includes('epic');
-      
-      return {
-        shouldGenerate: true, // Always generate for demo purposes
-        impact: isHighImpact ? 'high' : 'medium',
-        categories: ['sales', 'marketing', 'product'],
-        reasoning: 'Demo mode - using predefined insights'
-      };
-    }
-
-    try {
-      const client = getOpenAIClient();
-      if (!client) {
-        throw new Error("Anthropic client not available");
-      }
-      
-      const response = await client.chat.completions.create({
-        model: "gpt-4o",
-        max_tokens: 1000,
-        temperature: 0.2,
-        messages: [
-          {
-            role: "system",
-            content: `You are a competitive intelligence analyst for Freed AI, a medical AI scribe company. 
-            
-Your job is to determine if a competitor feed item requires strategic insights generation.
-
-Only generate insights for HIGH-IMPACT items that could affect:
-- Sales strategy and competitive positioning  
-- Marketing messaging and positioning
-- Product roadmap and feature priorities
-
-Analyze the feed item and return JSON with this structure:
-{
-  "shouldGenerate": true/false,
-  "impact": "high"/"medium"/"low", 
-  "categories": ["sales", "marketing", "product"],
-  "reasoning": "Brief explanation of why this item does/doesn't warrant insights"
-}
-
-HIGH-IMPACT examples:
-- Major funding rounds ($20M+)
-- New product launches or major feature releases
-- Key partnerships (Epic, major health systems)
-- Pricing changes
-- Leadership changes at senior levels
-- Security incidents
-- Major customer wins/losses
-
-LOW-IMPACT examples (skip these):
-- Minor feature updates
-- Small blog posts
-- Regular maintenance releases
-- Minor personnel changes
-- General industry news`
-          },
-          {
-            role: "user", 
-            content: `Analyze this feed item:
-Title: ${feedItem.title}
-Content: ${feedItem.content}
-Source: ${feedItem.source}
-Tags: ${feedItem.tags?.join(', ') || 'none'}
-
-Please respond with valid JSON only.`
-          }
-        ]
-      });
-
-      const content = response.choices[0].message.content;
-      if (!content) {
-        throw new Error('Unexpected response from OpenAI');
-      }
-      
-      const result = JSON.parse(content);
-      
-      return {
-        shouldGenerate: result.shouldGenerate || false,
-        impact: result.impact || 'low',
-        categories: Array.isArray(result.categories) ? result.categories : [],
-        reasoning: result.reasoning || "Analysis completed"
-      };
-
-    } catch (error) {
-      console.error("Failed to analyze feed item for insights:", error);
-      return {
-        shouldGenerate: false,
-        impact: 'low',
-        categories: [],
-        reasoning: "Analysis failed - defaulting to no insights generation"
-      };
-    }
+  async shouldGenerateInsight(feedItem: ExtendedFeedItem): Promise<InsightGenerationResult> {
+    // Use severity to determine if we should generate insights (severity 8+ = high impact)
+    const severity = feedItem.severity || 5;
+    const isHighImpact = severity >= 8;
+    
+    console.log(`Insights analysis: severity=${severity}, isHighImpact=${isHighImpact}, shouldGenerate=${isHighImpact}`);
+    return {
+      shouldGenerate: isHighImpact, // Only generate for high severity items
+      impact: isHighImpact ? 'high' : 'medium',
+      categories: ['sales', 'marketing', 'product'],
+      reasoning: `Severity ${severity} ${isHighImpact ? 'warrants' : 'does not warrant'} insights generation`
+    };
   }
 
-  async generateInsight(feedItem: FeedItem, analysis: InsightGenerationResult): Promise<GeneratedInsight> {
+  async generateInsight(feedItem: ExtendedFeedItem, analysis: InsightGenerationResult): Promise<GeneratedInsight> {
     // If no API key, use predefined insights
     if (!hasApiKey()) {
       console.log("No API key found, using predefined insights for demo");
