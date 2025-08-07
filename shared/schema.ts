@@ -117,6 +117,9 @@ export const feedItems = pgTable("feed_items", {
   sourceUrl: text("source_url").notNull(),
   publishedAt: timestamp("published_at").notNull(),
   tags: jsonb("tags").$type<string[]>().default([]),
+  severity: integer("severity"), // 1-10 scale for importance
+  category: text("category"), // e.g., 'Features', 'Personnel', 'Partnerships'
+  subcategory: text("subcategory"), // e.g., 'Product Updates', 'Executive Hires'
   createdAt: timestamp("created_at").defaultNow(),
 });
 

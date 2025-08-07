@@ -1,7 +1,32 @@
 import OpenAI from "openai";
 
-// the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+// Dynamic OpenAI client management
+let openaiClient: OpenAI | null = null;
+let lastApiKeyCheck: string | null = null;
+
+function getOpenAIClient(): OpenAI | null {
+  const currentApiKey = process.env.OPENAI_API_KEY || null;
+  
+  // Check if API key has changed or if client needs to be initialized
+  if (currentApiKey !== lastApiKeyCheck) {
+    if (currentApiKey) {
+      // API key exists - create or recreate client
+      openaiClient = new OpenAI({ apiKey: currentApiKey });
+      console.log("AI Vendor Analyzer: OpenAI client initialized with API key");
+    } else {
+      // No API key - clear client
+      openaiClient = null;
+      console.log("AI Vendor Analyzer: OpenAI client cleared - no API key available");
+    }
+    lastApiKeyCheck = currentApiKey;
+  }
+  
+  return openaiClient;
+}
+
+function isClientAvailable(): boolean {
+  return getOpenAIClient() !== null;
+}
 
 export interface VendorAnalysisResult {
   vendorName: string;
@@ -22,8 +47,20 @@ export interface VendorAnalysisResult {
 }
 
 export async function analyzeVendorInput(input: string): Promise<VendorAnalysisResult> {
+  // Check if OpenAI client is available
+  if (!isClientAvailable()) {
+    console.log("AI Vendor Analyzer: OpenAI client not available, using fallback analysis");
+    return getFallbackVendorAnalysis(input);
+  }
+
   try {
-    const response = await openai.chat.completions.create({
+    const client = getOpenAIClient();
+    if (!client) {
+      console.log("AI Vendor Analyzer: OpenAI client not available, using fallback analysis");
+      return getFallbackVendorAnalysis(input);
+    }
+
+    const response = await client.chat.completions.create({
       model: "gpt-4o",
       messages: [
         {
@@ -85,31 +122,8 @@ Guidelines:
 
   } catch (error) {
     console.error("AI vendor analysis failed:", error);
-    
-    // Enhanced fallback parsing for basic inputs
-    const fallbackName = input.includes("http") 
-      ? extractDomainName(input)
-      : capitalizeVendorName(input.trim());
-    
-    let fallbackWebsite = "";
-    if (input.includes("http")) {
-      fallbackWebsite = input;
-    } else {
-      // Enhanced website discovery for known medical AI companies
-      const cleanName = input.toLowerCase().replace(/\s+/g, "");
-      const knownWebsite = getKnownMedicalAIWebsite(cleanName);
-      fallbackWebsite = knownWebsite || `https://www.${cleanName}.com`;
-    }
-    
-    return {
-      vendorName: fallbackName,
-      description: `${fallbackName} is an AI medical scribe solution that helps healthcare providers with clinical documentation and workflow automation.`,
-      website: fallbackWebsite,
-      reviewSources: [],
-      newsSources: [],
-      confidence: 0.3,
-      reasoning: "Fallback analysis - AI quota exceeded, using basic pattern matching"
-    };
+    console.log("Using fallback vendor analysis due to error");
+    return getFallbackVendorAnalysis(input);
   }
 }
 
@@ -152,4 +166,31 @@ function getKnownMedicalAIWebsite(cleanName: string): string | null {
   };
   
   return knownCompanies[cleanName] || null;
+}
+
+function getFallbackVendorAnalysis(input: string): VendorAnalysisResult {
+  // Enhanced fallback parsing for basic inputs
+  const fallbackName = input.includes("http") 
+    ? extractDomainName(input)
+    : capitalizeVendorName(input.trim());
+  
+  let fallbackWebsite = "";
+  if (input.includes("http")) {
+    fallbackWebsite = input;
+  } else {
+    // Enhanced website discovery for known medical AI companies
+    const cleanName = input.toLowerCase().replace(/\s+/g, "");
+    const knownWebsite = getKnownMedicalAIWebsite(cleanName);
+    fallbackWebsite = knownWebsite || `https://www.${cleanName}.com`;
+  }
+  
+  return {
+    vendorName: fallbackName,
+    description: `${fallbackName} is an AI medical scribe solution that helps healthcare providers with clinical documentation and workflow automation.`,
+    website: fallbackWebsite,
+    reviewSources: [],
+    newsSources: [],
+    confidence: 0.3,
+    reasoning: "Fallback analysis - OpenAI client not available, using basic pattern matching"
+  };
 }

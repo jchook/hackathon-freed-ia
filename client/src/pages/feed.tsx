@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAtom, useSetAtom } from "jotai";
+import { Link } from "wouter";
 import { Sidebar } from "@/components/Sidebar";
 import { Header } from "@/components/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,9 +11,9 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   Rss, ExternalLink, Calendar, Filter, Search, RefreshCw,
-  DollarSign, Users, TrendingUp, FileText, Tv, 
+  DollarSign, TrendingUp, FileText, Tv, 
   Handshake, UserPlus, Zap, Star, Code, Shield,
-  Building, TrendingDown, AlertTriangle, CheckCircle,
+  Building, 
   Brain, Sparkles
 } from "lucide-react";
 import { format } from "date-fns";
@@ -226,8 +227,8 @@ export default function Feed() {
 
   const getSeverityColor = (severity: number) => {
     if (severity >= 8) return "bg-red-500";
-    if (severity >= 5) return "bg-orange-500"; 
-    return "bg-green-500";
+    if (severity >= 5) return "bg-yellow-500"; 
+    return "bg-gray-500";
   };
 
   const getSeverityLabel = (severity: number) => {
@@ -378,14 +379,6 @@ export default function Feed() {
                           }`}></div>
                           <span className="text-sm text-muted-foreground">{getSeverityLabel(item.severity || 5)}</span>
                         </div>
-                        
-                        {/* Insights Indicator */}
-                        {isHighRelevanceForInsights(item) && (
-                          <div className="flex items-center gap-1">
-                            <Brain className="w-3 h-3 text-purple-500" />
-                            <span className="text-xs text-purple-600 font-medium">AI Insights</span>
-                          </div>
-                        )}
                       </div>
                     </div>
                   </CardHeader>
@@ -414,10 +407,15 @@ export default function Feed() {
                       
                       {/* Insights Generated Badge */}
                       {isHighRelevanceForInsights(item) && (
-                        <Badge variant="outline" className="text-xs border-purple-200 text-purple-700 bg-purple-50">
-                          <Sparkles className="w-3 h-3 mr-1" />
-                          Insights Generated
-                        </Badge>
+                        <Link href="/insights">
+                          <Badge 
+                            variant="outline" 
+                            className="text-xs border-purple-200 text-purple-700 bg-purple-50 hover:bg-purple-100 hover:border-purple-300 cursor-pointer transition-colors"
+                          >
+                            <Sparkles className="w-3 h-3 mr-1" />
+                            Insights Generated
+                          </Badge>
+                        </Link>
                       )}
                       
                       <div className="flex-1"></div>

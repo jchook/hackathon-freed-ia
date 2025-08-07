@@ -1,24 +1,53 @@
 import OpenAI from "openai";
 import type { FeedItem, Insight } from "../shared/schema";
 
-// Extended FeedItem type that includes severity, category, and subcategory
-interface ExtendedFeedItem extends FeedItem {
-  severity?: number;
-  category?: string;
-  subcategory?: string;
-}
-
-let openai: OpenAI | null = null;
+// Dynamic OpenAI client management
+let openaiClient: OpenAI | null = null;
+let lastApiKeyCheck: string | null = null;
 
 function getOpenAIClient(): OpenAI | null {
-  if (!openai && process.env.OPENAI_API_KEY) {
-    openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  const currentApiKey = process.env.OPENAI_API_KEY || null;
+  
+  // Check if API key has changed or if client needs to be initialized
+  if (currentApiKey !== lastApiKeyCheck) {
+    if (currentApiKey) {
+      // API key exists - create or recreate client
+      openaiClient = new OpenAI({ apiKey: currentApiKey });
+      console.log("OpenAI client initialized with API key");
+    } else {
+      // No API key - clear client
+      openaiClient = null;
+      console.log("OpenAI client cleared - no API key available");
+    }
+    lastApiKeyCheck = currentApiKey;
   }
-  return openai;
+  
+  return openaiClient;
 }
 
 function hasApiKey(): boolean {
   return !!process.env.OPENAI_API_KEY;
+}
+
+function isClientAvailable(): boolean {
+  return getOpenAIClient() !== null;
+}
+
+function getFallbackInsight(feedItem: FeedItem): typeof DEMO_INSIGHTS[keyof typeof DEMO_INSIGHTS] {
+  // Determine which predefined insight to use based on the source/competitor
+  if (feedItem.title.toLowerCase().includes('heidi') || feedItem.source.toLowerCase() === 'heidi') {
+    console.log("Using Heidi-specific fallback insight");
+    return DEMO_INSIGHTS.heidi;
+  } else if (feedItem.title.toLowerCase().includes('abridge') || feedItem.source.toLowerCase() === 'abridge') {
+    console.log("Using Abridge-specific fallback insight");
+    return DEMO_INSIGHTS.abridge;
+  } else if (feedItem.title.toLowerCase().includes('suki') || feedItem.source.toLowerCase() === 'suki') {
+    console.log("Using Suki-specific fallback insight");
+    return DEMO_INSIGHTS.suki;
+  } else {
+    console.log("Using generic fallback insight");
+    return DEMO_INSIGHTS.generic;
+  }
 }
 
 // Predefined insights for demo purposes when no API key is available
@@ -90,11 +119,115 @@ Automated patient calls inch Heidi toward engagement/CRM territory. Freed should
 - Position Freed as the focused, reliable choice vs. the Swiss-army knife approach`,
     mentions: ["@sales-team", "@marketing-team", "@product-team", "@leadership"]
   },
+  abridge: {
+    title: "Abridge Competitive Intelligence Analysis",
+    summary: "Abridge continues to expand its enterprise presence with significant funding and Epic integration capabilities. Strategic monitoring required for competitive positioning.",
+    categories: ["sales", "marketing", "product"],
+    impact: "high" as const,
+    content: `# Abridge Competitive Intelligence Analysis
+
+## Executive Summary
+Abridge's continued expansion in the enterprise space with significant funding rounds and Epic integration capabilities requires strategic response from Freed to maintain competitive positioning.
+
+## GTM Impact Analysis
+
+### 💰 Funding Advantage
+Abridge's substantial funding ($300M Series E at $5B+ valuation) provides significant resources for enterprise sales and product development. This creates pressure on Freed's competitive positioning.
+
+### 🏥 Enterprise Focus
+Abridge's strong enterprise presence with 150+ enterprise customers positions them as a serious competitor in hospital/health-system deals.
+
+### 🔗 Epic Integration Strength
+Abridge's native Epic integration capabilities create competitive pressure in Epic-heavy environments.
+
+## Counter-Programming Strategy
+
+### 🎯 Speed & Simplicity Advantage
+> "While competitors focus on enterprise complexity, Freed delivers speed and simplicity that clinicians actually want. Our 30-60 second note generation beats enterprise bloat."
+
+### 💡 Focus vs. Scale
+> "Abridge's enterprise focus means they're optimizing for large health systems, while Freed optimizes for the individual clinician experience."
+
+### ⚡ Clinical Workflow Integration
+> "Freed's Chrome extension approach provides seamless integration without the complexity of enterprise deployments."
+
+## Sales Soundbites
+
+| Situation | Response |
+|-----------|----------|
+| Funding comparison comes up | "Funding doesn't guarantee product-market fit. Freed's focus on clinician experience drives adoption." |
+| Enterprise capabilities | "Enterprise features often come at the cost of simplicity. Freed prioritizes what matters most to clinicians." |
+| Epic integration | "We integrate with Epic through our Chrome extension - simpler than enterprise deployments." |
+
+## Action Items
+
+- [ ] **Sales Team**: Emphasize speed and simplicity advantages in competitive discussions
+- [ ] **Marketing Team**: Highlight clinician-focused approach vs. enterprise complexity
+- [ ] **Product Team**: Continue optimizing for individual clinician experience
+
+## Key Takeaways
+- Position Freed as the clinician-focused alternative to enterprise complexity
+- Emphasize speed and simplicity as key differentiators
+- Use funding discussions to highlight product-market fit over resources`,
+    mentions: ["@sales-team", "@marketing-team", "@product-team", "@leadership"]
+  },
+  suki: {
+    title: "Suki AI Competitive Intelligence Analysis",
+    summary: "Suki's leadership expansion and EHR integration capabilities demonstrate continued investment in enterprise healthcare solutions.",
+    categories: ["sales", "marketing", "product"],
+    impact: "high" as const,
+    content: `# Suki AI Competitive Intelligence Analysis
+
+## Executive Summary
+Suki's recent leadership expansion and EHR integration capabilities show continued investment in enterprise healthcare solutions, requiring strategic monitoring.
+
+## GTM Impact Analysis
+
+### 👥 Leadership Investment
+Suki's expansion of leadership team (CMO, CTO, CCO) indicates serious commitment to scaling enterprise healthcare solutions.
+
+### 🔗 EHR Integration Breadth
+Suki's MEDITECH Expanse integration demonstrates continued investment in EHR partnerships beyond Epic.
+
+### 🏥 Enterprise Focus
+Suki's enterprise focus with 100,000+ encounters positions them as a competitor in large health system deals.
+
+## Counter-Programming Strategy
+
+### 🎯 Simplicity vs. Complexity
+> "Suki's enterprise approach means complex deployments and long sales cycles. Freed's simplicity means faster time-to-value."
+
+### ⚡ Speed Advantage
+> "While competitors focus on enterprise features, Freed focuses on speed - 30-60 second notes vs. enterprise complexity."
+
+### 🔧 Integration Approach
+> "Freed's Chrome extension approach provides universal EHR compatibility without complex integrations."
+
+## Sales Soundbites
+
+| Situation | Response |
+|-----------|----------|
+| Enterprise capabilities | "Enterprise features often mean longer deployments and more complexity. Freed delivers value faster." |
+| EHR integration | "Our Chrome extension works with any web-based EHR - no complex integrations required." |
+| Leadership team | "Freed's focus is on product excellence, not organizational complexity." |
+
+## Action Items
+
+- [ ] **Sales Team**: Emphasize speed and simplicity in competitive discussions
+- [ ] **Marketing Team**: Position as the fast, simple alternative to enterprise complexity
+- [ ] **Product Team**: Continue optimizing for speed and ease of use
+
+## Key Takeaways
+- Use Suki's enterprise focus to highlight Freed's simplicity advantage
+- Emphasize speed and time-to-value as key differentiators
+- Position as the clinician-friendly alternative to enterprise complexity`,
+    mentions: ["@sales-team", "@marketing-team", "@product-team"]
+  },
   generic: {
     title: "Competitive Intelligence Analysis",
     summary: "New competitive development detected. Strategic review recommended to assess impact on Freed's market position.",
     categories: ["sales", "marketing"],
-    impact: "medium" as const,
+    impact: "high" as const,
     content: `# Competitive Intelligence Analysis
 
 ## Executive Summary
@@ -142,7 +275,7 @@ interface GeneratedInsight {
 }
 
 export class InsightsService {
-  async shouldGenerateInsight(feedItem: ExtendedFeedItem): Promise<InsightGenerationResult> {
+  async shouldGenerateInsight(feedItem: FeedItem): Promise<InsightGenerationResult> {
     // Use severity to determine if we should generate insights (severity 8+ = high impact)
     const severity = feedItem.severity || 5;
     const isHighImpact = severity >= 8;
@@ -156,16 +289,16 @@ export class InsightsService {
     };
   }
 
-  async generateInsight(feedItem: ExtendedFeedItem, analysis: InsightGenerationResult): Promise<GeneratedInsight> {
-    // If no API key, use predefined insights
-    if (!hasApiKey()) {
-      console.log("No API key found, using predefined insights for demo");
+  async generateInsight(feedItem: FeedItem, analysis: InsightGenerationResult): Promise<GeneratedInsight> {
+    // Check if OpenAI client is available
+    if (!isClientAvailable()) {
+      console.log("OpenAI client not available, using predefined insights for demo");
       
-      // Check if this is about Heidi to use specific insights
-      const isHeidiRelated = feedItem.title.toLowerCase().includes('heidi') || 
-                            feedItem.source.toLowerCase() === 'heidi';
+      // Add 2-second delay for fallback insights
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
-      const demoInsight = isHeidiRelated ? DEMO_INSIGHTS.heidi : DEMO_INSIGHTS.generic;
+      // Get appropriate fallback insight based on the feed item
+      const demoInsight = getFallbackInsight(feedItem);
       
       return {
         title: demoInsight.title,
@@ -180,6 +313,7 @@ export class InsightsService {
     try {
       const client = getOpenAIClient();
       if (!client) {
+        console.log("OpenAI client not available, falling back to predefined insights");
         throw new Error("OpenAI client not available");
       }
       
@@ -264,30 +398,21 @@ Provide specific, actionable insights that help Freed maintain competitive advan
     } catch (error) {
       console.error("Failed to generate insights:", error);
       
-      // Fallback insight
+      // Use fallback insight on error
+      console.log("Using fallback insight due to error");
+      
+      // Add 2-second delay for fallback insights
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      const fallbackInsight = getFallbackInsight(feedItem);
+      
       return {
-        title: `${feedItem.source} Update - Requires Analysis`,
-        summary: `New development from ${feedItem.source}: ${feedItem.title}`,
-        categories: analysis.categories,
-        impact: analysis.impact,
-        content: `# ${feedItem.source} Update - Requires Analysis
-
-## Executive Summary
-New development from ${feedItem.source}: ${feedItem.title}
-
-## Key Areas to Monitor
-
-- **Sales**: Monitor ${feedItem.source} developments for competitive positioning
-- **Marketing**: Review messaging against ${feedItem.source} claims  
-- **Product**: Assess product implications of ${feedItem.source} changes
-
-## Action Items
-
-- [ ] **Leadership**: Manual review required for ${feedItem.source} development
-
-## Next Steps
-Continue monitoring and assess strategic implications as more information becomes available.`,
-        mentions: ['@leadership']
+        title: fallbackInsight.title,
+        summary: fallbackInsight.summary,
+        categories: fallbackInsight.categories,
+        impact: fallbackInsight.impact,
+        content: fallbackInsight.content,
+        mentions: fallbackInsight.mentions
       };
     }
   }
