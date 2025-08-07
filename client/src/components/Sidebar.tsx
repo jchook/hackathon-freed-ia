@@ -67,15 +67,15 @@ export function Sidebar() {
   return (
     <aside className="w-64 bg-sidebar-bg text-white flex-shrink-0" data-testid="sidebar">
       <div className="p-6">
-        <div className="flex items-center space-x-4 mb-8" data-testid="sidebar-logo">
-          <div className="w-16 h-16 rounded-lg overflow-hidden">
+        <div className="mb-8" data-testid="sidebar-logo">
+          <div className="w-full h-20 rounded-lg overflow-hidden mb-4">
             <img 
               src={logoImage} 
               alt="ScribeArena Logo" 
               className="w-full h-full object-cover"
             />
           </div>
-          <h1 className="text-xl font-bold">ScribeArena</h1>
+          <h1 className="text-xl font-bold text-center">ScribeArena</h1>
         </div>
         
         {/* Action Buttons */}
