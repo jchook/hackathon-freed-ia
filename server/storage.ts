@@ -88,6 +88,12 @@ export interface IStorage {
   getLatestSharedExperience(competitorId: string): Promise<SharedExperience | undefined>;
   createSharedExperience(experience: InsertSharedExperience): Promise<SharedExperience>;
   
+  // Insights
+  getInsights(): Promise<Insight[]>;
+  getInsightsByFeedItem(feedItemId: string): Promise<Insight[]>;
+  getInsightsByImpact(impact: string): Promise<Insight[]>;
+  createInsight(insight: InsertInsight): Promise<Insight>;
+  
   // Dashboard
   getCompetitorsWithPlans(): Promise<CompetitorWithPlans[]>;
   getCompetitorsWithReviews(): Promise<CompetitorWithReviews[]>;
