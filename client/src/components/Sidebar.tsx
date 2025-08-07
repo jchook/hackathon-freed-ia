@@ -67,8 +67,8 @@ export function Sidebar() {
   return (
     <aside className="w-64 bg-sidebar-bg text-white flex-shrink-0" data-testid="sidebar">
       <div className="p-6">
-        <div className="flex items-center space-x-3 mb-8" data-testid="sidebar-logo">
-          <div className="w-10 h-10 rounded-lg overflow-hidden">
+        <div className="flex items-center space-x-4 mb-8" data-testid="sidebar-logo">
+          <div className="w-16 h-16 rounded-lg overflow-hidden">
             <img 
               src={logoImage} 
               alt="ScribeArena Logo" 
