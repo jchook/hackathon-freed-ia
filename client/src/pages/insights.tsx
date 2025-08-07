@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
+import ReactMarkdown from "react-markdown";
 import { Sidebar } from "@/components/Sidebar";
 import { Header } from "@/components/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,20 +22,7 @@ interface Insight {
   summary: string;
   categories: string[];
   impact: 'high' | 'medium' | 'low';
-  insights: {
-    gtm_impact?: string[];
-    counter_programming?: string[];
-    sales_soundbites?: string[];
-    sales?: string[];
-    marketing?: string[];
-    product?: string[];
-  };
-  actionItems: {
-    category: string;
-    action: string;
-    assignee?: string;
-    priority: 'high' | 'medium' | 'low';
-  }[];
+  content: string; // Markdown content
   mentions: string[];
   createdAt: string;
 }
@@ -45,9 +33,10 @@ export default function Insights() {
 
   const { data: insights = [], isLoading } = useQuery({
     queryKey: ["insights", impactFilter],
-    queryFn: () => {
+    queryFn: async () => {
       const params = impactFilter !== "all" ? `?impact=${impactFilter}` : "";
-      return apiRequest(`/api/insights${params}`);
+      const response = await apiRequest("GET", `/api/insights${params}`);
+      return await response.json();
     },
   });
 
@@ -214,56 +203,9 @@ export default function Insights() {
                     </div>
 
                     {/* Insights Content */}
-                    {Object.entries(insight.insights).map(([category, items]) => 
-                      items && items.length > 0 ? (
-                        <div key={category} className="space-y-2">
-                          <h4 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground flex items-center gap-1">
-                            {getCategoryIcon(category)}
-                            {category.replace(/_/g, ' ')}
-                          </h4>
-                          <ul className="space-y-1 text-sm">
-                            {items.map((item, index) => (
-                              <li key={index} className="flex items-start gap-2">
-                                <span className="text-primary mt-1.5">•</span>
-                                <span className="flex-1">{item}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      ) : null
-                    )}
-
-                    {/* Action Items */}
-                    {insight.actionItems && insight.actionItems.length > 0 && (
-                      <div className="space-y-2">
-                        <h4 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground flex items-center gap-1">
-                          <CheckCircle2 className="w-3 h-3" />
-                          Action Items
-                        </h4>
-                        <div className="space-y-2">
-                          {insight.actionItems.map((action, index) => (
-                            <div key={index} className="flex items-start gap-3 p-3 rounded-md bg-muted/30">
-                              <div className={`w-2 h-2 rounded-full mt-2 ${getPriorityColor(action.priority)}`}></div>
-                              <div className="flex-1 space-y-1">
-                                <p className="text-sm font-medium">{action.action}</p>
-                                <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                                  <span className="capitalize">{action.category}</span>
-                                  {action.assignee && (
-                                    <span className="flex items-center gap-1">
-                                      <Users className="w-3 h-3" />
-                                      {action.assignee}
-                                    </span>
-                                  )}
-                                  <span className={`capitalize font-medium ${getPriorityColor(action.priority)}`}>
-                                    {action.priority} priority
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
+                    <div className="markdown-content">
+                      <ReactMarkdown>{insight.content}</ReactMarkdown>
+                    </div>
 
                     {/* Footer */}
                     <div className="flex items-center justify-between pt-2 border-t text-xs text-muted-foreground">

@@ -212,20 +212,7 @@ export const insights = pgTable("insights", {
   summary: text("summary").notNull(),
   categories: jsonb("categories").$type<string[]>().default([]), // ['sales', 'marketing', 'product']
   impact: text("impact"), // 'high', 'medium', 'low'
-  insights: jsonb("insights").$type<{
-    gtm_impact?: string[];
-    counter_programming?: string[];
-    sales_soundbites?: string[];
-    sales?: string[];
-    marketing?: string[];
-    product?: string[];
-  }>().default({}),
-  actionItems: jsonb("action_items").$type<{
-    category: string;
-    action: string;
-    assignee?: string;
-    priority: 'high' | 'medium' | 'low';
-  }[]>().default([]),
+  content: text("content").notNull(), // Markdown content with rich formatting
   mentions: jsonb("mentions").$type<string[]>().default([]), // People to @ in Slack
   createdAt: timestamp("created_at").defaultNow(),
 });

@@ -3,15 +3,120 @@ import type { FeedItem, Insight } from "../shared/schema";
 
 let openai: OpenAI | null = null;
 
-function getOpenAIClient(): OpenAI {
-  if (!openai) {
-    if (!process.env.OPENAI_API_KEY) {
-      throw new Error("OPENAI_API_KEY environment variable is required");
-    }
+function getOpenAIClient(): OpenAI | null {
+  if (!openai && process.env.OPENAI_API_KEY) {
     openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   }
   return openai;
 }
+
+function hasApiKey(): boolean {
+  return !!process.env.OPENAI_API_KEY;
+}
+
+// Predefined insights for demo purposes when no API key is available
+const DEMO_INSIGHTS = {
+  heidi: {
+    title: "Heidi July 2025 Release – Strategic Analysis",
+    summary: "Heidi rolled out six notable upgrades including PDF form filling, AI calls, 110+ language support, smart dictation, native Epic integration, and an integration marketplace. This represents significant feature expansion that impacts Freed's competitive positioning.",
+    categories: ["sales", "marketing", "product"],
+    impact: "high" as const,
+    content: `# Heidi July 2025 Release – Strategic Analysis
+
+## Executive Summary
+Heidi's July 2025 release represents a significant expansion of their platform capabilities, moving beyond pure ambient scribing into broader clinical workflow automation. This development requires strategic response from Freed to maintain competitive positioning.
+
+## GTM Impact Analysis
+
+### 🏢 Enterprise Pull-Through
+Heidi's Epic connector and marketplace messaging will increase mindshare in hospital/health-system deals where Freed pitches its custom Epic, Cerner & Meditech work. The integration marketplace positions Heidi as a comprehensive solution rather than a point tool.
+
+### ⚠️ Feature-Bloat Perception Risk
+A wider surface area (calls, forms, multilingual, etc.) may impress buyers but also raises expectations that could complicate proofs-of-concept and lengthen sales cycles. This creates an opportunity for Freed to emphasize simplicity.
+
+### 🌍 International Pressure
+The 110-language claim sets a new bar for global customers. Freed may need to highlight its current multilingual roadmap or prioritize top-requested languages based on customer demand.
+
+### 📞 Up-Funnel Competition
+Automated patient calls inch Heidi toward engagement/CRM territory. Freed should monitor if prospects start benchmarking 'patient-outreach' rather than pure ambient scribing.
+
+## Counter-Programming Strategy
+
+### 🎯 Trinity Narrative First
+> "With Freed you never sacrifice the core three—speed (30–60 sec), clinical-grade accuracy, and ultra-simple workflows. Competitors that bolt on extra modules inevitably slow at least one of those pillars."
+
+### 🎛️ Ease-of-Use Trade-Off
+> "More toggles, tabs and call flows mean more onboarding and IT change-management. Freed stays friction-free: one workflow, one login, zero clutter."
+
+### ⚡ Accuracy Under Load
+> "Real-time accuracy drops when a model juggles 110 languages and phone triage. Freed's single-purpose engine is tuned exclusively for high-fidelity English clinical notes."
+
+### 🏃 Speed Remains King
+> "Freed still delivers notes in under a minute—even as Heidi adds PDF parsing and telephony that can tax processing time."
+
+### 🔗 Epic Parity, Simpler Path
+> "We already deploy inside Epic today—without forcing clinicians to learn a new marketplace. Freed's Chrome extension covers every other web-based EHR out-of-the-box."
+
+### 🎯 Focus Beats Sprawl
+> "Heidi's new features are exciting, but clinicians tell us they need one tool that nails note-taking, not a Swiss-army knife that's half-open on the desk."
+
+## Sales Soundbites
+
+| Situation | Response |
+|-----------|----------|
+| Heidi's feature expansion comes up | "More features often mean more complexity. What matters is getting notes done fast and accurately." |
+| Epic integration discussion | "We integrate with Epic today through our Chrome extension - no new marketplace to learn." |
+| Multilingual capabilities | "Our focus is on perfecting English clinical notes. Speed and accuracy beat language breadth." |
+
+## Action Items
+
+### High Priority
+- [ ] **Sales Team**: Update competitive battlecards with new counter-positions against Heidi's feature expansion
+- [ ] **Marketing Team**: Refresh messaging to emphasize Trinity narrative and simplicity advantage
+
+### Medium Priority  
+- [ ] **Product Team**: Review multilingual roadmap priorities based on market pressure
+
+## Key Takeaways
+- Use these points to steer conversations back to Freed's differentiated speed, accuracy, and ease of use
+- Emphasize that feature expansion often comes at the cost of core competencies
+- Position Freed as the focused, reliable choice vs. the Swiss-army knife approach`,
+    mentions: ["@sales-team", "@marketing-team", "@product-team", "@leadership"]
+  },
+  generic: {
+    title: "Competitive Intelligence Analysis",
+    summary: "New competitive development detected. Strategic review recommended to assess impact on Freed's market position.",
+    categories: ["sales", "marketing"],
+    impact: "medium" as const,
+    content: `# Competitive Intelligence Analysis
+
+## Executive Summary
+New competitive development detected. Strategic review recommended to assess impact on Freed's market position.
+
+## GTM Impact
+
+- Monitor competitive landscape changes that may affect sales positioning
+- Assess potential impact on customer acquisition and retention strategies
+
+## Counter-Programming
+
+- Reinforce Freed's core value proposition of speed, accuracy, and simplicity
+- Emphasize proven track record and customer satisfaction
+
+## Sales Soundbites
+
+- Focus on Freed's differentiated Trinity approach
+- Highlight customer success stories and proven ROI
+
+## Action Items
+
+- [ ] **Sales Team**: Review competitive positioning and update sales materials
+
+## Next Steps
+Continue monitoring competitive landscape and adjust strategy as needed.`,
+    mentions: ["@sales-team", "@leadership"]
+  }
+};
 
 interface InsightGenerationResult {
   shouldGenerate: boolean;
@@ -25,28 +130,38 @@ interface GeneratedInsight {
   summary: string;
   categories: string[];
   impact: 'high' | 'medium' | 'low';
-  insights: {
-    gtm_impact?: string[];
-    counter_programming?: string[];
-    sales_soundbites?: string[];
-    sales?: string[];
-    marketing?: string[];
-    product?: string[];
-  };
-  actionItems: {
-    category: string;
-    action: string;
-    assignee?: string;
-    priority: 'high' | 'medium' | 'low';
-  }[];
+  content: string; // Markdown content
   mentions: string[];
 }
 
 export class InsightsService {
   async shouldGenerateInsight(feedItem: FeedItem): Promise<InsightGenerationResult> {
+    // If no API key, use simple heuristics to determine if we should generate insights
+    if (!hasApiKey()) {
+      const isHighImpact = feedItem.title.toLowerCase().includes('heidi') || 
+                          feedItem.tags?.includes('high-priority') ||
+                          feedItem.title.toLowerCase().includes('funding') ||
+                          feedItem.title.toLowerCase().includes('partnership') ||
+                          feedItem.title.toLowerCase().includes('epic');
+      
+      return {
+        shouldGenerate: true, // Always generate for demo purposes
+        impact: isHighImpact ? 'high' : 'medium',
+        categories: ['sales', 'marketing', 'product'],
+        reasoning: 'Demo mode - using predefined insights'
+      };
+    }
+
     try {
-      const response = await getOpenAIClient().chat.completions.create({
+      const client = getOpenAIClient();
+      if (!client) {
+        throw new Error("Anthropic client not available");
+      }
+      
+      const response = await client.chat.completions.create({
         model: "gpt-4o",
+        max_tokens: 1000,
+        temperature: 0.2,
         messages: [
           {
             role: "system",
@@ -89,14 +204,19 @@ LOW-IMPACT examples (skip these):
 Title: ${feedItem.title}
 Content: ${feedItem.content}
 Source: ${feedItem.source}
-Tags: ${feedItem.tags?.join(', ') || 'none'}`
+Tags: ${feedItem.tags?.join(', ') || 'none'}
+
+Please respond with valid JSON only.`
           }
-        ],
-        response_format: { type: "json_object" },
-        temperature: 0.2,
+        ]
       });
 
-      const result = JSON.parse(response.choices[0].message.content || "{}");
+      const content = response.choices[0].message.content;
+      if (!content) {
+        throw new Error('Unexpected response from OpenAI');
+      }
+      
+      const result = JSON.parse(content);
       
       return {
         shouldGenerate: result.shouldGenerate || false,
@@ -117,9 +237,36 @@ Tags: ${feedItem.tags?.join(', ') || 'none'}`
   }
 
   async generateInsight(feedItem: FeedItem, analysis: InsightGenerationResult): Promise<GeneratedInsight> {
+    // If no API key, use predefined insights
+    if (!hasApiKey()) {
+      console.log("No API key found, using predefined insights for demo");
+      
+      // Check if this is about Heidi to use specific insights
+      const isHeidiRelated = feedItem.title.toLowerCase().includes('heidi') || 
+                            feedItem.source.toLowerCase() === 'heidi';
+      
+      const demoInsight = isHeidiRelated ? DEMO_INSIGHTS.heidi : DEMO_INSIGHTS.generic;
+      
+      return {
+        title: demoInsight.title,
+        summary: demoInsight.summary,
+        categories: demoInsight.categories,
+        impact: demoInsight.impact,
+        content: demoInsight.content,
+        mentions: demoInsight.mentions
+      };
+    }
+
     try {
-      const response = await getOpenAIClient().chat.completions.create({
+      const client = getOpenAIClient();
+      if (!client) {
+        throw new Error("OpenAI client not available");
+      }
+      
+      const response = await client.chat.completions.create({
         model: "gpt-4o",
+        max_tokens: 4000,
+        temperature: 0.3,
         messages: [
           {
             role: "system",
@@ -140,49 +287,23 @@ COMPETITIVE POSITIONING AGAINST HEIDI HEALTH:
 - Epic parity, simpler path: "We already deploy inside Epic today—without forcing clinicians to learn a new marketplace. Freed's Chrome extension covers every other web-based EHR out-of-the-box."
 - Focus beats sprawl: "Heidi's new features are exciting, but clinicians tell us they need one tool that nails note-taking, not a Swiss-army knife that's half-open on the desk."
 
-Generate strategic insights in this JSON format with specific focus on GTM impact and counter-programming:
-{
-  "title": "Competitor Event - Talking Points",
-  "summary": "Executive summary of the competitive event and its implications",
-  "categories": ["sales", "marketing", "product"],
-  "impact": "high"/"medium"/"low",
-  "insights": {
-    "gtm_impact": [
-      "Enterprise pull-through: specific impact on enterprise deals",
-      "Feature-bloat perception risk: how this affects buyer perception", 
-      "International pressure: global market implications",
-      "Up-funnel competition: expansion into new territories"
-    ],
-    "counter_programming": [
-      "Trinity narrative first: core messaging about speed/accuracy/simplicity",
-      "Ease-of-use trade-off: simplicity vs complexity argument",
-      "Accuracy under load: performance under stress argument",
-      "Speed remains king: time-to-value advantage",
-      "Epic parity, simpler path: integration simplicity",
-      "Focus beats sprawl: specialized vs generalized approach"
-    ],
-    "sales_soundbites": [
-      "Ready-to-use talking points for sales conversations",
-      "Specific responses to competitor claims",
-      "Positioning statements that redirect to Freed's strengths"
-    ]
-  },
-  "actionItems": [
-    {
-      "category": "sales",
-      "action": "Update competitive battlecards with new counter-positions",
-      "assignee": "@sales-team",
-      "priority": "high"
-    },
-    {
-      "category": "marketing", 
-      "action": "Refresh messaging to emphasize differentiation",
-      "assignee": "@marketing-team",
-      "priority": "medium"
-    }
-  ],
-  "mentions": ["@sales-team", "@product-team", "@leadership"]
-}
+Generate strategic insights in rich markdown format with specific focus on GTM impact and counter-programming. Use:
+
+- **Headings** (##, ###) for organization
+- **Bold text** for emphasis
+- **Tables** for structured data
+- **Bullet points** for lists
+- **Blockquotes** (>) for key messaging
+- **Emojis** for visual appeal
+- **Checkboxes** (- [ ]) for action items
+
+Structure your response with:
+1. Executive Summary
+2. GTM Impact Analysis
+3. Counter-Programming Strategy  
+4. Sales Soundbites (use tables)
+5. Action Items (use checkboxes)
+6. Key Takeaways
 
 TONE: Strategic, actionable, confident. Focus on specific talking points and competitive responses that sales teams can use immediately.`
           },
@@ -200,36 +321,24 @@ Feed Item:
 
 Focus on these categories: ${analysis.categories.join(', ')}
 
-Provide specific, actionable insights that help Freed maintain competitive advantage.`
+Provide specific, actionable insights that help Freed maintain competitive advantage. Respond with rich markdown content.`
           }
-        ],
-        response_format: { type: "json_object" },
-        temperature: 0.3,
+        ]
       });
 
-      const result = JSON.parse(response.choices[0].message.content || "{}");
+      const content = response.choices[0].message.content;
+      if (!content) {
+        throw new Error('Unexpected response from OpenAI');
+      }
       
-      // Validate and clean up the result
+      // Return the markdown content directly
       return {
-        title: result.title || `${feedItem.source} Competitive Intelligence`,
-        summary: result.summary || "Strategic analysis of competitive development",
-        categories: Array.isArray(result.categories) ? result.categories : analysis.categories,
-        impact: result.impact || analysis.impact,
-        insights: {
-          gtm_impact: Array.isArray(result.insights?.gtm_impact) ? result.insights.gtm_impact : [],
-          counter_programming: Array.isArray(result.insights?.counter_programming) ? result.insights.counter_programming : [],
-          sales_soundbites: Array.isArray(result.insights?.sales_soundbites) ? result.insights.sales_soundbites : [],
-          sales: Array.isArray(result.insights?.sales) ? result.insights.sales : [],
-          marketing: Array.isArray(result.insights?.marketing) ? result.insights.marketing : [],
-          product: Array.isArray(result.insights?.product) ? result.insights.product : []
-        },
-        actionItems: Array.isArray(result.actionItems) ? result.actionItems.map(item => ({
-          category: item.category || 'general',
-          action: item.action || '',
-          assignee: item.assignee,
-          priority: item.priority || 'medium'
-        })) : [],
-        mentions: Array.isArray(result.mentions) ? result.mentions : []
+        title: `${feedItem.source} Competitive Intelligence`,
+        summary: `Strategic analysis of ${feedItem.source} development: ${feedItem.title}`,
+        categories: analysis.categories,
+        impact: analysis.impact,
+        content: content,
+        mentions: ["@sales-team", "@marketing-team", "@product-team", "@leadership"]
       };
 
     } catch (error) {
@@ -241,17 +350,23 @@ Provide specific, actionable insights that help Freed maintain competitive advan
         summary: `New development from ${feedItem.source}: ${feedItem.title}`,
         categories: analysis.categories,
         impact: analysis.impact,
-        insights: {
-          sales: [`Monitor ${feedItem.source} developments for competitive positioning`],
-          marketing: [`Review messaging against ${feedItem.source} claims`],
-          product: [`Assess product implications of ${feedItem.source} changes`]
-        },
-        actionItems: [{
-          category: 'general',
-          action: `Manual review required for ${feedItem.source} development`,
-          assignee: '@leadership',
-          priority: 'medium' as const
-        }],
+        content: `# ${feedItem.source} Update - Requires Analysis
+
+## Executive Summary
+New development from ${feedItem.source}: ${feedItem.title}
+
+## Key Areas to Monitor
+
+- **Sales**: Monitor ${feedItem.source} developments for competitive positioning
+- **Marketing**: Review messaging against ${feedItem.source} claims  
+- **Product**: Assess product implications of ${feedItem.source} changes
+
+## Action Items
+
+- [ ] **Leadership**: Manual review required for ${feedItem.source} development
+
+## Next Steps
+Continue monitoring and assess strategic implications as more information becomes available.`,
         mentions: ['@leadership']
       };
     }
