@@ -17,6 +17,8 @@ import {
   type InsertSeoData,
   type SharedExperience,
   type InsertSharedExperience,
+  type Insight,
+  type InsertInsight,
   type CompetitorWithPlans,
   type CompetitorWithReviews,
   type DashboardStats,
@@ -28,7 +30,8 @@ import {
   reviewSummary,
   feedItems,
   seoData,
-  sharedExperiences
+  sharedExperiences,
+  insights
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { db } from "./db";
@@ -85,6 +88,12 @@ export interface IStorage {
   getLatestSharedExperience(competitorId: string): Promise<SharedExperience | undefined>;
   createSharedExperience(experience: InsertSharedExperience): Promise<SharedExperience>;
   
+  // Insights
+  getInsights(): Promise<Insight[]>;
+  getInsightsByFeedItem(feedItemId: string): Promise<Insight[]>;
+  getInsightsByImpact(impact: string): Promise<Insight[]>;
+  createInsight(insight: InsertInsight): Promise<Insight>;
+  
   // Dashboard
   getCompetitorsWithPlans(): Promise<CompetitorWithPlans[]>;
   getCompetitorsWithReviews(): Promise<CompetitorWithReviews[]>;
@@ -101,6 +110,7 @@ export class MemStorage implements IStorage {
   private feedItems: Map<string, FeedItem> = new Map();
   private seoData: Map<string, SeoData> = new Map();
   private sharedExperiences: Map<string, SharedExperience> = new Map();
+  private insights: Map<string, Insight> = new Map();
 
   constructor() {
     this.initializeData();
@@ -879,6 +889,9 @@ export class MemStorage implements IStorage {
         sourceUrl: "https://www.heidihealth.com/changelog/july-2025-updates",
         publishedAt: new Date("2025-07-23"),
         tags: ["product-update", "forms", "automation"],
+        severity: 7,
+        category: "Features",
+        subcategory: "Product Updates",
         createdAt: new Date(),
       },
       {
@@ -890,6 +903,9 @@ export class MemStorage implements IStorage {
         sourceUrl: "https://www.heidihealth.com/changelog/july-2025-updates",
         publishedAt: new Date("2025-07-23"),
         tags: ["product-update", "calls", "automation", "beta"],
+        severity: 6,
+        category: "Features",
+        subcategory: "Product Updates",
         createdAt: new Date(),
       },
       {
@@ -901,6 +917,9 @@ export class MemStorage implements IStorage {
         sourceUrl: "https://www.heidihealth.com/changelog/july-2025-updates",
         publishedAt: new Date("2025-07-23"),
         tags: ["integration", "epic", "ehr"],
+        severity: 8,
+        category: "Features",
+        subcategory: "EHR Integration",
         createdAt: new Date(),
       },
       {
@@ -912,6 +931,9 @@ export class MemStorage implements IStorage {
         sourceUrl: "https://www.getfreed.ai/blog/freed-raises-series-a",
         publishedAt: new Date("2025-01-15"),
         tags: ["funding", "series-a", "sequoia"],
+        severity: 9,
+        category: "Fundraising",
+        subcategory: "Series A",
         createdAt: new Date(),
       },
       {
@@ -923,6 +945,9 @@ export class MemStorage implements IStorage {
         sourceUrl: "https://www.getfreed.ai/blog/how-freed-handles-data-privacy-compliance",
         publishedAt: new Date("2025-01-10"),
         tags: ["security", "hipaa", "privacy"],
+        severity: 6,
+        category: "Security",
+        subcategory: "Compliance",
         createdAt: new Date(),
       },
       {
@@ -934,6 +959,9 @@ export class MemStorage implements IStorage {
         sourceUrl: "https://www.getfreed.ai/blog/freed-template-library",
         publishedAt: new Date("2025-01-05"),
         tags: ["templates", "customization", "productivity"],
+        severity: 5,
+        category: "Features",
+        subcategory: "Product Updates",
         createdAt: new Date(),
       },
       {
@@ -945,6 +973,9 @@ export class MemStorage implements IStorage {
         sourceUrl: "https://www.heidihealth.com/changelog/tasks-and-past-sessions-as-context",
         publishedAt: new Date("2025-06-05"),
         tags: ["tasks", "context", "workflow"],
+        severity: 6,
+        category: "Features",
+        subcategory: "Workflow",
         createdAt: new Date(),
       },
       {
@@ -956,6 +987,9 @@ export class MemStorage implements IStorage {
         sourceUrl: "https://example.com/market-research",
         publishedAt: new Date("2025-01-20"),
         tags: ["market-research", "growth", "adoption"],
+        severity: 7,
+        category: "Market",
+        subcategory: "Industry Trends",
         createdAt: new Date(),
       },
     ];
@@ -1505,6 +1539,36 @@ Musculoskeletal: Positive for ankle pain and swelling.`,
     };
     this.sharedExperiences.set(id, newExperience);
     return newExperience;
+  }
+
+  // Insights methods
+  async getInsights(): Promise<Insight[]> {
+    return Array.from(this.insights.values()).sort(
+      (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
+    );
+  }
+
+  async getInsightsByFeedItem(feedItemId: string): Promise<Insight[]> {
+    return Array.from(this.insights.values())
+      .filter(insight => insight.feedItemId === feedItemId)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  async getInsightsByImpact(impact: string): Promise<Insight[]> {
+    return Array.from(this.insights.values())
+      .filter(insight => insight.impact === impact)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  async createInsight(insight: InsertInsight): Promise<Insight> {
+    const id = randomUUID();
+    const newInsight: Insight = {
+      id,
+      ...insight,
+      createdAt: new Date(),
+    };
+    this.insights.set(id, newInsight);
+    return newInsight;
   }
 }
 

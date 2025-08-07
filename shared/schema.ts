@@ -117,6 +117,9 @@ export const feedItems = pgTable("feed_items", {
   sourceUrl: text("source_url").notNull(),
   publishedAt: timestamp("published_at").notNull(),
   tags: jsonb("tags").$type<string[]>().default([]),
+  severity: integer("severity"), // 1-10 scale for importance
+  category: text("category"), // e.g., 'Features', 'Personnel', 'Partnerships'
+  subcategory: text("subcategory"), // e.g., 'Product Updates', 'Executive Hires'
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -203,6 +206,27 @@ export const insertSharedExperienceSchema = createInsertSchema(sharedExperiences
 
 export type SharedExperience = typeof sharedExperiences.$inferSelect;
 export type InsertSharedExperience = z.infer<typeof insertSharedExperienceSchema>;
+
+// Business Intelligence Insights
+export const insights = pgTable("insights", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  feedItemId: varchar("feed_item_id").references(() => feedItems.id),
+  title: text("title").notNull(),
+  summary: text("summary").notNull(),
+  categories: jsonb("categories").$type<string[]>().default([]), // ['sales', 'marketing', 'product']
+  impact: text("impact"), // 'high', 'medium', 'low'
+  content: text("content").notNull(), // Markdown content with rich formatting
+  mentions: jsonb("mentions").$type<string[]>().default([]), // People to @ in Slack
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertInsightSchema = createInsertSchema(insights).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type Insight = typeof insights.$inferSelect;
+export type InsertInsight = z.infer<typeof insertInsightSchema>;
 
 // Combined types for API responses
 export type CompetitorWithPlans = Competitor & {

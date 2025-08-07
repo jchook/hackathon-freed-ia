@@ -101,4 +101,87 @@
   .bg-danger {
     background-color: var(--danger);
   }
+  
+  /* Markdown content styling */
+  .markdown-content {
+    @apply text-sm leading-relaxed;
+  }
+  
+  .markdown-content h1 {
+    @apply text-2xl font-bold mt-6 mb-4 text-foreground;
+  }
+  
+  .markdown-content h2 {
+    @apply text-xl font-bold mt-5 mb-3 text-foreground;
+  }
+  
+  .markdown-content h3 {
+    @apply text-lg font-semibold mt-4 mb-2 text-foreground;
+  }
+  
+  .markdown-content p {
+    @apply mb-3 text-muted-foreground;
+  }
+  
+  .markdown-content ul {
+    @apply space-y-1 mb-3;
+  }
+  
+  .markdown-content ol {
+    @apply space-y-1 mb-3;
+  }
+  
+  .markdown-content li {
+    @apply text-muted-foreground;
+  }
+  
+  .markdown-content blockquote {
+    @apply border-l-4 border-primary pl-4 italic text-muted-foreground my-3;
+  }
+  
+  .markdown-content code {
+    @apply bg-muted px-1 py-0.5 rounded text-xs font-mono;
+  }
+  
+  .markdown-content pre {
+    @apply bg-muted p-3 rounded text-xs font-mono overflow-x-auto my-3;
+  }
+  
+  .markdown-content table {
+    @apply w-full border-collapse my-3 rounded-lg overflow-hidden;
+  }
+  
+  .markdown-content th,
+  .markdown-content td {
+    @apply border border-border px-3 py-2 text-sm;
+  }
+  
+  .markdown-content th {
+    @apply bg-muted font-semibold;
+  }
+  
+  /* GFM specific styles */
+  .markdown-content .task-list-item {
+    @apply list-none;
+  }
+  
+  .markdown-content .task-list-item input[type="checkbox"] {
+    @apply mr-2 h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary;
+  }
+  
+  .markdown-content .task-list-item input[type="checkbox"]:checked {
+    @apply bg-primary border-primary;
+  }
+  
+  .markdown-content .strikethrough {
+    @apply line-through text-muted-foreground;
+  }
+  
+  .markdown-content .footnote {
+    @apply text-xs text-muted-foreground;
+  }
+  
+  .markdown-content .footnote-ref {
+    @apply text-xs text-primary;
+  }
 }

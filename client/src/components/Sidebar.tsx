@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BarChart3, MessageSquare, TrendingUp, Rss, GitCompare, RefreshCw, Download, Clock, FileText, User, Activity, Building2 } from "lucide-react";
+import { BarChart3, MessageSquare, TrendingUp, Rss, GitCompare, RefreshCw, Download, Clock, FileText, User, Activity, Building2, Brain } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -57,6 +57,7 @@ export function Sidebar() {
     { icon: BarChart3, label: "Dashboard", href: "/", active: location === "/" },
     { icon: Activity, label: "Deltas", href: "/deltas", active: location === "/deltas" },
     { icon: Rss, label: "Feed", href: "/feed", active: location === "/feed" },
+    { icon: Brain, label: "Insights", href: "/insights", active: location === "/insights" },
     { icon: MessageSquare, label: "Reviews", href: "/reviews", active: location === "/reviews" },
     { icon: GitCompare, label: "Comparison", href: "/comparison", active: location === "/comparison" },
     { icon: FileText, label: "Example Note", href: "/example-note", active: location === "/example-note" },

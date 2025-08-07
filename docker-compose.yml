@@ -23,30 +23,29 @@ services:
 
   # ScribeArena Application
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: oven/bun:latest
     container_name: scribearena_app
     restart: unless-stopped
+    init: true
     ports:
       - "5001:5001"
+    env_file:
+      - .env
     environment:
       - PORT=5001
       - NODE_ENV=development
       - DATABASE_URL=postgresql://scribearena_user:scribearena_password@postgres:5432/scribearena
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
       - PGHOST=postgres
       - PGPORT=5432
       - PGUSER=scribearena_user
       - PGPASSWORD=scribearena_password
       - PGDATABASE=scribearena
     depends_on:
-      postgres:
-        condition: service_healthy
+      - postgres
     volumes:
       - .:/app
-      - /app/node_modules
-    command: npm run dev
+    working_dir: /app
+    command: sh -c "bun install && bun run dev"
 
 volumes:
   postgres_data:
